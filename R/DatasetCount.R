@@ -18,8 +18,9 @@ DatasetCount <-
             data %>% 
             group_by(vin, contract_start_date) %>% 
             slice(1) %>% 
-            select(vin, contract_start_date, expo:years_licensed, nb_claims_cov_1_2_3_4_5_6) %>% 
-            ungroup()
+            select(vin, contract_start_date, nb_claims = nb_claims_cov_1_2_3_4_5_6, expo:years_licensed) %>% 
+            ungroup() %>% 
+            mutate(nb_claims = as.integer(nb_claims))
           
           # -----
           
@@ -45,6 +46,7 @@ DatasetCount <-
             ) %>% 
             group_by(vin, contract_start_date) %>% 
             summarise(
+              nb_claims                 = first(as.integer(nb_claims_cov_1_2_3_4_5_6)),
               avg_daily_distance        = sum(trip_distance) / 365.25,
               avg_daily_nb_trips        = n() / 365.25,
               med_trip_avg_speed        = median(trip_avg_speed),
@@ -58,8 +60,7 @@ DatasetCount <-
               frac_expo_peak_morning    = sum(distance_peak_morning_trip) / sum(trip_distance),
               frac_expo_peak_evening    = sum(distance_peak_evening_trip) / sum(trip_distance),
               frac_expo_mon_to_thu      = sum(distance_mon_to_thu) / sum(trip_distance),
-              frac_expo_fri_sat         = sum(distance_fri_sat) / sum(trip_distance),
-              claim_ind_cov_1_2_3_4_5_6 = first(claim_ind_cov_1_2_3_4_5_6)
+              frac_expo_fri_sat         = sum(distance_fri_sat) / sum(trip_distance)
             ) %>% 
             ungroup()
           
@@ -220,7 +221,7 @@ DatasetCount <-
             dist_dat <- compute_d_cols(data)
             
             res <- 
-              d_dat %>% 
+              bind_cols(d_dat, nb_claims = self$classic_ml_data$nb_claims) %>% 
               left_join(h_dat, by = c("vin", "contract_start_date")) %>% 
               left_join(p_dat, by = c("vin", "contract_start_date")) %>% 
               left_join(vmo_dat, by = c("vin", "contract_start_date")) %>% 

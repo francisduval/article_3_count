@@ -33,12 +33,12 @@ list(
   tar_target(atd_train, filter(aug_trip_data, vin %in% vins_train), pattern = map(aug_trip_data), iteration = "vector"),
   tar_target(atd_valid, filter(aug_trip_data, vin %in% vins_valid), pattern = map(aug_trip_data), iteration = "vector"),
   tar_target(atd_test, filter(aug_trip_data, vin %in% vins_test), pattern = map(aug_trip_data), iteration = "vector"),
-  tar_target(atd_confirm, filter(aug_trip_data, vin %in% vins_confirm), pattern = map(aug_trip_data), iteration = "vector")#,
+  tar_target(atd_confirm, filter(aug_trip_data, vin %in% vins_confirm), pattern = map(aug_trip_data), iteration = "vector"),
   
-  # tar_target(JeuDonnees_learn, DatasetCount$new(atd_learn)),
-  # tar_target(JeuDonnees_train, DatasetCount$new(atd_train)),
-  # tar_target(JeuDonnees_valid, DatasetCount$new(atd_valid)),
-  # tar_target(JeuDonnees_test, DatasetCount$new(atd_test)),
-  # tar_target(JeuDonnees_confirm, DatasetCount$new(atd_confirm)),
+  # tar_target(DatasetCount_learn, DatasetCount$new(atd_learn)),
+  # tar_target(DatasetCount_train, DatasetCount$new(atd_train)),
+  # tar_target(DatasetCount_valid, DatasetCount$new(atd_valid)),
+  tar_target(DatasetCount_test, DatasetCount$new(atd_test))#,
+  # tar_target(DatasetCount_confirm, DatasetCount$new(atd_confirm))
 )
   
