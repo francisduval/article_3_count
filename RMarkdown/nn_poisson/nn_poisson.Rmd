@@ -1,0 +1,150 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+train_df <- tar_read(train_df)
+valid_df <- tar_read(valid_df)
+test_df <- tar_read(test_df)
+```
+
+```{r}
+DatasetNNCount <- 
+  dataset(
+    name = "DatasetNNCount",
+    
+    initialize = function(df) {
+      data <- self$prepare_data(df)
+      
+      self$x_mlp <- data$x_mlp
+      self$y <- data$y
+    },
+    
+    .getitem = function(i) {
+      list(
+        x_mlp = self$x_mlp[i, ],
+        y = self$y[i, ]
+      )
+    },
+    
+    .length = function() {
+      self$y$size()[[1]]
+    },
+    
+    prepare_data = function(df) {
+      target_col <- as.matrix(df$nb_claims) 
+      
+      tele_cols <- 
+        df %>%
+        select(starts_with(c("h_", "p_", "vmo", "vma", "d_"))) %>%
+        as.matrix()
+      
+      class_df <- select(df, expo:years_licensed, distance)
+      
+      rec_class <-
+        recipe(~ ., data = class_df) %>%
+        step_impute_median(commute_distance, years_claim_free) %>%
+        step_other(all_nominal(), threshold = 0.05) %>%
+        step_dummy(all_nominal()) %>%
+        prep()
+      
+      class_cols <- juice(rec_class) %>% as.matrix()
+      
+      list(
+        x_mlp = torch_tensor(cbind(class_cols, tele_cols)),
+        y = torch_tensor(target_col)
+      )
+    }
+  )
+```
+
+```{r}
+train_ds <- DatasetNNCount(train_df)
+valid_ds <- DatasetNNCount(valid_df)
+test_ds <- DatasetNNCount(test_df)
+
+train_dl <- dataloader(train_ds, batch_size = 128, shuffle = F)
+valid_dl <- dataloader(valid_ds, batch_size = 128, shuffle = F)
+test_dl <- dataloader(test_ds, batch_size = 128, shuffle = F)
+```
+
+```{r}
+train_ds$.getitem(1)
+```
+
+```{r}
+PoissonMLP <- 
+  nn_module(
+    "PoissonMLP",
+    
+    initialize = function(input_size) {
+      self$bn0 = nn_batch_norm1d(input_size)
+      self$linear1 = nn_linear(input_size, 32)
+      self$bn1 = nn_batch_norm1d(32)
+      self$linear2 = nn_linear(32, 16)
+      self$bn2 = nn_batch_norm1d(16)
+      self$linear3 = nn_linear(16, 1)
+      # self$init_params()
+    },
+    
+    # init_params = function() {
+      # nn_init_zeros_(self$linear1$weight)
+      # nn_init_zeros_(self$linear1$bias)
+      # nn$linear1$weight <- nn_parameter(torch_tensor(array(c(1, 2), dim = c(1, 2))))
+    # },
+    
+    forward = function(x) {
+      x %>% 
+        self$bn0() %>%
+        self$linear1() %>% 
+        self$bn1() %>% 
+        self$linear2() %>% 
+        self$bn2() %>% 
+        self$linear3() %>% 
+        nnf_softplus()
+    }
+)
+```
+
+```{r}
+net <- NeuralNet$new(PoissonMLP, DatasetNNCount, train_df, valid_df, test_df)
+```
+
+```{r}
+net$train(input_size = 86)
+```
+
+
+
+```{r}
+nn <- PoissonMLP$new(input_size = 2)
+x <- torch_tensor(rbind(c(1, 1), c(10, 10)))
+nn$forward(x)
+```
+
+```{r}
+fit <- 
+  PoissonMLP %>%
+  setup(
+    loss = nn_poisson_nll_loss(log_input = F),
+    optimizer = optim_adam,
+    metrics = list(luz_metric_mse())
+  ) %>%
+  set_hparams(
+    input_size = 86
+  ) %>% 
+  luz::fit(
+    train_dl, 
+    epochs = 1, 
+    valid_data = valid_dl
+  )
+
+plot(fit)
+```
+
+```{r}
+x <- fit$model$forward(test_ds$.getitem(1:7500)$x_mlp) %>% as.numeric()
+```
+
+

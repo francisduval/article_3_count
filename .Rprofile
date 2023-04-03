@@ -23,6 +23,7 @@ library(embed)
 library(glue)
 library(R6)
 library(torch)
+library(luz)
 
 # Conflits ======================================================================================================================
 conflicted::conflicts_prefer(

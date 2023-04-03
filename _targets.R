@@ -36,9 +36,17 @@ list(
   tar_target(atd_confirm, filter(aug_trip_data, vin %in% vins_confirm), pattern = map(aug_trip_data), iteration = "vector"),
   
   # tar_target(DatasetCount_learn, DatasetCount$new(atd_learn)),
-  # tar_target(DatasetCount_train, DatasetCount$new(atd_train)),
-  # tar_target(DatasetCount_valid, DatasetCount$new(atd_valid)),
-  tar_target(DatasetCount_test, DatasetCount$new(atd_test))#,
-  # tar_target(DatasetCount_confirm, DatasetCount$new(atd_confirm))
+  tar_target(DatasetCount_train, DatasetCount$new(atd_train)),
+  tar_target(DatasetCount_valid, DatasetCount$new(atd_valid)),
+  tar_target(DatasetCount_test, DatasetCount$new(atd_test)),
+  # tar_target(DatasetCount_confirm, DatasetCount$new(atd_confirm)),
+  
+  # tar_target(learn_df, join_class_tele_nn(DatasetCount_learn)),
+  tar_target(train_df, join_class_tele_nn(DatasetCount_train)),
+  tar_target(valid_df, join_class_tele_nn(DatasetCount_valid)),
+  tar_target(test_df, join_class_tele_nn(DatasetCount_test)),
+  # tar_target(confirm_df, join_class_tele_nn(DatasetCount_confirm))
+  
+  tar_render(nn_poisson, here("RMarkdown", "nn_poisson", "nn_poisson.Rmd"))
 )
   

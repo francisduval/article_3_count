@@ -226,7 +226,8 @@ DatasetCount <-
               left_join(p_dat, by = c("vin", "contract_start_date")) %>% 
               left_join(vmo_dat, by = c("vin", "contract_start_date")) %>% 
               left_join(vma_dat, by = c("vin", "contract_start_date")) %>% 
-              left_join(dist_dat, by = c("vin", "contract_start_date"))
+              left_join(dist_dat, by = c("vin", "contract_start_date")) # %>% 
+              # ungroup()
             
             return(res)
           }
