@@ -47,6 +47,22 @@ list(
   tar_target(test_df, join_class_tele_nn(DatasetCount_test)),
   # tar_target(confirm_df, join_class_tele_nn(DatasetCount_confirm))
   
-  tar_render(nn_poisson, here("RMarkdown", "nn_poisson", "nn_poisson.Rmd"))
+  tar_target(train_valid_df, bind_rows(train_df, valid_df)),
+  
+  # -----------------------------------------------------------------------------------------------------------------------------
+  # Modèles ---------------------------------------------------------------------------------------------------------------------
+  # -----------------------------------------------------------------------------------------------------------------------------
+  
+  tar_target(
+    rec_class,
+    recipe(nb_claims ~ ., data = select(train_valid_df, nb_claims:years_licensed, distance)) %>%
+      step_impute_median(commute_distance, years_claim_free) %>%
+      step_other(all_nominal(), threshold = 0.05) %>%
+      step_dummy(all_nominal())
+  ),
+  
+  tar_target(glm_poisson, PoissonGLM$new(rec_class, test_df))
+  
+  # tar_render(nn_poisson, here("RMarkdown", "nn_poisson", "nn_poisson.Rmd"))
 )
   

@@ -18,12 +18,16 @@ DatasetNNCount <-
       data <- self$prepare_data(df)
       
       self$x_mlp <- data$x_mlp
+      self$x_skip <- data$x_skip
       self$y <- data$y
     },
     
     .getitem = function(i) {
       list(
-        x_mlp = self$x_mlp[i, ],
+        x = list(
+          x_mlp = self$x_mlp[i, ],
+          x_skip = self$x_skip[i, ]
+        ),
         y = self$y[i, ]
       )
     },
@@ -53,6 +57,7 @@ DatasetNNCount <-
       
       list(
         x_mlp = torch_tensor(cbind(class_cols, tele_cols)),
+        x_skip = torch_tensor(class_cols),
         y = torch_tensor(target_col)
       )
     }
@@ -64,13 +69,9 @@ train_ds <- DatasetNNCount(train_df)
 valid_ds <- DatasetNNCount(valid_df)
 test_ds <- DatasetNNCount(test_df)
 
-train_dl <- dataloader(train_ds, batch_size = 128, shuffle = F)
-valid_dl <- dataloader(valid_ds, batch_size = 128, shuffle = F)
-test_dl <- dataloader(test_ds, batch_size = 128, shuffle = F)
-```
-
-```{r}
-train_ds$.getitem(1)
+train_dl <- dataloader(train_ds, batch_size = 256, shuffle = F)
+valid_dl <- dataloader(valid_ds, batch_size = 256, shuffle = F)
+test_dl <- dataloader(test_ds, batch_size = 256, shuffle = F)
 ```
 
 ```{r}
@@ -78,49 +79,66 @@ PoissonMLP <-
   nn_module(
     "PoissonMLP",
     
-    initialize = function(input_size) {
-      self$bn0 = nn_batch_norm1d(input_size)
-      self$linear1 = nn_linear(input_size, 32)
+    initialize = function(input_size_mlp, input_size_skip, beta_vec) {
+      self$bn0 = nn_batch_norm1d(input_size_mlp)
+      self$linear1 = nn_linear(input_size_mlp, 32)
       self$bn1 = nn_batch_norm1d(32)
       self$linear2 = nn_linear(32, 16)
       self$bn2 = nn_batch_norm1d(16)
-      self$linear3 = nn_linear(16, 1)
-      # self$init_params()
+      self$linear3 = nn_linear(16, 8)
+      self$bn3 = nn_batch_norm1d(8)
+      self$linear4 = nn_linear(8, 1)
+      
+      self$bn_skip = nn_batch_norm1d(input_size_skip)
+      self$linear_skip = nn_linear(input_size_skip, 1)
+      
+      self$init_params(beta_vec, input_size_skip)
     },
     
-    # init_params = function() {
-      # nn_init_zeros_(self$linear1$weight)
-      # nn_init_zeros_(self$linear1$bias)
-      # nn$linear1$weight <- nn_parameter(torch_tensor(array(c(1, 2), dim = c(1, 2))))
-    # },
+    init_params = function(beta_vec, input_size_skip) {
+      nn_init_zeros_(self$linear1$bias)
+      nn_init_zeros_(self$linear2$bias)
+      nn_init_zeros_(self$linear3$bias)
+      nn_init_zeros_(self$linear4$bias)
+      
+      nn_init_zeros_(self$linear1$weight)
+      nn_init_zeros_(self$linear2$weight)
+      nn_init_zeros_(self$linear3$weight)
+      nn_init_zeros_(self$linear4$weight)
+      
+      beta_0 <- torch_tensor(beta_vec[1], dtype = torch_float())
+      betas <- torch_tensor(array(beta_vec[2:(input_size_skip + 1)], dim = c(1, input_size_skip)), dtype = torch_float())
+      
+      self$linear_skip$bias <- nn_parameter(beta_0)
+      self$linear_skip$weight <- nn_parameter(betas)
+    },
     
-    forward = function(x) {
-      x %>% 
+    mlp = function(x) {
+      x$x_mlp %>% 
         self$bn0() %>%
         self$linear1() %>% 
+        nnf_relu() %>%
         self$bn1() %>% 
-        self$linear2() %>% 
+        self$linear2() %>%
+        nnf_relu() %>%
         self$bn2() %>% 
         self$linear3() %>% 
-        nnf_softplus()
+        nnf_relu() %>%
+        self$bn3() %>% 
+        self$linear4()
+    },
+    
+    skip = function(x) {
+      x$x_skip %>% 
+        self$bn_skip() %>% 
+        self$linear_skip()
+    },
+    
+    forward = function(x) {
+      torch_add(self$skip(x), self$mlp(x)) %>% 
+      nnf_softplus()
     }
 )
-```
-
-```{r}
-net <- NeuralNet$new(PoissonMLP, DatasetNNCount, train_df, valid_df, test_df)
-```
-
-```{r}
-net$train(input_size = 86)
-```
-
-
-
-```{r}
-nn <- PoissonMLP$new(input_size = 2)
-x <- torch_tensor(rbind(c(1, 1), c(10, 10)))
-nn$forward(x)
 ```
 
 ```{r}
@@ -132,19 +150,26 @@ fit <-
     metrics = list(luz_metric_mse())
   ) %>%
   set_hparams(
-    input_size = 86
+    input_size_mlp = 86,
+    input_size_skip = 16,
+    beta_vec = rep(0, 17)
   ) %>% 
   luz::fit(
     train_dl, 
     epochs = 1, 
     valid_data = valid_dl
   )
+```
 
-plot(fit)
+
+```{r}
+net <- NeuralNet$new(PoissonMLP, DatasetNNCount, train_df[1:200, ], valid_df, test_df)
 ```
 
 ```{r}
-x <- fit$model$forward(test_ds$.getitem(1:7500)$x_mlp) %>% as.numeric()
+net$train(beta_vec = rep(0, 17))
 ```
 
-
+```{r}
+net$print_metrics()
+```

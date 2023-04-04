@@ -24,6 +24,7 @@ library(glue)
 library(R6)
 library(torch)
 library(luz)
+library(poissonreg)
 
 # Conflits ======================================================================================================================
 conflicted::conflicts_prefer(

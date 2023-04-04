@@ -1,6 +1,6 @@
 NeuralNet <- R6Class(
   classname = "NeuralNet",
-  # inherit = ClassifMetrics,
+  inherit = CountMetrics,
   
   public =
     list(
@@ -15,7 +15,6 @@ NeuralNet <- R6Class(
       train_preds = NULL,
       test_preds = NULL,
       training = NULL,
-      embeddings = NULL,
       
       initialize = function(model_spec, dataset, train_df, valid_df, test_df) {
         self$model_spec <- model_spec
@@ -25,7 +24,7 @@ NeuralNet <- R6Class(
         self$test_df <- test_df
       },
       
-      train = function(input_size, nb_epochs = 1, lr = 0.01) {
+      train = function(beta_vec, input_size_mlp = 86, input_size_skip = 16, nb_epochs = 1, lr = 0.01) {
         train_ds <- self$dataset(self$train_df)
         valid_ds <- self$dataset(self$valid_df)
         test_ds <- self$dataset(self$test_df)
@@ -46,7 +45,9 @@ NeuralNet <- R6Class(
             metrics = list(luz_metric_mse())
           ) %>%
           set_hparams(
-            input_size = input_size
+            input_size_mlp = input_size_mlp,
+            input_size_skip = input_size_skip,
+            beta_vec = beta_vec
           ) %>% 
           set_opt_hparams(lr = lr) %>% 
           luz::fit(
