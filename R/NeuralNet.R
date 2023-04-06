@@ -8,30 +8,25 @@ NeuralNet <- R6Class(
       dataset = NULL,
       train_df = NULL,
       valid_df = NULL,
-      test_df = NULL,
       train_targets = NULL,
       valid_targets = NULL,
-      test_targets = NULL,
       train_preds = NULL,
-      test_preds = NULL,
+      valid_preds = NULL,
       training = NULL,
       
-      initialize = function(model_spec, dataset, train_df, valid_df, test_df) {
+      initialize = function(model_spec, dataset, train_df, valid_df) {
         self$model_spec <- model_spec
         self$dataset <- dataset
         self$train_df <- train_df
         self$valid_df <- valid_df
-        self$test_df <- test_df
       },
       
       train = function(beta_vec, input_size_mlp = 86, input_size_skip = 16, nb_epochs = 1, lr = 0.01) {
         train_ds <- self$dataset(self$train_df)
         valid_ds <- self$dataset(self$valid_df)
-        test_ds <- self$dataset(self$test_df)
         
         self$train_targets <- as.numeric(train_ds$y)
         self$valid_targets <- as.numeric(valid_ds$y)
-        self$test_targets <- as.numeric(test_ds$y)
         
         train_dl <- dataloader(train_ds, batch_size = 256, shuffle = F)
         valid_dl <- dataloader(valid_ds, batch_size = 256, shuffle = F)
@@ -57,9 +52,9 @@ NeuralNet <- R6Class(
             callbacks = luz_callback_early_stopping(patience = 3)
           )
         
-        # Predict on train and test sets
+        # Predict on train and valid sets
         self$train_preds <- as.double(fit$model$forward(train_ds[1:length(train_ds)]$x))
-        self$test_preds <- as.double(fit$model$forward(test_ds[1:length(test_ds)]$x))
+        self$valid_preds <- as.double(fit$model$forward(valid_ds[1:length(valid_ds)]$x))
         
         # Save training process
         self$training <-

@@ -85,11 +85,21 @@ list(
       model <- PoissonGLM$new(rec_class_tele, valid)
       model$train()
     }
-  )
+  ),
   
   # -----------------------------------------------------------------------------------------------------------------------------
   # Réseaux de neurones ---------------------------------------------------------------------------------------------------------
   # -----------------------------------------------------------------------------------------------------------------------------
+  
+  # tar_target(lr_grid, c(0.003, 0.01, 0.03, 0.1, 0.3)),
+  
+  tar_target(
+    reseau_poisson_tune,
+    {
+      model <- NeuralNet$new(PoissonMLP, DatasetNNCount, train, valid)
+      model$train(beta_vec = glm_poisson_class$params_df$estimate, nb_epochs = 1) 
+    }
+  )
   
   # tar_render(nn_poisson, here("RMarkdown", "nn_poisson", "nn_poisson.Rmd"))
 )

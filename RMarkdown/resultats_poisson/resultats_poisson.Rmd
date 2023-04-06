@@ -1,7 +1,7 @@
 ---
 title: "R Notebook"
-# output: html_notebook
-output: rmdformats::material
+output: html_notebook
+# output: rmdformats::material
 ---
 
 ```{r}
@@ -66,6 +66,86 @@ glm_poisson_class_tele$plot_var_imp()
 ### Coefficients {-}
 ```{r}
 glm_poisson_class_tele$plot_coefs()
+```
+
+
+# Réseau de neurones
+
+Le réseau de neurones développé est inspiré de l'[approche CANN](https://www.cambridge.org/core/journals/astin-bulletin-journal-of-the-iaa/article/editorial-yes-we-cann/66E8BEC373B5CCEF3BF3303D442D6B75), développée par Wüthrich et Merz en 2018.
+
+Le réseau consiste en 2 parties: une partie « GLM » et une partie « MLP ». La partie GLM consiste en ce qu'on appelle des « skip connections », c'est-à-dire que les inputs sont directement connectés au neurone d'output. Les inputs de la partie GLM sont les 10 variables classiques (variables catégorielles: encodage binaire) en plus de la vraie distance conduite. La partie MLP est un perceptron multicouches standard, qui est « rattaché » à la partie GLM. Les inputs de cette partie MLP comprennent les mêmes variables utilisées dans la partie GLM (les 10 variables classiques + distance) en plus des 70 attributs télématiques. 
+
+Les 2 parties se rencontrent au neurone d'output, où elles sont simplement additionnées. On passe ensuite l'addition de ces 2 parties dans une fonction d'activation « softplus » afin que l'output du réseau soit positif. La fonction softplus a la même utilité que la fonction exponentielle dans un GLM Poisson, sauf qu'elle est plus stable. La fonction exponentielle n'est pas recommandée pour un réseau de neurones car trop instable numériquement (je l'ai essayée et ça me donnait des prédictions ridicules sur l'ensemble de validation, du genre un lambda de 4000!).
+
+Les paramètres de la partie MLP sont initialisés à zéro, tandis que les paramètres de la partie GLM sont initialisés aux coefficients obtenus par maximum de vraisemblance (donc les coefficients d'un GLM Poisson). Cela signifie que lors de l'initialisation, le réseau donne à peu près les mêmes prédictions qu'un GLM Poisson (pas exactement les même parce qu'on a une fonction d'activation softplus au lieu d'une exponentielle). C'est une manière de partir le réseau à des valeurs raisonnables de paramètres. Lorsqu'on débute l'entrainement du réseau, celui-ci est donc en quelque sorte entrainé sur les résidus d'un GLM Poisson. La partie MLP sert à aller chercher le signal dans les variables télématiques, dans les interactions entre variables classiques, dans les interactions classique-télématique, etc.
+
+Voici le code en `torch` décrivant l'architecture du réseau:
+
+```{r eval = F}
+PoissonMLP <- 
+  nn_module(
+    "PoissonMLP",
+    
+    initialize = function(input_size_mlp, input_size_skip, beta_vec) {
+      self$bn0 = nn_batch_norm1d(input_size_mlp)
+      self$linear1 = nn_linear(input_size_mlp, 32)
+      self$bn1 = nn_batch_norm1d(32)
+      self$linear2 = nn_linear(32, 16)
+      self$bn2 = nn_batch_norm1d(16)
+      self$linear3 = nn_linear(16, 8)
+      self$bn3 = nn_batch_norm1d(8)
+      self$linear4 = nn_linear(8, 1)
+      
+      self$bn_skip = nn_batch_norm1d(input_size_skip)
+      self$linear_skip = nn_linear(input_size_skip, 1)
+      
+      self$init_params(beta_vec, input_size_skip)
+    },
+    
+    init_params = function(beta_vec, input_size_skip) {
+      nn_init_zeros_(self$linear1$bias)
+      nn_init_zeros_(self$linear2$bias)
+      nn_init_zeros_(self$linear3$bias)
+      nn_init_zeros_(self$linear4$bias)
+      
+      nn_init_zeros_(self$linear1$weight)
+      nn_init_zeros_(self$linear2$weight)
+      nn_init_zeros_(self$linear3$weight)
+      nn_init_zeros_(self$linear4$weight)
+      
+      beta_0 <- torch_tensor(beta_vec[1], dtype = torch_float())
+      betas <- torch_tensor(array(beta_vec[2:(input_size_skip + 1)], dim = c(1, input_size_skip)), dtype = torch_float())
+      
+      self$linear_skip$bias <- nn_parameter(beta_0)
+      self$linear_skip$weight <- nn_parameter(betas)
+    },
+    
+    mlp = function(x) {
+      x$x_mlp %>% 
+        self$bn0() %>%
+        self$linear1() %>% 
+        nnf_relu() %>%
+        self$bn1() %>% 
+        self$linear2() %>%
+        nnf_relu() %>%
+        self$bn2() %>% 
+        self$linear3() %>% 
+        nnf_relu() %>%
+        self$bn3() %>% 
+        self$linear4()
+    },
+    
+    skip = function(x) {
+      x$x_skip %>% 
+        self$bn_skip() %>% 
+        self$linear_skip()
+    },
+    
+    forward = function(x) {
+      torch_add(self$skip(x), self$mlp(x)) %>% 
+      nnf_softplus()
+    }
+)
 ```
 
 
