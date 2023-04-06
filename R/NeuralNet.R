@@ -33,8 +33,8 @@ NeuralNet <- R6Class(
         self$valid_targets <- as.numeric(valid_ds$y)
         self$test_targets <- as.numeric(test_ds$y)
         
-        train_dl <- dataloader(train_ds, batch_size = 128, shuffle = F)
-        valid_dl <- dataloader(valid_ds, batch_size = 128, shuffle = F)
+        train_dl <- dataloader(train_ds, batch_size = 256, shuffle = F)
+        valid_dl <- dataloader(valid_ds, batch_size = 256, shuffle = F)
         
         # Fit on training set
         fit <- 
@@ -53,7 +53,8 @@ NeuralNet <- R6Class(
           luz::fit(
             train_dl, 
             epochs = nb_epochs, 
-            valid_data = valid_dl
+            valid_data = valid_dl,
+            callbacks = luz_callback_early_stopping(patience = 3)
           )
         
         # Predict on train and test sets

@@ -23,45 +23,73 @@ list(
   tar_target(aug_trip_data, join_contracts_claims_trips(contract_data, claim_data, trip_data), pattern = map(trip_data), iteration = "vector"),
   
   tar_target(vins, unique(aug_trip_data$vin), pattern = map(aug_trip_data), iteration = "vector"),
-  tar_target(vins_learn, vins[1:40000]),
-  tar_target(vins_train, vins[1:25000]),
-  tar_target(vins_valid, vins[25001:32500]),
-  tar_target(vins_test, vins[32501:40000]),
-  tar_target(vins_confirm, vins[40001:49671]),
   
-  tar_target(atd_learn, filter(aug_trip_data, vin %in% vins_learn), pattern = map(aug_trip_data), iteration = "vector"),
+  tar_target(vins_train, vins[1:30000]),
+  tar_target(vins_valid, vins[30001:40000]),
+  tar_target(vins_test, vins[40001:49671]),
+
   tar_target(atd_train, filter(aug_trip_data, vin %in% vins_train), pattern = map(aug_trip_data), iteration = "vector"),
   tar_target(atd_valid, filter(aug_trip_data, vin %in% vins_valid), pattern = map(aug_trip_data), iteration = "vector"),
   tar_target(atd_test, filter(aug_trip_data, vin %in% vins_test), pattern = map(aug_trip_data), iteration = "vector"),
-  tar_target(atd_confirm, filter(aug_trip_data, vin %in% vins_confirm), pattern = map(aug_trip_data), iteration = "vector"),
   
-  # tar_target(DatasetCount_learn, DatasetCount$new(atd_learn)),
-  tar_target(DatasetCount_train, DatasetCount$new(atd_train)),
-  tar_target(DatasetCount_valid, DatasetCount$new(atd_valid)),
-  tar_target(DatasetCount_test, DatasetCount$new(atd_test)),
-  # tar_target(DatasetCount_confirm, DatasetCount$new(atd_confirm)),
+  tar_target(train_class, compute_class_data(atd_train), pattern = map(atd_train), iteration = "vector"),
+  tar_target(valid_class, compute_class_data(atd_valid), pattern = map(atd_valid), iteration = "vector"),
+  tar_target(test_class, compute_class_data(atd_test), pattern = map(atd_test), iteration = "vector"),
   
-  # tar_target(learn_df, join_class_tele_nn(DatasetCount_learn)),
-  tar_target(train_df, join_class_tele_nn(DatasetCount_train)),
-  tar_target(valid_df, join_class_tele_nn(DatasetCount_valid)),
-  tar_target(test_df, join_class_tele_nn(DatasetCount_test)),
-  # tar_target(confirm_df, join_class_tele_nn(DatasetCount_confirm))
+  tar_target(train_tele, compute_tele_data(atd_train), pattern = map(atd_train), iteration = "vector"),
+  tar_target(valid_tele, compute_tele_data(atd_valid), pattern = map(atd_valid), iteration = "vector"),
+  tar_target(test_tele, compute_tele_data(atd_test), pattern = map(atd_test), iteration = "vector"),
   
-  tar_target(train_valid_df, bind_rows(train_df, valid_df)),
+  tar_target(train_nn, compute_nn_data(atd_train), pattern = map(atd_train), iteration = "vector"),
+  tar_target(valid_nn, compute_nn_data(atd_valid), pattern = map(atd_valid), iteration = "vector"),
+  tar_target(test_nn, compute_nn_data(atd_test), pattern = map(atd_test), iteration = "vector"),
   
+  tar_target(train, join_class_tele_nn(train_class, train_tele, train_nn)),
+  tar_target(valid, join_class_tele_nn(valid_class, valid_tele, valid_nn)),
+  tar_target(test, join_class_tele_nn(test_class, test_tele, test_nn)),
+  
+
   # -----------------------------------------------------------------------------------------------------------------------------
-  # Modèles ---------------------------------------------------------------------------------------------------------------------
+  # Modèles GLM -----------------------------------------------------------------------------------------------------------------
   # -----------------------------------------------------------------------------------------------------------------------------
   
   tar_target(
     rec_class,
-    recipe(nb_claims ~ ., data = select(train_valid_df, nb_claims:years_licensed, distance)) %>%
+    recipe(nb_claims ~ ., data = select(train, nb_claims:distance)) %>%
       step_impute_median(commute_distance, years_claim_free) %>%
       step_other(all_nominal(), threshold = 0.05) %>%
-      step_dummy(all_nominal())
+      step_dummy(all_nominal()) %>% 
+      step_normalize()
   ),
   
-  tar_target(glm_poisson, PoissonGLM$new(rec_class, test_df))
+  tar_target(
+    rec_class_tele,
+    recipe(nb_claims ~ ., data = select(train, nb_claims:frac_expo_fri_sat, -avg_daily_distance, -nb_trips)) %>%
+      step_impute_median(commute_distance, years_claim_free) %>%
+      step_other(all_nominal(), threshold = 0.05) %>%
+      step_dummy(all_nominal()) %>% 
+      step_normalize()
+  ),
+
+  tar_target(
+    glm_poisson_class,
+    {
+      model <- PoissonGLM$new(rec_class, valid)
+      model$train()
+    }
+  ),
+  
+  tar_target(
+    glm_poisson_class_tele,
+    {
+      model <- PoissonGLM$new(rec_class_tele, valid)
+      model$train()
+    }
+  )
+  
+  # -----------------------------------------------------------------------------------------------------------------------------
+  # Réseaux de neurones ---------------------------------------------------------------------------------------------------------
+  # -----------------------------------------------------------------------------------------------------------------------------
   
   # tar_render(nn_poisson, here("RMarkdown", "nn_poisson", "nn_poisson.Rmd"))
 )

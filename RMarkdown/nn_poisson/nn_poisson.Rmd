@@ -4,10 +4,11 @@ output: html_notebook
 ---
 
 ```{r}
-train_df <- tar_read(train_df)
-valid_df <- tar_read(valid_df)
-test_df <- tar_read(test_df)
+train_df <- tar_read(train)
+valid_df <- tar_read(valid)
+test_df <- tar_read(test)
 ```
+
 
 ```{r}
 DatasetNNCount <- 
@@ -44,7 +45,7 @@ DatasetNNCount <-
         select(starts_with(c("h_", "p_", "vmo", "vma", "d_"))) %>%
         as.matrix()
       
-      class_df <- select(df, expo:years_licensed, distance)
+      class_df <- select(df, expo:distance)
       
       rec_class <-
         recipe(~ ., data = class_df) %>%
@@ -152,22 +153,23 @@ fit <-
   set_hparams(
     input_size_mlp = 86,
     input_size_skip = 16,
-    beta_vec = rep(0, 17)
+    beta_vec = glm_poisson$params_df$estimate
   ) %>% 
   luz::fit(
-    train_dl, 
-    epochs = 1, 
-    valid_data = valid_dl
+    train_dl,
+    epochs = 3, 
+    valid_data = valid_dl,
+    callbacks = luz_callback_early_stopping(patience = 3)
   )
 ```
 
 
 ```{r}
-net <- NeuralNet$new(PoissonMLP, DatasetNNCount, train_df[1:200, ], valid_df, test_df)
+net <- NeuralNet$new(PoissonMLP, DatasetNNCount, train_df, valid_df, test_df)
 ```
 
 ```{r}
-net$train(beta_vec = rep(0, 17))
+net$train(beta_vec = glm_poisson$params_df$estimate, nb_epochs = 15)
 ```
 
 ```{r}

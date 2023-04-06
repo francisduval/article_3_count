@@ -1,0 +1,72 @@
+---
+title: "R Notebook"
+# output: html_notebook
+output: rmdformats::material
+---
+
+```{r}
+train <- tar_read(train)
+valid <- tar_read(valid)
+```
+
+
+# GLM Poisson
+
+## Variables classiques {.tabset .tabset-pills}
+
+```{r}
+glm_poisson_class <- tar_read(glm_poisson_class)
+```
+
+### Performance {-}
+```{r}
+glm_poisson_class$print_metrics()
+```
+
+### Résumé {-}
+```{r}
+glm_poisson_class
+```
+
+### Importance des variables {-}
+```{r}
+glm_poisson_class$plot_var_imp()
+```
+
+### Coefficients {-}
+```{r}
+glm_poisson_class$plot_coefs()
+```
+
+## {-}
+
+Les coefficients de ce modèle seront utilisés comme valeurs de départ des poids des skips connections du réseau de neurones.
+
+## Variables classiques + télématique {.tabset .tabset-pills}
+
+```{r}
+glm_poisson_class_tele <- tar_read(glm_poisson_class_tele)
+```
+
+### Performance {-}
+```{r}
+glm_poisson_class_tele$print_metrics()
+```
+
+### Résumé {-}
+```{r}
+glm_poisson_class_tele
+```
+
+### Importance des variables {-}
+```{r}
+glm_poisson_class_tele$plot_var_imp()
+```
+
+### Coefficients {-}
+```{r}
+glm_poisson_class_tele$plot_coefs()
+```
+
+
+

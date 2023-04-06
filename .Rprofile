@@ -25,6 +25,7 @@ library(R6)
 library(torch)
 library(luz)
 library(poissonreg)
+library(vip)
 
 # Conflits ======================================================================================================================
 conflicted::conflicts_prefer(

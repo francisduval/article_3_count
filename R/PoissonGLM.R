@@ -15,6 +15,7 @@ PoissonGLM <- R6Class(
     test_targets = NULL,
     
     params_df = NULL,
+    var_imp = NULL,
     test_preds = NULL,
     
     initialize = function(recipe, test_df) {
@@ -35,9 +36,31 @@ PoissonGLM <- R6Class(
       wf <- workflow() %>% add_recipe(self$recipe) %>% add_model(spec)
       fit <- parsnip::fit(wf, data = self$train_df)
       self$params_df <- tidy(fit)
+      self$var_imp <- extract_fit_parsnip(fit) %>% vip::vi()
       self$test_preds <- predict(fit, new_data = self$test_df)$.pred
       
       invisible(self)
+    },
+    
+    plot_coefs = function() {
+      df <-
+        self$params_df %>%
+        filter(term != "(Intercept)")
+      
+      df %>%
+        mutate(Sign = if_else(estimate > 0, "+", "-")) %>%
+        mutate(abs_estimate = abs(estimate)) %>%
+        mutate(term = fct_reorder(term, abs_estimate)) %>%
+        ggplot(aes(x = term, y = abs_estimate, fill = Sign)) +
+        geom_col(alpha = 0.7) +
+        xlab(NULL) +
+        ylab("Absolute value of coefficient") +
+        scale_fill_manual(values = c("#a61d21", "#00743F")) +
+        coord_flip()
+    },
+    
+    plot_var_imp = function() {
+      self$var_imp %>% vip(num_features = 100, include_type = T) + geom_col(col = "black", fill = "white")
     },
     
     print = function() {
