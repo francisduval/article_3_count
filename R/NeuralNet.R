@@ -21,7 +21,7 @@ NeuralNet <- R6Class(
         self$valid_df <- valid_df
       },
       
-      train = function(beta_vec, input_size_mlp = 86, input_size_skip = 16, nb_epochs = 1, lr = 0.01) {
+      train = function(beta_vec, input_size_mlp = 86, input_size_skip = 16, nb_epochs = 1, nb_neurons = 32, lr = 0.01) {
         train_ds <- self$dataset(self$train_df)
         valid_ds <- self$dataset(self$valid_df)
         
@@ -42,7 +42,8 @@ NeuralNet <- R6Class(
           set_hparams(
             input_size_mlp = input_size_mlp,
             input_size_skip = input_size_skip,
-            beta_vec = beta_vec
+            beta_vec = beta_vec,
+            nb_neurons = nb_neurons
           ) %>% 
           set_opt_hparams(lr = lr) %>% 
           luz::fit(

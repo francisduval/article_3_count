@@ -1,21 +1,3 @@
-train <- tar_read(train)
-valid <- tar_read(valid)
-
-model <- PoissonNN$new(DatasetNNCount, PoissonCANN1L, train, valid)
-model$train(nb_epochs = 1, lr = 0.001, n_1L = 8)
-
-model2 <- PoissonNN$new(DatasetNNCount, PoissonCANN1L, train, valid)
-model2$train(nb_epochs = 1, lr = 0.001, n_1L = 16)
-
-
-
-train_ds <- DatasetNNCount(train)
-valid_ds <- DatasetNNCount(valid)
-
-train_dl <- dataloader(train_ds, batch_size = 256, shuffle = F)
-valid_dl <- dataloader(valid_ds, batch_size = 256, shuffle = F)
-
-
 PoissonCANN1L <- 
   nn_module(
     "PoissonCANN1L",
@@ -30,14 +12,14 @@ PoissonCANN1L <-
       self$linear_skip = nn_linear(input_size_skip, 1)
       
       beta_vec = c(
-        -3.315941880194, 0.616156785235, 0.000002915498, 0.000824747918, 0.113638267928, -0.036712764040, 
-        -0.003624109271, -0.001962461408, 0.000020006844, -0.057640242691, 0.053808785455, 0.128105697562,
-        0.245872331710, 0.183671264351, 0.132037363102, 0.007204221409, -0.089563765999
+        -3.315941880194,  0.616156785235,  0.000002915498, 0.000824747918, 0.113638267928, -0.036712764040, 
+        -0.003624109271, -0.001962461408,  0.000020006844, -0.057640242691,  0.053808785455,  0.128105697562,
+        0.245872331710,  0.183671264351,  0.132037363102, 0.007204221409, -0.089563765999
       )
-      self$init_params(beta_vec, input_size_skip, input_size_mlp, n_1L)
+      self$init_params(beta_vec, input_size_skip)
     },
     
-    init_params = function(beta_vec, input_size_skip, input_size_mlp, n_1L) {
+    init_params = function(beta_vec, input_size_skip) {
       nn_init_normal_(self$linear1$bias, std = 0.01)
       nn_init_normal_(self$linear2$bias, std = 0.01)
       
@@ -71,28 +53,3 @@ PoissonCANN1L <-
         nnf_softplus()
     }
   )
-
-
-
-
-
-
-fit <- 
-  PoissonCANN1L%>%
-  setup(
-    loss = nn_poisson_nll_loss(log_input = F),
-    optimizer = optim_adam,
-    metrics = list(luz_metric_mse())
-  ) %>%
-  set_opt_hparams(lr = 0.01) %>% 
-  set_hparams(
-    n_1L = 8
-  ) %>% 
-  luz::fit(
-    train_dl, 
-    epochs = 1, 
-    valid_data = valid_dl,
-    callbacks = luz_callback_early_stopping(patience = 3)
-  )
-
-

@@ -6,261 +6,56 @@ output: html_notebook
 ```{r}
 train_df <- tar_read(train)
 valid_df <- tar_read(valid)
-test_df <- tar_read(test)
-glm_poisson <- tar_read(glm_poisson_class)
 ```
 
 
 ```{r}
-DatasetNNCount <- 
-  dataset(
-    name = "DatasetNNCount",
-    
-    initialize = function(df) {
-      data <- self$prepare_data(df)
-      
-      self$x_mlp <- data$x_mlp
-      self$x_skip <- data$x_skip
-      self$y <- data$y
-    },
-    
-    .getitem = function(i) {
-      list(
-        x = list(
-          x_mlp = self$x_mlp[i, ],
-          x_skip = self$x_skip[i, ]
-        ),
-        y = self$y[i, ]
-      )
-    },
-    
-    .length = function() {
-      self$y$size()[[1]]
-    },
-    
-    prepare_data = function(df) {
-      target_col <- as.matrix(df$nb_claims) 
-      
-      tele_cols <- 
-        df %>%
-        select(starts_with(c("h_", "p_", "vmo", "vma", "d_"))) %>%
-        as.matrix()
-      
-      class_df <- select(df, expo:distance)
-      
-      rec_class <-
-        recipe(~ ., data = class_df) %>%
-        step_impute_median(commute_distance, years_claim_free) %>%
-        step_other(all_nominal(), threshold = 0.05) %>%
-        step_dummy(all_nominal()) %>%
-        prep()
-      
-      class_cols <- juice(rec_class) %>% as.matrix()
-      
-      list(
-        x_mlp = torch_tensor(cbind(class_cols, tele_cols)),
-        x_skip = torch_tensor(class_cols),
-        y = torch_tensor(target_col)
-      )
-    }
-  )
+model <- PoissonNN$new(DatasetNNCount, PoissonCANN1L, train_df, valid_df)
 ```
+
+```{r}
+model$train(n_1L = 8)
+```
+
+
 
 ```{r}
 train_ds <- DatasetNNCount(train_df)
 valid_ds <- DatasetNNCount(valid_df)
-test_ds <- DatasetNNCount(test_df)
-
-train_dl <- dataloader(train_ds, batch_size = 256, shuffle = F)
-valid_dl <- dataloader(valid_ds, batch_size = 256, shuffle = F)
-test_dl <- dataloader(test_ds, batch_size = 256, shuffle = F)
 ```
 
 ```{r}
-PoissonMLP <- 
-  nn_module(
-    "PoissonMLP",
-    
-    initialize = function(input_size_mlp, input_size_skip, beta_vec) {
-      self$bn0 = nn_batch_norm1d(input_size_mlp)
-      self$linear1 = nn_linear(input_size_mlp, 32)
-      self$bn1 = nn_batch_norm1d(32)
-      self$linear2 = nn_linear(32, 16)
-      self$bn2 = nn_batch_norm1d(16)
-      self$linear3 = nn_linear(16, 8)
-      self$bn3 = nn_batch_norm1d(8)
-      self$linear4 = nn_linear(8, 1)
-      
-      self$bn_skip = nn_batch_norm1d(input_size_skip)
-      self$linear_skip = nn_linear(input_size_skip, 1)
-      
-      self$init_params(beta_vec, input_size_skip)
-    },
-    
-    init_params = function(beta_vec, input_size_skip) {
-      nn_init_zeros_(self$linear1$bias)
-      nn_init_zeros_(self$linear2$bias)
-      nn_init_zeros_(self$linear3$bias)
-      nn_init_zeros_(self$linear4$bias)
-      
-      nn_init_zeros_(self$linear1$weight)
-      nn_init_zeros_(self$linear2$weight)
-      nn_init_zeros_(self$linear3$weight)
-      nn_init_zeros_(self$linear4$weight)
-      
-      beta_0 <- torch_tensor(beta_vec[1], dtype = torch_float())
-      betas <- torch_tensor(array(beta_vec[2:(input_size_skip + 1)], dim = c(1, input_size_skip)), dtype = torch_float())
-      
-      self$linear_skip$bias <- nn_parameter(beta_0)
-      self$linear_skip$weight <- nn_parameter(betas)
-    },
-    
-    mlp = function(x) {
-      x$x_mlp %>% 
-        self$bn0() %>%
-        self$linear1() %>% 
-        nnf_relu() %>%
-        self$bn1() %>% 
-        self$linear2() %>%
-        nnf_relu() %>%
-        self$bn2() %>% 
-        self$linear3() %>% 
-        nnf_relu() %>%
-        self$bn3() %>% 
-        self$linear4()
-    },
-    
-    skip = function(x) {
-      x$x_skip %>% 
-        self$bn_skip() %>% 
-        self$linear_skip()
-    },
-    
-    forward = function(x) {
-      torch_add(self$skip(x), self$mlp(x)) %>% 
-      nnf_softplus()
-    }
-)
+train_dl <- dataloader(train_ds, batch_size = 256, shuffle = F)
+valid_dl <- dataloader(valid_ds, batch_size = 256, shuffle = F)
 ```
+
 
 ```{r}
 fit <- 
-  PoissonMLP %>%
-  setup(
-    loss = nn_poisson_nll_loss(log_input = F),
-    optimizer = optim_adam,
-    metrics = list(luz_metric_mse())
-  ) %>%
-  set_hparams(
-    input_size_mlp = 86,
-    input_size_skip = 16,
-    beta_vec = glm_poisson$params_df$estimate
-  ) %>% 
-  luz::fit(
-    train_dl,
-    epochs = 3, 
-    valid_data = valid_dl,
-    callbacks = luz_callback_early_stopping(patience = 3)
-  )
+            PoissonCANN1L %>%
+            setup(
+              loss = nn_poisson_nll_loss(log_input = F),
+              optimizer = optim_adam,
+              metrics = list(luz_metric_mse())
+            ) %>%
+            set_opt_hparams(lr = 0.01) %>% 
+            luz::fit(
+              train_dl, 
+              epochs = 1, 
+              valid_data = valid_dl,
+              callbacks = luz_callback_early_stopping(patience = 3)
+            )
 ```
 
 
 
-```{r}
-NeuralNet <- R6Class(
-  classname = "NeuralNet",
-  inherit = CountMetrics,
-  
-  public =
-    list(
-      model_spec = NULL,
-      dataset = NULL,
-      train_df = NULL,
-      valid_df = NULL,
-      train_targets = NULL,
-      valid_targets = NULL,
-      train_preds = NULL,
-      valid_preds = NULL,
-      training = NULL,
-      
-      initialize = function(model_spec, dataset, train_df, valid_df) {
-        self$model_spec <- model_spec
-        self$dataset <- dataset
-        self$train_df <- train_df
-        self$valid_df <- valid_df
-      },
-      
-      train = function(beta_vec, input_size_mlp = 86, input_size_skip = 16, nb_epochs = 1, lr = 0.01) {
-        train_ds <- self$dataset(self$train_df)
-        valid_ds <- self$dataset(self$valid_df)
-        
-        self$train_targets <- as.numeric(train_ds$y)
-        self$valid_targets <- as.numeric(valid_ds$y)
-        
-        train_dl <- dataloader(train_ds, batch_size = 256, shuffle = F)
-        valid_dl <- dataloader(valid_ds, batch_size = 256, shuffle = F)
-        
-        # Fit on training set
-        fit <- 
-          self$model_spec %>%
-          setup(
-            loss = nn_poisson_nll_loss(log_input = F),
-            optimizer = optim_adam,
-            metrics = list(luz_metric_mse())
-          ) %>%
-          set_hparams(
-            input_size_mlp = input_size_mlp,
-            input_size_skip = input_size_skip,
-            beta_vec = beta_vec
-          ) %>% 
-          set_opt_hparams(lr = lr) %>% 
-          luz::fit(
-            train_dl, 
-            epochs = nb_epochs, 
-            valid_data = valid_dl,
-            callbacks = luz_callback_early_stopping(patience = 3)
-          )
-        
-        # Predict on train and valid sets
-        self$train_preds <- as.double(fit$model$forward(train_ds[1:length(train_ds)]$x))
-        self$valid_preds <- as.double(fit$model$forward(valid_ds[1:length(valid_ds)]$x))
-        
-        # Save training process
-        self$training <-
-          tibble(
-            train_loss = fit$records$metrics$train %>% map("loss") %>% flatten_dbl(),
-            train_mse = fit$records$metrics$train %>% map("mse") %>% flatten_dbl(),
-            valid_loss = fit$records$metrics$valid %>% map("loss") %>% flatten_dbl(),
-            valid_mse = fit$records$metrics$valid %>% map("mse") %>% flatten_dbl()
-          )
-        
-        invisible(self)
-      },
-      
-      plot_training = function() {
-        self$training %>%
-          mutate(epochs = seq_along(train_loss)) %>%
-          pivot_longer(cols = -"epochs") %>%
-          separate(col = "name", into = c("dataset", "metric"), sep = "_") %>%
-          ggplot(aes(x = epochs, y = value, col = dataset)) +
-          geom_point(shape = 21) +
-          geom_line() +
-          scale_color_discrete(name = NULL) +
-          ylab(NULL) +
-          facet_grid(vars(metric), scales = "free_y")
-      }
-    )
-)
-```
-
-
 
 ```{r}
-net <- NeuralNet$new(PoissonMLP, DatasetNNCount, train_df, valid_df)
+net <- NeuralNet$new(PoissonMLP1L, DatasetNNCount, train_df, valid_df)
 ```
 
 ```{r}
-net$train(beta_vec = glm_poisson$params_df$estimate, nb_epochs = 1)
+net$train(beta_vec = glm_poisson$params_df$estimate, nb_epochs = 1, nb_neurons = 128)
 ```
 
 ```{r}

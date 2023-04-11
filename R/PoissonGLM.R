@@ -6,29 +6,29 @@ PoissonGLM <- R6Class(
     recipe = NULL, 
     train_df = NULL,
     train_df_juiced = NULL,
-    test_df = NULL,
+    valid_df = NULL,
     
     predictors = NULL,
     response = NULL,
     
     train_targets = NULL,
-    test_targets = NULL,
+    valid_targets = NULL,
     
     params_df = NULL,
     var_imp = NULL,
-    test_preds = NULL,
+    valid_preds = NULL,
     
-    initialize = function(recipe, test_df) {
+    initialize = function(recipe, valid_df) {
       self$recipe <- recipe
       self$train_df <- recipe$template
       self$train_df_juiced <- juice(prep(recipe))
-      self$test_df <- test_df
+      self$valid_df <- valid_df
       
       self$predictors <- recipe$var_info %>% filter(role == "predictor") %>% pull(variable)
       self$response <- recipe$term_info %>% filter(role == "outcome") %>% pull(variable)
       
       self$train_targets <- self$train_df[[self$response]]
-      self$test_targets <- test_df[[self$response]]
+      self$valid_targets <- valid_df[[self$response]]
     },
     
     train = function() {
@@ -37,7 +37,7 @@ PoissonGLM <- R6Class(
       fit <- parsnip::fit(wf, data = self$train_df)
       self$params_df <- tidy(fit)
       self$var_imp <- extract_fit_parsnip(fit) %>% vip::vi()
-      self$test_preds <- predict(fit, new_data = self$test_df)$.pred
+      self$valid_preds <- predict(fit, new_data = self$valid_df)$.pred
       
       invisible(self)
     },
@@ -66,7 +66,7 @@ PoissonGLM <- R6Class(
     print = function() {
       cat("Régression Poisson non-pénalisée \n\n")
       cat("\tTraining set: ", nrow(self$train_df), " observations\n", sep = "")
-      cat("\tTesting set: ", nrow(self$test_df), " observations\n\n", sep = "")
+      cat("\tValidation set: ", nrow(self$valid_df), " observations\n\n", sep = "")
       cat("\tVariable réponse: ", self$response, "\n\n", sep = "")
       cat("\tPrédicteurs:\n", glue("{self$predictors}\n"), sep = "\n\t")
       invisible(self)

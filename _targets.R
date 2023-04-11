@@ -91,14 +91,18 @@ list(
   # Réseaux de neurones ---------------------------------------------------------------------------------------------------------
   # -----------------------------------------------------------------------------------------------------------------------------
   
-  # tar_target(lr_grid, c(0.003, 0.01, 0.03, 0.1, 0.3)),
+  tar_target(lr_grid, c(0.001, 0.003, 0.01, 0.03)),
+  tar_target(n_1L_grid, c(8, 16, 32, 64)),
+  
+  tar_target(allo, c(lr_grid, n_1L_grid), pattern = cross(lr_grid, n_1L_grid)),
   
   tar_target(
-    reseau_poisson_tune,
+    PoissonCANN1L_tune,
     {
-      model <- NeuralNet$new(PoissonMLP, DatasetNNCount, train, valid)
-      model$train(beta_vec = glm_poisson_class$params_df$estimate, nb_epochs = 1) 
-    }
+      model <- PoissonNN$new(DatasetNNCount, PoissonCANN1L, train, valid)
+      model$train(nb_epochs = 10, lr = lr_grid, n_1L = n_1L_grid)
+    },
+    pattern = cross(lr_grid, n_1L_grid)
   )
   
   # tar_render(nn_poisson, here("RMarkdown", "nn_poisson", "nn_poisson.Rmd"))
