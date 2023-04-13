@@ -1,7 +1,7 @@
 ---
 title: "R Notebook"
-output: html_notebook
-# output: rmdformats::material
+# output: html_notebook
+output: rmdformats::material
 ---
 
 ```{r}
@@ -69,7 +69,7 @@ glm_poisson_class_tele$plot_coefs()
 ```
 
 
-# Réseau de neurones
+# Réseau à une seule couche cachée
 
 Le réseau de neurones développé est inspiré de l'[approche CANN](https://www.cambridge.org/core/journals/astin-bulletin-journal-of-the-iaa/article/editorial-yes-we-cann/66E8BEC373B5CCEF3BF3303D442D6B75), développée par Wüthrich et Merz en 2018.
 
@@ -77,41 +77,40 @@ Le réseau consiste en 2 parties: une partie « GLM » et une partie « MLP ». 
 
 Les 2 parties se rencontrent au neurone d'output, où elles sont simplement additionnées. On passe ensuite l'addition de ces 2 parties dans une fonction d'activation « softplus » afin que l'output du réseau soit positif. La fonction softplus a la même utilité que la fonction exponentielle dans un GLM Poisson, sauf qu'elle est plus stable. La fonction exponentielle n'est pas recommandée pour un réseau de neurones car trop instable numériquement (je l'ai essayée et ça me donnait des prédictions ridicules sur l'ensemble de validation, du genre un lambda de 4000!).
 
-Les paramètres de la partie MLP sont initialisés à zéro, tandis que les paramètres de la partie GLM sont initialisés aux coefficients obtenus par maximum de vraisemblance (donc les coefficients d'un GLM Poisson). Cela signifie que lors de l'initialisation, le réseau donne à peu près les mêmes prédictions qu'un GLM Poisson (pas exactement les même parce qu'on a une fonction d'activation softplus au lieu d'une exponentielle). C'est une manière de partir le réseau à des valeurs raisonnables de paramètres. Lorsqu'on débute l'entrainement du réseau, celui-ci est donc en quelque sorte entrainé sur les résidus d'un GLM Poisson. La partie MLP sert à aller chercher le signal dans les variables télématiques, dans les interactions entre variables classiques, dans les interactions classique-télématique, etc.
+Les paramètres de la partie MLP sont initialisés à zéro (ou presque, parce que des paramètres initialisés exactement à zéro ne permettent pas au réseau d'apprendre), tandis que les paramètres de la partie GLM sont initialisés aux coefficients obtenus par maximum de vraisemblance (donc les coefficients d'un GLM Poisson). Cela signifie que lors de l'initialisation, le réseau donne à peu près les mêmes prédictions qu'un GLM Poisson (pas exactement les même parce qu'on a une fonction d'activation softplus au lieu d'une exponentielle). C'est une manière de partir le réseau à des valeurs raisonnables de paramètres. Lorsqu'on débute l'entrainement du réseau, celui-ci est donc en quelque sorte entrainé sur les résidus d'un GLM Poisson. La partie MLP sert à aller chercher le signal dans les variables télématiques, dans les interactions entre variables classiques, dans les interactions classique-télématique, etc.
 
-Voici le code en `torch` décrivant l'architecture du réseau:
+Voici le code en `torch` décrivant l'architecture du réseau à 1 seule couche cachée:
 
 ```{r eval = F}
-PoissonMLP <- 
+PoissonCANN1L <- 
   nn_module(
-    "PoissonMLP",
+    "PoissonCANN1L",
     
-    initialize = function(input_size_mlp, input_size_skip, beta_vec) {
+    initialize = function(input_size_mlp = 86, input_size_skip = 16, n_1L) {
       self$bn0 = nn_batch_norm1d(input_size_mlp)
-      self$linear1 = nn_linear(input_size_mlp, 32)
-      self$bn1 = nn_batch_norm1d(32)
-      self$linear2 = nn_linear(32, 16)
-      self$bn2 = nn_batch_norm1d(16)
-      self$linear3 = nn_linear(16, 8)
-      self$bn3 = nn_batch_norm1d(8)
-      self$linear4 = nn_linear(8, 1)
+      self$linear1 = nn_linear(input_size_mlp, n_1L)
+      self$bn1 = nn_batch_norm1d(n_1L)
+      self$linear2 = nn_linear(n_1L, 1)
       
       self$bn_skip = nn_batch_norm1d(input_size_skip)
       self$linear_skip = nn_linear(input_size_skip, 1)
       
+      beta_vec = c(
+        -3.315941880194, 0.616156785235, 0.000002915498, 0.000824747918, 0.113638267928, -0.036712764040, 
+        -0.003624109271, -0.001962461408, 0.000020006844, -0.057640242691, 0.053808785455, 0.128105697562,
+        0.245872331710, 0.183671264351, 0.132037363102, 0.007204221409, -0.089563765999
+      )
       self$init_params(beta_vec, input_size_skip)
     },
     
     init_params = function(beta_vec, input_size_skip) {
-      nn_init_zeros_(self$linear1$bias)
-      nn_init_zeros_(self$linear2$bias)
-      nn_init_zeros_(self$linear3$bias)
-      nn_init_zeros_(self$linear4$bias)
+      torch_manual_seed(1994)
       
-      nn_init_zeros_(self$linear1$weight)
-      nn_init_zeros_(self$linear2$weight)
-      nn_init_zeros_(self$linear3$weight)
-      nn_init_zeros_(self$linear4$weight)
+      nn_init_normal_(self$linear1$bias, std = 0.01)
+      nn_init_normal_(self$linear2$bias, std = 0.01)
+      
+      nn_init_normal_(self$linear1$weight, std = 0.01)
+      nn_init_normal_(self$linear2$weight, std = 0.01)
       
       beta_0 <- torch_tensor(beta_vec[1], dtype = torch_float())
       betas <- torch_tensor(array(beta_vec[2:(input_size_skip + 1)], dim = c(1, input_size_skip)), dtype = torch_float())
@@ -125,14 +124,8 @@ PoissonMLP <-
         self$bn0() %>%
         self$linear1() %>% 
         nnf_relu() %>%
-        self$bn1() %>% 
-        self$linear2() %>%
-        nnf_relu() %>%
-        self$bn2() %>% 
-        self$linear3() %>% 
-        nnf_relu() %>%
-        self$bn3() %>% 
-        self$linear4()
+        self$bn1() %>%
+        self$linear2()
     },
     
     skip = function(x) {
@@ -143,10 +136,88 @@ PoissonMLP <-
     
     forward = function(x) {
       torch_add(self$skip(x), self$mlp(x)) %>% 
-      nnf_softplus()
+        nnf_softplus()
     }
-)
+  )
 ```
 
+## Tuning des hyperparamètres
+
+On commence par un tuning simple. On considère 4 taux d'apprentissage (0.001, 0.003, 0.01 et 0.03) ainsi que 4 « nombre de neurones cachés » (8, 16, 32, 64). Voici les résultats de l'entrainement sur l'ensemble de validation:
+
+```{r}
+PoissonCANN1L_tune <- tar_read(PoissonCANN1L_tune)
+lr_n_1L_grid <- tar_read(lr_n_1L_grid)
+```
+
+```{r}
+prepare_data <- function(data, params_df) {
+  data$training %>% 
+    mutate(
+      epoch = 1:nrow(.),
+      params = glue("lr = {params_df$lr}, nb_neurons = {params_df$n_1L}"),
+      lr = params_df$lr,
+      nb_neurons = params_df$n_1L
+    )
+}
+```
+
+```{r}
+plot_data <- map2_df(PoissonCANN1L_tune, seq(1, nrow(lr_n_1L_grid)), ~ prepare_data(.x, params_df = lr_n_1L_grid[.y, ]))
+
+plot_data <- 
+  plot_data %>% 
+  select(-train_loss, -train_mse) %>% 
+  pivot_longer(cols = c(valid_loss, valid_mse))
+```
+
+```{r}
+ggplot(plot_data, aes(x = epoch, y = value, col = factor(lr))) +
+  geom_point(size = 1) +
+  geom_line(size = 0.3) +
+  facet_grid(rows = vars(name), cols = vars(nb_neurons), scales = "free") +
+  scale_color_discrete(name = "Learning rate") +
+  scale_shape_discrete(name = "Nb. hidden neurons") +
+  scale_x_continuous(breaks = 1:10) +
+  ylab("Validation metric") +
+  ggtitle("Réseau à une seule couche cachée")
+```
+
+Un learning rate de 0.001 avec 64 neurones cachés (avec 2 époques) fonctionne le mieux pour un réseau à 1 couche cachée. Réentrainons le modèle avec 2 époques et observons les résultats:
+
+```{r}
+model <- PoissonNN$new(DatasetNNCount, PoissonCANN1L, train, valid)
+model$train(nb_epochs = 2, lr = 0.001, n_1L = 64)
+```
+
+```{r}
+model$print_metrics()
+```
+
+Déjà avec une seule couche cachée et un tuning minimal des hyperparamètres, on a une performance similaire au GLM Poisson avec les variables télématiques créées à la main.
 
 
+# Comparaison des résultats
+
+```{r}
+tib <- 
+  data.frame(
+    model = c("GLM classique", "GLM classique + télé", "PoissonCANN1L"),
+    mse_skill = c(glm_poisson_class$mse_skill(), glm_poisson_class_tele$mse_skill(), model$mse_skill()),
+    logloss_skill = c(glm_poisson_class$poisson_logloss_skill(), glm_poisson_class_tele$poisson_logloss_skill(), model$poisson_logloss_skill()),
+    logscore_skill = c(glm_poisson_class$logscore_skill(), glm_poisson_class_tele$logscore_skill(), model$logscore_skill())
+  ) %>% 
+  as_tibble()
+```
+
+```{r}
+tib %>% 
+  pivot_longer(cols = c(mse_skill, logloss_skill, logscore_skill)) %>% 
+  ggplot(aes(x = model, y = value)) +
+  geom_col() +
+  facet_wrap(vars(name)) +
+  scale_x_discrete(guide = guide_axis(n.dodge = 2)) +
+  ggtitle("Amélioration des métriques par rapport au modèle naïf") +
+  xlab(NULL) +
+  ylab(NULL)
+```

@@ -8,17 +8,6 @@ train_df <- tar_read(train)
 valid_df <- tar_read(valid)
 ```
 
-
-```{r}
-model <- PoissonNN$new(DatasetNNCount, PoissonCANN1L, train_df, valid_df)
-```
-
-```{r}
-model$train(n_1L = 8)
-```
-
-
-
 ```{r}
 train_ds <- DatasetNNCount(train_df)
 valid_ds <- DatasetNNCount(valid_df)
@@ -29,35 +18,107 @@ train_dl <- dataloader(train_ds, batch_size = 256, shuffle = F)
 valid_dl <- dataloader(valid_ds, batch_size = 256, shuffle = F)
 ```
 
-
 ```{r}
 fit <- 
-            PoissonCANN1L %>%
-            setup(
-              loss = nn_poisson_nll_loss(log_input = F),
-              optimizer = optim_adam,
-              metrics = list(luz_metric_mse())
-            ) %>%
-            set_opt_hparams(lr = 0.01) %>% 
-            luz::fit(
-              train_dl, 
-              epochs = 1, 
-              valid_data = valid_dl,
-              callbacks = luz_callback_early_stopping(patience = 3)
-            )
+  PoissonCANN1L %>%
+  setup(
+    loss = nn_poisson_nll_loss(log_input = F),
+    optimizer = optim_adam,
+    metrics = list(luz_metric_mse())
+  ) %>%
+  set_opt_hparams(lr = 0.01) %>% 
+  set_hparams(n_1L = 8) %>% 
+  luz::fit(
+    train_dl, 
+    epochs = 10, 
+    valid_data = valid_dl,
+    callbacks = list(
+      luz_callback_early_stopping(patience = 3),
+      # luz_callback_keep_best_model(),
+      luz_callback_lr_scheduler(torch::lr_reduce_on_plateau, factor = 0.5, patience = 3)#,
+      # luz_callback_lr_scheduler(
+      #   lr_one_cycle,
+      #   max_lr = 0.01,
+      #   epochs = num_epochs,
+      #   steps_per_epoch = length(train_dl),
+      #   call_on = "on_batch_end"
+      # )
+    )
+  )
 ```
-
 
 
 
 ```{r}
-net <- NeuralNet$new(PoissonMLP1L, DatasetNNCount, train_df, valid_df)
+train_batch <- function(b) {
+  optimizer$zero_grad()
+  output <- model(b[[1]])
+  target <- b[[2]]
+  lr <- optimizer$param_groups[[1]]$lr
+
+  loss <- nnf_poisson_nll_loss(output, target, log_input = F)
+  loss$backward()
+  optimizer$step()
+
+  return(list(loss = loss$item(), lr = lr))
+}
+
+valid_batch <- function(b) {
+  output <- model(b[[1]])
+  target <- b[[2]]
+
+  loss <- nnf_poisson_nll_loss(output, target, log_input = F)
+  loss$item()
+}
 ```
 
 ```{r}
-net$train(beta_vec = glm_poisson$params_df$estimate, nb_epochs = 1, nb_neurons = 128)
+model <- PoissonCANN1L(n_1L = 64)
+optimizer <- optim_adam(model$parameters, lr = 0.0001)
+scheduler <- 
+  lr_reduce_on_plateau(
+    optimizer,
+    factor = 0.5,
+    patience = 1,
+  )
+
+num_epochs <- 50
+
+train_loss_mean_vec <- c()
+valid_loss_mean_vec <- c()
+
+for (epoch in 1:num_epochs) {
+  model$train()
+  train_loss <- c()
+
+  coro::loop(for (b in train_dl) {
+    loss <- train_batch(b)$loss
+    lr <- train_batch(b)$lr
+    train_loss <- c(train_loss, loss)
+  })
+
+  model$eval()
+  valid_loss <- c()
+
+  with_no_grad({ 
+    coro::loop(for (b in valid_dl) {
+      loss <- valid_batch(b)
+      valid_loss <- c(valid_loss, loss)
+    })  
+  })
+  
+  train_loss_mean <- mean(train_loss)
+  valid_loss_mean <- mean(valid_loss)
+  
+  train_loss_mean_vec <- c(train_loss_mean_vec, train_loss_mean)
+  valid_loss_mean_vec <- c(valid_loss_mean_vec, valid_loss_mean)
+  
+  scheduler$step(valid_loss_mean)
+  
+  cat(sprintf(
+    "\nEpoch %d (lr = %g), training loss: %3.4f, validation loss: %3.4f",
+    epoch, lr, mean(train_loss), mean(valid_loss)
+  ))
+}
 ```
 
-```{r}
-net$print_metrics()
-```

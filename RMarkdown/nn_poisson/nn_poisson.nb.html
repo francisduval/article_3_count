@@ -1762,66 +1762,6 @@ valid_df &lt;- tar_read(valid)</code></pre>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kZWwgPC0gUG9pc3Nvbk5OJG5ldyhEYXRhc2V0Tk5Db3VudCwgUG9pc3NvbkNBTk4xTCwgdHJhaW5fZGYsIHZhbGlkX2RmKVxuYGBgIn0= -->
-<pre class="r"><code>model &lt;- PoissonNN$new(DatasetNNCount, PoissonCANN1L, train_df, valid_df)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kZWwkdHJhaW4obl8xTCA9IDgpXG5gYGAifQ== -->
-<pre class="r"><code>model$train(n_1L = 8)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXBvY2ggMS8xXG4zLzI3NiBbPi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDI3cyAtIExvc3M6IDAuMjAyMyAgLSBNU0U6IDAuMDUyOCBcbjQvMjc2IFs+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzBzIC0gTG9zczogMC4xOTMxICAtIE1TRTogMC4wNTE2IFxuNS8yNzYgWz4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzMnMgLSBMb3NzOiAwLjIxNzMgIC0gTVNFOiAwLjA1OTMgXG42LzI3NiBbPT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM2cyAtIExvc3M6IDAuMjI5OSAgLSBNU0U6IDAuMDY5OCBcbjcvMjc2IFs9Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yMzEzICAtIE1TRTogMC4wNjk5IFxuOC8yNzYgWz0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNXMgLSBMb3NzOiAwLjIzNzMgIC0gTVNFOiAwLjA3MjEgXG45LzI3NiBbPT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM1cyAtIExvc3M6IDAuMjM5NyAgLSBNU0U6IDAuMDcxNCBcbjEwLzI3NiBbPT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzRzIC0gTG9zczogMC4yNDAzICAtIE1TRTogMC4wNzI3IFxuMTEvMjc2IFs9PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNHMgLSBMb3NzOiAwLjIzNjkgIC0gTVNFOiAwLjA3MDUgXG4xMi8yNzYgWz09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM0cyAtIExvc3M6IDAuMjQxNyAgLSBNU0U6IDAuMDcxNSBcbjEzLzI3NiBbPT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yMzY5ICAtIE1TRTogMC4wNjk5IFxuMTQvMjc2IFs9PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNXMgLSBMb3NzOiAwLjIzMjMgIC0gTVNFOiAwLjA2OTEgXG4xNS8yNzYgWz09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM1cyAtIExvc3M6IDAuMjI4MiAgLSBNU0U6IDAuMDY4MSBcbjE2LzI3NiBbPT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yMzE0ICAtIE1TRTogMC4wNjgzIFxuMTcvMjc2IFs9PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yMzUgIC0gTVNFOiAwLjA2OTMgXG4xOC8yNzYgWz09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNXMgLSBMb3NzOiAwLjIzNDUgIC0gTVNFOiAwLjA2OSBcbjE5LzI3NiBbPT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yMzMzICAtIE1TRTogMC4wNjg0IFxuMjAvMjc2IFs9PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNXMgLSBMb3NzOiAwLjIzNjkgIC0gTVNFOiAwLjA2OTMgXG4yMS8yNzYgWz09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM1cyAtIExvc3M6IDAuMjQwNCAgLSBNU0U6IDAuMDcwNiBcbjIyLzI3NiBbPT09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yNDM2ICAtIE1TRTogMC4wNzEzIFxuMjMvMjc2IFs9PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNXMgLSBMb3NzOiAwLjI0MzMgIC0gTVNFOiAwLjA3MTIgXG4yNC8yNzYgWz09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM1cyAtIExvc3M6IDAuMjQ0NCAgLSBNU0U6IDAuMDcxOSBcbjI1LzI3NiBbPT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yNDIzICAtIE1TRTogMC4wNzA5IFxuMjYvMjc2IFs9PT09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNXMgLSBMb3NzOiAwLjI0MjMgIC0gTVNFOiAwLjA3MDQgXG4yNy8yNzYgWz09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM1cyAtIExvc3M6IDAuMjQyOCAgLSBNU0U6IDAuMDcxMiBcbjI4LzI3NiBbPT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yNDIyICAtIE1TRTogMC4wNzA5IFxuMjkvMjc2IFs9PT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNXMgLSBMb3NzOiAwLjI0MTMgIC0gTVNFOiAwLjA3MDMgXG4zMC8yNzYgWz09PT09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM1cyAtIExvc3M6IDAuMjQyMSAgLSBNU0U6IDAuMDcwMyBcbjMxLzI3NiBbPT09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM1cyAtIExvc3M6IDAuMjQyICAtIE1TRTogMC4wNzAyIFxuMzIvMjc2IFs9PT09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM1cyAtIExvc3M6IDAuMjQwNiAgLSBNU0U6IDAuMDcgXG4zMy8yNzYgWz09PT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM1cyAtIExvc3M6IDAuMjM5MyAgLSBNU0U6IDAuMDY5NCBcbjM0LzI3NiBbPT09PT09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzRzIC0gTG9zczogMC4yNDAyICAtIE1TRTogMC4wNjk2IFxuMzUvMjc2IFs9PT09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNHMgLSBMb3NzOiAwLjIzOTMgIC0gTVNFOiAwLjA2OTMgXG4zNi8yNzYgWz09PT09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNXMgLSBMb3NzOiAwLjIzODMgIC0gTVNFOiAwLjA2OSBcbjM3LzI3NiBbPT09PT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yMzYzICAtIE1TRTogMC4wNjgyIFxuMzgvMjc2IFs9PT09PT09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yMzUgIC0gTVNFOiAwLjA2NzYgXG4zOS8yNzYgWz09PT09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM1cyAtIExvc3M6IDAuMjMzOSAgLSBNU0U6IDAuMDY3MyBcbjQwLzI3NiBbPT09PT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yMzM5ICAtIE1TRTogMC4wNjczIFxuNDEvMjc2IFs9PT09PT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNXMgLSBMb3NzOiAwLjIzMjkgIC0gTVNFOiAwLjA2NjkgXG40Mi8yNzYgWz09PT09PT09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM1cyAtIExvc3M6IDAuMjMyOSAgLSBNU0U6IDAuMDY2OSBcbjQzLzI3NiBbPT09PT09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yMzcxICAtIE1TRTogMC4wNjg4IFxuNDQvMjc2IFs9PT09PT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNXMgLSBMb3NzOiAwLjI0MDIgIC0gTVNFOiAwLjA2OTkgXG40NS8yNzYgWz09PT09PT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNHMgLSBMb3NzOiAwLjI0MSAgLSBNU0U6IDAuMDY5OSBcbiJ9 -->
-<pre><code>Epoch 1/1
-3/276 [&gt;------------------------------------------------------------------------] - ETA: 27s - Loss: 0.2023  - MSE: 0.0528 
-4/276 [&gt;------------------------------------------------------------------------] - ETA: 30s - Loss: 0.1931  - MSE: 0.0516 
-5/276 [&gt;------------------------------------------------------------------------] - ETA: 32s - Loss: 0.2173  - MSE: 0.0593 
-6/276 [=&gt;-----------------------------------------------------------------------] - ETA: 36s - Loss: 0.2299  - MSE: 0.0698 
-7/276 [=&gt;-----------------------------------------------------------------------] - ETA: 35s - Loss: 0.2313  - MSE: 0.0699 
-8/276 [=&gt;-----------------------------------------------------------------------] - ETA: 35s - Loss: 0.2373  - MSE: 0.0721 
-9/276 [=&gt;-----------------------------------------------------------------------] - ETA: 35s - Loss: 0.2397  - MSE: 0.0714 
-10/276 [==&gt;---------------------------------------------------------------------] - ETA: 34s - Loss: 0.2403  - MSE: 0.0727 
-11/276 [==&gt;---------------------------------------------------------------------] - ETA: 34s - Loss: 0.2369  - MSE: 0.0705 
-12/276 [==&gt;---------------------------------------------------------------------] - ETA: 34s - Loss: 0.2417  - MSE: 0.0715 
-13/276 [==&gt;---------------------------------------------------------------------] - ETA: 35s - Loss: 0.2369  - MSE: 0.0699 
-14/276 [===&gt;--------------------------------------------------------------------] - ETA: 35s - Loss: 0.2323  - MSE: 0.0691 
-15/276 [===&gt;--------------------------------------------------------------------] - ETA: 35s - Loss: 0.2282  - MSE: 0.0681 
-16/276 [===&gt;--------------------------------------------------------------------] - ETA: 35s - Loss: 0.2314  - MSE: 0.0683 
-17/276 [===&gt;---------------------------------------------------------------------] - ETA: 35s - Loss: 0.235  - MSE: 0.0693 
-18/276 [====&gt;--------------------------------------------------------------------] - ETA: 35s - Loss: 0.2345  - MSE: 0.069 
-19/276 [====&gt;-------------------------------------------------------------------] - ETA: 35s - Loss: 0.2333  - MSE: 0.0684 
-20/276 [====&gt;-------------------------------------------------------------------] - ETA: 35s - Loss: 0.2369  - MSE: 0.0693 
-21/276 [====&gt;-------------------------------------------------------------------] - ETA: 35s - Loss: 0.2404  - MSE: 0.0706 
-22/276 [=====&gt;------------------------------------------------------------------] - ETA: 35s - Loss: 0.2436  - MSE: 0.0713 
-23/276 [=====&gt;------------------------------------------------------------------] - ETA: 35s - Loss: 0.2433  - MSE: 0.0712 
-24/276 [=====&gt;------------------------------------------------------------------] - ETA: 35s - Loss: 0.2444  - MSE: 0.0719 
-25/276 [======&gt;-----------------------------------------------------------------] - ETA: 35s - Loss: 0.2423  - MSE: 0.0709 
-26/276 [======&gt;-----------------------------------------------------------------] - ETA: 35s - Loss: 0.2423  - MSE: 0.0704 
-27/276 [======&gt;-----------------------------------------------------------------] - ETA: 35s - Loss: 0.2428  - MSE: 0.0712 
-28/276 [======&gt;-----------------------------------------------------------------] - ETA: 35s - Loss: 0.2422  - MSE: 0.0709 
-29/276 [=======&gt;----------------------------------------------------------------] - ETA: 35s - Loss: 0.2413  - MSE: 0.0703 
-30/276 [=======&gt;----------------------------------------------------------------] - ETA: 35s - Loss: 0.2421  - MSE: 0.0703 
-31/276 [=======&gt;-----------------------------------------------------------------] - ETA: 35s - Loss: 0.242  - MSE: 0.0702 
-32/276 [========&gt;-----------------------------------------------------------------] - ETA: 35s - Loss: 0.2406  - MSE: 0.07 
-33/276 [========&gt;---------------------------------------------------------------] - ETA: 35s - Loss: 0.2393  - MSE: 0.0694 
-34/276 [========&gt;---------------------------------------------------------------] - ETA: 34s - Loss: 0.2402  - MSE: 0.0696 
-35/276 [========&gt;---------------------------------------------------------------] - ETA: 34s - Loss: 0.2393  - MSE: 0.0693 
-36/276 [=========&gt;---------------------------------------------------------------] - ETA: 35s - Loss: 0.2383  - MSE: 0.069 
-37/276 [=========&gt;--------------------------------------------------------------] - ETA: 35s - Loss: 0.2363  - MSE: 0.0682 
-38/276 [=========&gt;---------------------------------------------------------------] - ETA: 35s - Loss: 0.235  - MSE: 0.0676 
-39/276 [=========&gt;--------------------------------------------------------------] - ETA: 35s - Loss: 0.2339  - MSE: 0.0673 
-40/276 [=========&gt;--------------------------------------------------------------] - ETA: 35s - Loss: 0.2339  - MSE: 0.0673 
-41/276 [==========&gt;-------------------------------------------------------------] - ETA: 35s - Loss: 0.2329  - MSE: 0.0669 
-42/276 [==========&gt;-------------------------------------------------------------] - ETA: 35s - Loss: 0.2329  - MSE: 0.0669 
-43/276 [==========&gt;-------------------------------------------------------------] - ETA: 35s - Loss: 0.2371  - MSE: 0.0688 
-44/276 [==========&gt;-------------------------------------------------------------] - ETA: 35s - Loss: 0.2402  - MSE: 0.0699 
-45/276 [===========&gt;-------------------------------------------------------------] - ETA: 34s - Loss: 0.241  - MSE: 0.0699 </code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudHJhaW5fZHMgPC0gRGF0YXNldE5OQ291bnQodHJhaW5fZGYpXG52YWxpZF9kcyA8LSBEYXRhc2V0Tk5Db3VudCh2YWxpZF9kZilcbmBgYCJ9 -->
 <pre class="r"><code>train_ds &lt;- DatasetNNCount(train_df)
 valid_ds &lt;- DatasetNNCount(valid_df)</code></pre>
@@ -1830,157 +1770,179 @@ valid_ds &lt;- DatasetNNCount(valid_df)</code></pre>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuICAgICAgICAgIHRyYWluX2RsIDwtIGRhdGFsb2FkZXIodHJhaW5fZHMsIGJhdGNoX3NpemUgPSAyNTYsIHNodWZmbGUgPSBGKVxuICAgICAgICAgIHZhbGlkX2RsIDwtIGRhdGFsb2FkZXIodmFsaWRfZHMsIGJhdGNoX3NpemUgPSAyNTYsIHNodWZmbGUgPSBGKVxuYGBgIn0= -->
-<pre class="r"><code>          train_dl &lt;- dataloader(train_ds, batch_size = 256, shuffle = F)
-          valid_dl &lt;- dataloader(valid_ds, batch_size = 256, shuffle = F)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudHJhaW5fZGwgPC0gZGF0YWxvYWRlcih0cmFpbl9kcywgYmF0Y2hfc2l6ZSA9IDI1Niwgc2h1ZmZsZSA9IEYpXG52YWxpZF9kbCA8LSBkYXRhbG9hZGVyKHZhbGlkX2RzLCBiYXRjaF9zaXplID0gMjU2LCBzaHVmZmxlID0gRilcbmBgYCJ9 -->
+<pre class="r"><code>train_dl &lt;- dataloader(train_ds, batch_size = 256, shuffle = F)
+valid_dl &lt;- dataloader(valid_ds, batch_size = 256, shuffle = F)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZml0IDwtIFxuICAgICAgICAgICAgUG9pc3NvbkNBTk4xTCAlPiVcbiAgICAgICAgICAgIHNldHVwKFxuICAgICAgICAgICAgICBsb3NzID0gbm5fcG9pc3Nvbl9ubGxfbG9zcyhsb2dfaW5wdXQgPSBGKSxcbiAgICAgICAgICAgICAgb3B0aW1pemVyID0gb3B0aW1fYWRhbSxcbiAgICAgICAgICAgICAgbWV0cmljcyA9IGxpc3QobHV6X21ldHJpY19tc2UoKSlcbiAgICAgICAgICAgICkgJT4lXG4gICAgICAgICAgICBzZXRfb3B0X2hwYXJhbXMobHIgPSAwLjAxKSAlPiUgXG4gICAgICAgICAgICBsdXo6OmZpdChcbiAgICAgICAgICAgICAgdHJhaW5fZGwsIFxuICAgICAgICAgICAgICBlcG9jaHMgPSAxLCBcbiAgICAgICAgICAgICAgdmFsaWRfZGF0YSA9IHZhbGlkX2RsLFxuICAgICAgICAgICAgICBjYWxsYmFja3MgPSBsdXpfY2FsbGJhY2tfZWFybHlfc3RvcHBpbmcocGF0aWVuY2UgPSAzKVxuICAgICAgICAgICAgKVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZml0IDwtIFxuICBQb2lzc29uQ0FOTjFMICU+JVxuICBzZXR1cChcbiAgICBsb3NzID0gbm5fcG9pc3Nvbl9ubGxfbG9zcyhsb2dfaW5wdXQgPSBGKSxcbiAgICBvcHRpbWl6ZXIgPSBvcHRpbV9hZGFtLFxuICAgIG1ldHJpY3MgPSBsaXN0KGx1el9tZXRyaWNfbXNlKCkpXG4gICkgJT4lXG4gIHNldF9vcHRfaHBhcmFtcyhsciA9IDAuMDEpICU+JSBcbiAgc2V0X2hwYXJhbXMobl8xTCA9IDgpICU+JSBcbiAgbHV6OjpmaXQoXG4gICAgdHJhaW5fZGwsIFxuICAgIGVwb2NocyA9IDEwLCBcbiAgICB2YWxpZF9kYXRhID0gdmFsaWRfZGwsXG4gICAgY2FsbGJhY2tzID0gbGlzdChcbiAgICAgIGx1el9jYWxsYmFja19lYXJseV9zdG9wcGluZyhwYXRpZW5jZSA9IDMpLFxuICAgICAgIyBsdXpfY2FsbGJhY2tfa2VlcF9iZXN0X21vZGVsKCksXG4gICAgICBsdXpfY2FsbGJhY2tfbHJfc2NoZWR1bGVyKHRvcmNoOjpscl9yZWR1Y2Vfb25fcGxhdGVhdSwgZmFjdG9yID0gMC41LCBwYXRpZW5jZSA9IDMpIyxcbiAgICAgICMgbHV6X2NhbGxiYWNrX2xyX3NjaGVkdWxlcihcbiAgICAgICMgICBscl9vbmVfY3ljbGUsXG4gICAgICAjICAgbWF4X2xyID0gMC4wMSxcbiAgICAgICMgICBlcG9jaHMgPSBudW1fZXBvY2hzLFxuICAgICAgIyAgIHN0ZXBzX3Blcl9lcG9jaCA9IGxlbmd0aCh0cmFpbl9kbCksXG4gICAgICAjICAgY2FsbF9vbiA9IFwib25fYmF0Y2hfZW5kXCJcbiAgICAgICMgKVxuICAgIClcbiAgKVxuYGBgIn0= -->
 <pre class="r"><code>fit &lt;- 
-            PoissonCANN1L %&gt;%
-            setup(
-              loss = nn_poisson_nll_loss(log_input = F),
-              optimizer = optim_adam,
-              metrics = list(luz_metric_mse())
-            ) %&gt;%
-            set_opt_hparams(lr = 0.01) %&gt;% 
-            luz::fit(
-              train_dl, 
-              epochs = 1, 
-              valid_data = valid_dl,
-              callbacks = luz_callback_early_stopping(patience = 3)
-            )</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXBvY2ggMS8xXG4yLzI3NiBbPi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDQ0cyAtIExvc3M6IDAuMTg1OCAgLSBNU0U6IDAuMDQyMSBcbjMvMjc2IFs+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogNDNzIC0gTG9zczogMC4yMDIzICAtIE1TRTogMC4wNTI4IFxuNC8yNzYgWz4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiA0MnMgLSBMb3NzOiAwLjE5MzEgIC0gTVNFOiAwLjA1MTYgXG41LzI3NiBbPi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDQzcyAtIExvc3M6IDAuMjE3MyAgLSBNU0U6IDAuMDU5MyBcbjYvMjc2IFs9Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogNDJzIC0gTG9zczogMC4yMjk5ICAtIE1TRTogMC4wNjk4IFxuNy8yNzYgWz0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiA0MXMgLSBMb3NzOiAwLjIzMTMgIC0gTVNFOiAwLjA2OTkgXG44LzI3NiBbPT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDQwcyAtIExvc3M6IDAuMjM3MyAgLSBNU0U6IDAuMDcyMSBcbjkvMjc2IFs9Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogNDBzIC0gTG9zczogMC4yMzk3ICAtIE1TRTogMC4wNzE0IFxuMTAvMjc2IFs9PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzOXMgLSBMb3NzOiAwLjI0MDMgIC0gTVNFOiAwLjA3MjcgXG4xMS8yNzYgWz09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM5cyAtIExvc3M6IDAuMjM2OSAgLSBNU0U6IDAuMDcwNSBcbjEyLzI3NiBbPT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzlzIC0gTG9zczogMC4yNDE3ICAtIE1TRTogMC4wNzE1IFxuMTMvMjc2IFs9PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzOHMgLSBMb3NzOiAwLjIzNjkgIC0gTVNFOiAwLjA2OTkgXG4xNC8yNzYgWz09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM4cyAtIExvc3M6IDAuMjMyMyAgLSBNU0U6IDAuMDY5MSBcbjE1LzI3NiBbPT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzhzIC0gTG9zczogMC4yMjgyICAtIE1TRTogMC4wNjgxIFxuMTYvMjc2IFs9PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzOHMgLSBMb3NzOiAwLjIzMTQgIC0gTVNFOiAwLjA2ODMgXG4xNy8yNzYgWz09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzOHMgLSBMb3NzOiAwLjIzNSAgLSBNU0U6IDAuMDY5MyBcbjE4LzI3NiBbPT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM4cyAtIExvc3M6IDAuMjM0NSAgLSBNU0U6IDAuMDY5IFxuMTkvMjc2IFs9PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzOHMgLSBMb3NzOiAwLjIzMzMgIC0gTVNFOiAwLjA2ODQgXG4yMC8yNzYgWz09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM3cyAtIExvc3M6IDAuMjM2OSAgLSBNU0U6IDAuMDY5MyBcbjIxLzI3NiBbPT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogNDJzIC0gTG9zczogMC4yNDA0ICAtIE1TRTogMC4wNzA2IFxuMjIvMjc2IFs9PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiA0MXMgLSBMb3NzOiAwLjI0MzYgIC0gTVNFOiAwLjA3MTMgXG4yMy8yNzYgWz09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDQxcyAtIExvc3M6IDAuMjQzMyAgLSBNU0U6IDAuMDcxMiBcbiJ9 -->
-<pre><code>Epoch 1/1
-2/276 [&gt;------------------------------------------------------------------------] - ETA: 44s - Loss: 0.1858  - MSE: 0.0421 
-3/276 [&gt;------------------------------------------------------------------------] - ETA: 43s - Loss: 0.2023  - MSE: 0.0528 
-4/276 [&gt;------------------------------------------------------------------------] - ETA: 42s - Loss: 0.1931  - MSE: 0.0516 
-5/276 [&gt;------------------------------------------------------------------------] - ETA: 43s - Loss: 0.2173  - MSE: 0.0593 
-6/276 [=&gt;-----------------------------------------------------------------------] - ETA: 42s - Loss: 0.2299  - MSE: 0.0698 
-7/276 [=&gt;-----------------------------------------------------------------------] - ETA: 41s - Loss: 0.2313  - MSE: 0.0699 
-8/276 [=&gt;-----------------------------------------------------------------------] - ETA: 40s - Loss: 0.2373  - MSE: 0.0721 
-9/276 [=&gt;-----------------------------------------------------------------------] - ETA: 40s - Loss: 0.2397  - MSE: 0.0714 
-10/276 [==&gt;---------------------------------------------------------------------] - ETA: 39s - Loss: 0.2403  - MSE: 0.0727 
-11/276 [==&gt;---------------------------------------------------------------------] - ETA: 39s - Loss: 0.2369  - MSE: 0.0705 
-12/276 [==&gt;---------------------------------------------------------------------] - ETA: 39s - Loss: 0.2417  - MSE: 0.0715 
-13/276 [==&gt;---------------------------------------------------------------------] - ETA: 38s - Loss: 0.2369  - MSE: 0.0699 
-14/276 [===&gt;--------------------------------------------------------------------] - ETA: 38s - Loss: 0.2323  - MSE: 0.0691 
-15/276 [===&gt;--------------------------------------------------------------------] - ETA: 38s - Loss: 0.2282  - MSE: 0.0681 
-16/276 [===&gt;--------------------------------------------------------------------] - ETA: 38s - Loss: 0.2314  - MSE: 0.0683 
-17/276 [===&gt;---------------------------------------------------------------------] - ETA: 38s - Loss: 0.235  - MSE: 0.0693 
-18/276 [====&gt;--------------------------------------------------------------------] - ETA: 38s - Loss: 0.2345  - MSE: 0.069 
-19/276 [====&gt;-------------------------------------------------------------------] - ETA: 38s - Loss: 0.2333  - MSE: 0.0684 
-20/276 [====&gt;-------------------------------------------------------------------] - ETA: 37s - Loss: 0.2369  - MSE: 0.0693 
-21/276 [====&gt;-------------------------------------------------------------------] - ETA: 42s - Loss: 0.2404  - MSE: 0.0706 
-22/276 [=====&gt;------------------------------------------------------------------] - ETA: 41s - Loss: 0.2436  - MSE: 0.0713 
-23/276 [=====&gt;------------------------------------------------------------------] - ETA: 41s - Loss: 0.2433  - MSE: 0.0712 </code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmV0IDwtIE5ldXJhbE5ldCRuZXcoUG9pc3Nvbk1MUDFMLCBEYXRhc2V0Tk5Db3VudCwgdHJhaW5fZGYsIHZhbGlkX2RmKVxuYGBgIn0= -->
-<pre class="r"><code>net &lt;- NeuralNet$new(PoissonMLP1L, DatasetNNCount, train_df, valid_df)</code></pre>
+  PoissonCANN1L %&gt;%
+  setup(
+    loss = nn_poisson_nll_loss(log_input = F),
+    optimizer = optim_adam,
+    metrics = list(luz_metric_mse())
+  ) %&gt;%
+  set_opt_hparams(lr = 0.01) %&gt;% 
+  set_hparams(n_1L = 8) %&gt;% 
+  luz::fit(
+    train_dl, 
+    epochs = 10, 
+    valid_data = valid_dl,
+    callbacks = list(
+      luz_callback_early_stopping(patience = 3),
+      # luz_callback_keep_best_model(),
+      luz_callback_lr_scheduler(torch::lr_reduce_on_plateau, factor = 0.5, patience = 3)#,
+      # luz_callback_lr_scheduler(
+      #   lr_one_cycle,
+      #   max_lr = 0.01,
+      #   epochs = num_epochs,
+      #   steps_per_epoch = length(train_dl),
+      #   call_on = &quot;on_batch_end&quot;
+      # )
+    )
+  )</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmV0JHRyYWluKGJldGFfdmVjID0gZ2xtX3BvaXNzb24kcGFyYW1zX2RmJGVzdGltYXRlLCBuYl9lcG9jaHMgPSAxLCBuYl9uZXVyb25zID0gMTI4KVxuYGBgIn0= -->
-<pre class="r"><code>net$train(beta_vec = glm_poisson$params_df$estimate, nb_epochs = 1, nb_neurons = 128)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudHJhaW5fYmF0Y2ggPC0gZnVuY3Rpb24oYikge1xuICBvcHRpbWl6ZXIkemVyb19ncmFkKClcbiAgb3V0cHV0IDwtIG1vZGVsKGJbWzFdXSlcbiAgdGFyZ2V0IDwtIGJbWzJdXVxuICBsciA8LSBvcHRpbWl6ZXIkcGFyYW1fZ3JvdXBzW1sxXV0kbHJcblxuICBsb3NzIDwtIG5uZl9wb2lzc29uX25sbF9sb3NzKG91dHB1dCwgdGFyZ2V0LCBsb2dfaW5wdXQgPSBGKVxuICBsb3NzJGJhY2t3YXJkKClcbiAgb3B0aW1pemVyJHN0ZXAoKVxuXG4gIHJldHVybihsaXN0KGxvc3MgPSBsb3NzJGl0ZW0oKSwgbHIgPSBscikpXG59XG5cbnZhbGlkX2JhdGNoIDwtIGZ1bmN0aW9uKGIpIHtcbiAgb3V0cHV0IDwtIG1vZGVsKGJbWzFdXSlcbiAgdGFyZ2V0IDwtIGJbWzJdXVxuXG4gIGxvc3MgPC0gbm5mX3BvaXNzb25fbmxsX2xvc3Mob3V0cHV0LCB0YXJnZXQsIGxvZ19pbnB1dCA9IEYpXG4gIGxvc3MkaXRlbSgpXG59XG5gYGAifQ== -->
+<pre class="r"><code>train_batch &lt;- function(b) {
+  optimizer$zero_grad()
+  output &lt;- model(b[[1]])
+  target &lt;- b[[2]]
+  lr &lt;- optimizer$param_groups[[1]]$lr
+
+  loss &lt;- nnf_poisson_nll_loss(output, target, log_input = F)
+  loss$backward()
+  optimizer$step()
+
+  return(list(loss = loss$item(), lr = lr))
+}
+
+valid_batch &lt;- function(b) {
+  output &lt;- model(b[[1]])
+  target &lt;- b[[2]]
+
+  loss &lt;- nnf_poisson_nll_loss(output, target, log_input = F)
+  loss$item()
+}</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXBvY2ggMS8xXG4zLzI3NiBbPi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDI0cyAtIExvc3M6IDAuMjAyMyAgLSBNU0U6IDAuMDUyOCBcbjQvMjc2IFs+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMjhzIC0gTG9zczogMC4xOTMxICAtIE1TRTogMC4wNTE2IFxuNS8yNzYgWz4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzMXMgLSBMb3NzOiAwLjIxNzMgIC0gTVNFOiAwLjA1OTMgXG42LzI3NiBbPT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDMycyAtIExvc3M6IDAuMjI5OSAgLSBNU0U6IDAuMDY5OCBcbjcvMjc2IFs9Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzNzIC0gTG9zczogMC4yMzEzICAtIE1TRTogMC4wNjk5IFxuOC8yNzYgWz0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNHMgLSBMb3NzOiAwLjIzNzMgIC0gTVNFOiAwLjA3MjEgXG45LzI3NiBbPT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM0cyAtIExvc3M6IDAuMjM5NyAgLSBNU0U6IDAuMDcxNCBcbjEwLzI3NiBbPT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzRzIC0gTG9zczogMC4yNDAzICAtIE1TRTogMC4wNzI3IFxuMTEvMjc2IFs9PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNXMgLSBMb3NzOiAwLjIzNjkgIC0gTVNFOiAwLjA3MDUgXG4xMi8yNzYgWz09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM1cyAtIExvc3M6IDAuMjQxNyAgLSBNU0U6IDAuMDcxNSBcbjEzLzI3NiBbPT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yMzY5ICAtIE1TRTogMC4wNjk5IFxuMTQvMjc2IFs9PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNXMgLSBMb3NzOiAwLjIzMjMgIC0gTVNFOiAwLjA2OTEgXG4xNS8yNzYgWz09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM1cyAtIExvc3M6IDAuMjI4MiAgLSBNU0U6IDAuMDY4MSBcbjE2LzI3NiBbPT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yMzE0ICAtIE1TRTogMC4wNjgzIFxuMTcvMjc2IFs9PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzZzIC0gTG9zczogMC4yMzUgIC0gTVNFOiAwLjA2OTMgXG4xOC8yNzYgWz09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNnMgLSBMb3NzOiAwLjIzNDUgIC0gTVNFOiAwLjA2OSBcbjE5LzI3NiBbPT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzZzIC0gTG9zczogMC4yMzMzICAtIE1TRTogMC4wNjg0IFxuMjAvMjc2IFs9PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNnMgLSBMb3NzOiAwLjIzNjkgIC0gTVNFOiAwLjA2OTMgXG4yMS8yNzYgWz09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM2cyAtIExvc3M6IDAuMjQwNCAgLSBNU0U6IDAuMDcwNiBcbjIyLzI3NiBbPT09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzZzIC0gTG9zczogMC4yNDM2ICAtIE1TRTogMC4wNzEzIFxuMjMvMjc2IFs9PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNnMgLSBMb3NzOiAwLjI0MzMgIC0gTVNFOiAwLjA3MTIgXG4yNC8yNzYgWz09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM2cyAtIExvc3M6IDAuMjQ0NCAgLSBNU0U6IDAuMDcxOSBcbjI1LzI3NiBbPT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzZzIC0gTG9zczogMC4yNDIzICAtIE1TRTogMC4wNzA5IFxuMjYvMjc2IFs9PT09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNnMgLSBMb3NzOiAwLjI0MjMgIC0gTVNFOiAwLjA3MDQgXG4yNy8yNzYgWz09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM2cyAtIExvc3M6IDAuMjQyOCAgLSBNU0U6IDAuMDcxMiBcbjI4LzI3NiBbPT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzZzIC0gTG9zczogMC4yNDIyICAtIE1TRTogMC4wNzA5IFxuMjkvMjc2IFs9PT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNnMgLSBMb3NzOiAwLjI0MTMgIC0gTVNFOiAwLjA3MDMgXG4zMC8yNzYgWz09PT09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM2cyAtIExvc3M6IDAuMjQyMSAgLSBNU0U6IDAuMDcwMyBcbjMxLzI3NiBbPT09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM2cyAtIExvc3M6IDAuMjQyICAtIE1TRTogMC4wNzAyIFxuMzIvMjc2IFs9PT09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM2cyAtIExvc3M6IDAuMjQwNiAgLSBNU0U6IDAuMDcgXG4zMy8yNzYgWz09PT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM2cyAtIExvc3M6IDAuMjM5MyAgLSBNU0U6IDAuMDY5NCBcbjM0LzI3NiBbPT09PT09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzZzIC0gTG9zczogMC4yNDAyICAtIE1TRTogMC4wNjk2IFxuMzUvMjc2IFs9PT09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNnMgLSBMb3NzOiAwLjIzOTMgIC0gTVNFOiAwLjA2OTMgXG4zNi8yNzYgWz09PT09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNnMgLSBMb3NzOiAwLjIzODMgIC0gTVNFOiAwLjA2OSBcbjM3LzI3NiBbPT09PT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzZzIC0gTG9zczogMC4yMzYzICAtIE1TRTogMC4wNjgyIFxuMzgvMjc2IFs9PT09PT09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzZzIC0gTG9zczogMC4yMzUgIC0gTVNFOiAwLjA2NzYgXG4zOS8yNzYgWz09PT09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM2cyAtIExvc3M6IDAuMjMzOSAgLSBNU0U6IDAuMDY3MyBcbjQwLzI3NiBbPT09PT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzZzIC0gTG9zczogMC4yMzM5ICAtIE1TRTogMC4wNjczIFxuNDEvMjc2IFs9PT09PT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNnMgLSBMb3NzOiAwLjIzMjkgIC0gTVNFOiAwLjA2NjkgXG40Mi8yNzYgWz09PT09PT09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM2cyAtIExvc3M6IDAuMjMyOSAgLSBNU0U6IDAuMDY2OSBcbjQzLzI3NiBbPT09PT09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzZzIC0gTG9zczogMC4yMzcxICAtIE1TRTogMC4wNjg4IFxuNDQvMjc2IFs9PT09PT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNXMgLSBMb3NzOiAwLjI0MDIgIC0gTVNFOiAwLjA2OTkgXG40NS8yNzYgWz09PT09PT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNXMgLSBMb3NzOiAwLjI0MSAgLSBNU0U6IDAuMDY5OSBcbjQ2LzI3NiBbPT09PT09PT09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yNDA4ICAtIE1TRTogMC4wNjk4IFxuNDcvMjc2IFs9PT09PT09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNXMgLSBMb3NzOiAwLjI0MTIgIC0gTVNFOiAwLjA2OTkgXG40OC8yNzYgWz09PT09PT09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM1cyAtIExvc3M6IDAuMjQyOCAgLSBNU0U6IDAuMDcwNiBcbjQ5LzI3NiBbPT09PT09PT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzZzIC0gTG9zczogMC4yNDM2ICAtIE1TRTogMC4wNzA5IFxuNTAvMjc2IFs9PT09PT09PT09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNnMgLSBMb3NzOiAwLjI0MzIgIC0gTVNFOiAwLjA3MDYgXG41MS8yNzYgWz09PT09PT09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM1cyAtIExvc3M6IDAuMjQzMyAgLSBNU0U6IDAuMDcwNCBcbjUyLzI3NiBbPT09PT09PT09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yNDQzICAtIE1TRTogMC4wNzA3IFxuNTMvMjc2IFs9PT09PT09PT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yNDQgIC0gTVNFOiAwLjA3MDYgXG41NC8yNzYgWz09PT09PT09PT09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM1cyAtIExvc3M6IDAuMjQyNSAgLSBNU0U6IDAuMDY5OSBcbjU1LzI3NiBbPT09PT09PT09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yNDIxICAtIE1TRTogMC4wNjk4IFxuNTYvMjc2IFs9PT09PT09PT09PT09PT4tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1dIC0gRVRBOiAzNXMgLSBMb3NzOiAwLjI0MzYgIC0gTVNFOiAwLjA3MTEgXG41Ny8yNzYgWz09PT09PT09PT09PT09Pi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLV0gLSBFVEE6IDM1cyAtIExvc3M6IDAuMjQ0OCAgLSBNU0U6IDAuMDcxNiBcbjU4LzI3NiBbPT09PT09PT09PT09PT0+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXSAtIEVUQTogMzVzIC0gTG9zczogMC4yNDc3ICAtIE1TRTogMC4wNzI2IFxuIn0= -->
-<pre><code>Epoch 1/1
-3/276 [&gt;------------------------------------------------------------------------] - ETA: 24s - Loss: 0.2023  - MSE: 0.0528 
-4/276 [&gt;------------------------------------------------------------------------] - ETA: 28s - Loss: 0.1931  - MSE: 0.0516 
-5/276 [&gt;------------------------------------------------------------------------] - ETA: 31s - Loss: 0.2173  - MSE: 0.0593 
-6/276 [=&gt;-----------------------------------------------------------------------] - ETA: 32s - Loss: 0.2299  - MSE: 0.0698 
-7/276 [=&gt;-----------------------------------------------------------------------] - ETA: 33s - Loss: 0.2313  - MSE: 0.0699 
-8/276 [=&gt;-----------------------------------------------------------------------] - ETA: 34s - Loss: 0.2373  - MSE: 0.0721 
-9/276 [=&gt;-----------------------------------------------------------------------] - ETA: 34s - Loss: 0.2397  - MSE: 0.0714 
-10/276 [==&gt;---------------------------------------------------------------------] - ETA: 34s - Loss: 0.2403  - MSE: 0.0727 
-11/276 [==&gt;---------------------------------------------------------------------] - ETA: 35s - Loss: 0.2369  - MSE: 0.0705 
-12/276 [==&gt;---------------------------------------------------------------------] - ETA: 35s - Loss: 0.2417  - MSE: 0.0715 
-13/276 [==&gt;---------------------------------------------------------------------] - ETA: 35s - Loss: 0.2369  - MSE: 0.0699 
-14/276 [===&gt;--------------------------------------------------------------------] - ETA: 35s - Loss: 0.2323  - MSE: 0.0691 
-15/276 [===&gt;--------------------------------------------------------------------] - ETA: 35s - Loss: 0.2282  - MSE: 0.0681 
-16/276 [===&gt;--------------------------------------------------------------------] - ETA: 35s - Loss: 0.2314  - MSE: 0.0683 
-17/276 [===&gt;---------------------------------------------------------------------] - ETA: 36s - Loss: 0.235  - MSE: 0.0693 
-18/276 [====&gt;--------------------------------------------------------------------] - ETA: 36s - Loss: 0.2345  - MSE: 0.069 
-19/276 [====&gt;-------------------------------------------------------------------] - ETA: 36s - Loss: 0.2333  - MSE: 0.0684 
-20/276 [====&gt;-------------------------------------------------------------------] - ETA: 36s - Loss: 0.2369  - MSE: 0.0693 
-21/276 [====&gt;-------------------------------------------------------------------] - ETA: 36s - Loss: 0.2404  - MSE: 0.0706 
-22/276 [=====&gt;------------------------------------------------------------------] - ETA: 36s - Loss: 0.2436  - MSE: 0.0713 
-23/276 [=====&gt;------------------------------------------------------------------] - ETA: 36s - Loss: 0.2433  - MSE: 0.0712 
-24/276 [=====&gt;------------------------------------------------------------------] - ETA: 36s - Loss: 0.2444  - MSE: 0.0719 
-25/276 [======&gt;-----------------------------------------------------------------] - ETA: 36s - Loss: 0.2423  - MSE: 0.0709 
-26/276 [======&gt;-----------------------------------------------------------------] - ETA: 36s - Loss: 0.2423  - MSE: 0.0704 
-27/276 [======&gt;-----------------------------------------------------------------] - ETA: 36s - Loss: 0.2428  - MSE: 0.0712 
-28/276 [======&gt;-----------------------------------------------------------------] - ETA: 36s - Loss: 0.2422  - MSE: 0.0709 
-29/276 [=======&gt;----------------------------------------------------------------] - ETA: 36s - Loss: 0.2413  - MSE: 0.0703 
-30/276 [=======&gt;----------------------------------------------------------------] - ETA: 36s - Loss: 0.2421  - MSE: 0.0703 
-31/276 [=======&gt;-----------------------------------------------------------------] - ETA: 36s - Loss: 0.242  - MSE: 0.0702 
-32/276 [========&gt;-----------------------------------------------------------------] - ETA: 36s - Loss: 0.2406  - MSE: 0.07 
-33/276 [========&gt;---------------------------------------------------------------] - ETA: 36s - Loss: 0.2393  - MSE: 0.0694 
-34/276 [========&gt;---------------------------------------------------------------] - ETA: 36s - Loss: 0.2402  - MSE: 0.0696 
-35/276 [========&gt;---------------------------------------------------------------] - ETA: 36s - Loss: 0.2393  - MSE: 0.0693 
-36/276 [=========&gt;---------------------------------------------------------------] - ETA: 36s - Loss: 0.2383  - MSE: 0.069 
-37/276 [=========&gt;--------------------------------------------------------------] - ETA: 36s - Loss: 0.2363  - MSE: 0.0682 
-38/276 [=========&gt;---------------------------------------------------------------] - ETA: 36s - Loss: 0.235  - MSE: 0.0676 
-39/276 [=========&gt;--------------------------------------------------------------] - ETA: 36s - Loss: 0.2339  - MSE: 0.0673 
-40/276 [=========&gt;--------------------------------------------------------------] - ETA: 36s - Loss: 0.2339  - MSE: 0.0673 
-41/276 [==========&gt;-------------------------------------------------------------] - ETA: 36s - Loss: 0.2329  - MSE: 0.0669 
-42/276 [==========&gt;-------------------------------------------------------------] - ETA: 36s - Loss: 0.2329  - MSE: 0.0669 
-43/276 [==========&gt;-------------------------------------------------------------] - ETA: 36s - Loss: 0.2371  - MSE: 0.0688 
-44/276 [==========&gt;-------------------------------------------------------------] - ETA: 35s - Loss: 0.2402  - MSE: 0.0699 
-45/276 [===========&gt;-------------------------------------------------------------] - ETA: 35s - Loss: 0.241  - MSE: 0.0699 
-46/276 [===========&gt;------------------------------------------------------------] - ETA: 35s - Loss: 0.2408  - MSE: 0.0698 
-47/276 [===========&gt;------------------------------------------------------------] - ETA: 35s - Loss: 0.2412  - MSE: 0.0699 
-48/276 [============&gt;-----------------------------------------------------------] - ETA: 35s - Loss: 0.2428  - MSE: 0.0706 
-49/276 [============&gt;-----------------------------------------------------------] - ETA: 36s - Loss: 0.2436  - MSE: 0.0709 
-50/276 [============&gt;-----------------------------------------------------------] - ETA: 36s - Loss: 0.2432  - MSE: 0.0706 
-51/276 [============&gt;-----------------------------------------------------------] - ETA: 35s - Loss: 0.2433  - MSE: 0.0704 
-52/276 [=============&gt;----------------------------------------------------------] - ETA: 35s - Loss: 0.2443  - MSE: 0.0707 
-53/276 [=============&gt;-----------------------------------------------------------] - ETA: 35s - Loss: 0.244  - MSE: 0.0706 
-54/276 [=============&gt;----------------------------------------------------------] - ETA: 35s - Loss: 0.2425  - MSE: 0.0699 
-55/276 [=============&gt;----------------------------------------------------------] - ETA: 35s - Loss: 0.2421  - MSE: 0.0698 
-56/276 [==============&gt;---------------------------------------------------------] - ETA: 35s - Loss: 0.2436  - MSE: 0.0711 
-57/276 [==============&gt;---------------------------------------------------------] - ETA: 35s - Loss: 0.2448  - MSE: 0.0716 
-58/276 [==============&gt;---------------------------------------------------------] - ETA: 35s - Loss: 0.2477  - MSE: 0.0726 </code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmV0JHByaW50X21ldHJpY3MoKVxuYGBgIn0= -->
-<pre class="r"><code>net$print_metrics()</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kZWwgPC0gUG9pc3NvbkNBTk4xTChuXzFMID0gNjQpXG5vcHRpbWl6ZXIgPC0gb3B0aW1fYWRhbShtb2RlbCRwYXJhbWV0ZXJzLCBsciA9IDAuMDAwMSlcbnNjaGVkdWxlciA8LSBcbiAgbHJfcmVkdWNlX29uX3BsYXRlYXUoXG4gICAgb3B0aW1pemVyLFxuICAgIGZhY3RvciA9IDAuNSxcbiAgICBwYXRpZW5jZSA9IDEsXG4gIClcblxubnVtX2Vwb2NocyA8LSA1MFxuXG50cmFpbl9sb3NzX21lYW5fdmVjIDwtIGMoKVxudmFsaWRfbG9zc19tZWFuX3ZlYyA8LSBjKClcblxuZm9yIChlcG9jaCBpbiAxOm51bV9lcG9jaHMpIHtcbiAgbW9kZWwkdHJhaW4oKVxuICB0cmFpbl9sb3NzIDwtIGMoKVxuXG4gIGNvcm86Omxvb3AoZm9yIChiIGluIHRyYWluX2RsKSB7XG4gICAgbG9zcyA8LSB0cmFpbl9iYXRjaChiKSRsb3NzXG4gICAgbHIgPC0gdHJhaW5fYmF0Y2goYikkbHJcbiAgICB0cmFpbl9sb3NzIDwtIGModHJhaW5fbG9zcywgbG9zcylcbiAgfSlcblxuICBtb2RlbCRldmFsKClcbiAgdmFsaWRfbG9zcyA8LSBjKClcblxuICB3aXRoX25vX2dyYWQoeyBcbiAgICBjb3JvOjpsb29wKGZvciAoYiBpbiB2YWxpZF9kbCkge1xuICAgICAgbG9zcyA8LSB2YWxpZF9iYXRjaChiKVxuICAgICAgdmFsaWRfbG9zcyA8LSBjKHZhbGlkX2xvc3MsIGxvc3MpXG4gICAgfSkgIFxuICB9KVxuICBcbiAgdHJhaW5fbG9zc19tZWFuIDwtIG1lYW4odHJhaW5fbG9zcylcbiAgdmFsaWRfbG9zc19tZWFuIDwtIG1lYW4odmFsaWRfbG9zcylcbiAgXG4gIHRyYWluX2xvc3NfbWVhbl92ZWMgPC0gYyh0cmFpbl9sb3NzX21lYW5fdmVjLCB0cmFpbl9sb3NzX21lYW4pXG4gIHZhbGlkX2xvc3NfbWVhbl92ZWMgPC0gYyh2YWxpZF9sb3NzX21lYW5fdmVjLCB2YWxpZF9sb3NzX21lYW4pXG4gIFxuICBzY2hlZHVsZXIkc3RlcCh2YWxpZF9sb3NzX21lYW4pXG4gIFxuICBjYXQoc3ByaW50ZihcbiAgICBcIlxcbkVwb2NoICVkIChsciA9ICVnKSwgdHJhaW5pbmcgbG9zczogJTMuNGYsIHZhbGlkYXRpb24gbG9zczogJTMuNGZcIixcbiAgICBlcG9jaCwgbHIsIG1lYW4odHJhaW5fbG9zcyksIG1lYW4odmFsaWRfbG9zcylcbiAgKSlcbn1cbmBgYCJ9 -->
+<pre class="r"><code>model &lt;- PoissonCANN1L(n_1L = 64)
+optimizer &lt;- optim_adam(model$parameters, lr = 0.0001)
+scheduler &lt;- 
+  lr_reduce_on_plateau(
+    optimizer,
+    factor = 0.5,
+    patience = 1,
+  )
+
+num_epochs &lt;- 50
+
+train_loss_mean_vec &lt;- c()
+valid_loss_mean_vec &lt;- c()
+
+for (epoch in 1:num_epochs) {
+  model$train()
+  train_loss &lt;- c()
+
+  coro::loop(for (b in train_dl) {
+    loss &lt;- train_batch(b)$loss
+    lr &lt;- train_batch(b)$lr
+    train_loss &lt;- c(train_loss, loss)
+  })
+
+  model$eval()
+  valid_loss &lt;- c()
+
+  with_no_grad({ 
+    coro::loop(for (b in valid_dl) {
+      loss &lt;- valid_batch(b)
+      valid_loss &lt;- c(valid_loss, loss)
+    })  
+  })
+  
+  train_loss_mean &lt;- mean(train_loss)
+  valid_loss_mean &lt;- mean(valid_loss)
+  
+  train_loss_mean_vec &lt;- c(train_loss_mean_vec, train_loss_mean)
+  valid_loss_mean_vec &lt;- c(valid_loss_mean_vec, valid_loss_mean)
+  
+  scheduler$step(valid_loss_mean)
+  
+  cat(sprintf(
+    &quot;\nEpoch %d (lr = %g), training loss: %3.4f, validation loss: %3.4f&quot;,
+    epoch, lr, mean(train_loss), mean(valid_loss)
+  ))
+}</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiTW9kw6hsZSBuYcOvZlxuLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS1cbk1TRSA9ICAwLjA2MDggXG5Qb2lzc29uIGxvZy1sb3NzID0gIDAuMjI3OSBcbkxvZ2FyaXRobWljIHNjb3JlID0gIC0yLjU0NTEgXG5cblBlcmZvcm1hbmNlIGFic29sdWVcbi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXG5NU0UgPSAgMC4wNiBcblBvaXNzb24gbG9nLWxvc3MgPSAgMC4yMjEzIFxuTG9nYXJpdGhtaWMgc2NvcmUgPSAgLTIuNjA5NyBcblxuU2tpbGxcbi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tXG5NU0UgPSAgMSUgXG5Qb2lzc29uIGxvZy1sb3NzID0gIDMlIFxuTG9nYXJpdGhtaWMgc2NvcmUgPSAgMiUgXG4ifQ== -->
-<pre><code>Modèle naïf
------------------------------------------------
-MSE =  0.0608 
-Poisson log-loss =  0.2279 
-Logarithmic score =  -2.5451 
-
-Performance absolue
------------------------------------------------
-MSE =  0.06 
-Poisson log-loss =  0.2213 
-Logarithmic score =  -2.6097 
-
-Skill
------------------------------------------------
-MSE =  1% 
-Poisson log-loss =  3% 
-Logarithmic score =  2% </code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiXG5FcG9jaCAxIChsciA9IDAuMDAwMSksIHRyYWluaW5nIGxvc3M6IDAuMjQ1MCwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNjdcbkVwb2NoIDIgKGxyID0gMC4wMDAxKSwgdHJhaW5pbmcgbG9zczogMC4yMzk5LCB2YWxpZGF0aW9uIGxvc3M6IDAuMjM0M1xuRXBvY2ggMyAobHIgPSAwLjAwMDEpLCB0cmFpbmluZyBsb3NzOiAwLjIzNzIsIHZhbGlkYXRpb24gbG9zczogMC4yMzM5XG5FcG9jaCA0IChsciA9IDAuMDAwMSksIHRyYWluaW5nIGxvc3M6IDAuMjM1NiwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNDBcbkVwb2NoIDUgKGxyID0gMC4wMDAxKSwgdHJhaW5pbmcgbG9zczogMC4yMzQ0LCB2YWxpZGF0aW9uIGxvc3M6IDAuMjM0M1xuRXBvY2ggNiAobHIgPSA1ZS0wNSksIHRyYWluaW5nIGxvc3M6IDAuMjMyNSwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNDVcbkVwb2NoIDcgKGxyID0gNWUtMDUpLCB0cmFpbmluZyBsb3NzOiAwLjIzMTcsIHZhbGlkYXRpb24gbG9zczogMC4yMzQ3XG5FcG9jaCA4IChsciA9IDIuNWUtMDUpLCB0cmFpbmluZyBsb3NzOiAwLjIzMDQsIHZhbGlkYXRpb24gbG9zczogMC4yMzQ5XG5FcG9jaCA5IChsciA9IDIuNWUtMDUpLCB0cmFpbmluZyBsb3NzOiAwLjIyOTksIHZhbGlkYXRpb24gbG9zczogMC4yMzUwXG5FcG9jaCAxMCAobHIgPSAxLjI1ZS0wNSksIHRyYWluaW5nIGxvc3M6IDAuMjI5MiwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNTFcbkVwb2NoIDExIChsciA9IDEuMjVlLTA1KSwgdHJhaW5pbmcgbG9zczogMC4yMjg5LCB2YWxpZGF0aW9uIGxvc3M6IDAuMjM1MlxuRXBvY2ggMTIgKGxyID0gNi4yNWUtMDYpLCB0cmFpbmluZyBsb3NzOiAwLjIyODUsIHZhbGlkYXRpb24gbG9zczogMC4yMzUyXG5FcG9jaCAxMyAobHIgPSA2LjI1ZS0wNiksIHRyYWluaW5nIGxvc3M6IDAuMjI4NCwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNTNcbkVwb2NoIDE0IChsciA9IDMuMTI1ZS0wNiksIHRyYWluaW5nIGxvc3M6IDAuMjI4MiwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNTNcbkVwb2NoIDE1IChsciA9IDMuMTI1ZS0wNiksIHRyYWluaW5nIGxvc3M6IDAuMjI4MSwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNTNcbkVwb2NoIDE2IChsciA9IDEuNTYyNWUtMDYpLCB0cmFpbmluZyBsb3NzOiAwLjIyODAsIHZhbGlkYXRpb24gbG9zczogMC4yMzUzXG5FcG9jaCAxNyAobHIgPSAxLjU2MjVlLTA2KSwgdHJhaW5pbmcgbG9zczogMC4yMjgwLCB2YWxpZGF0aW9uIGxvc3M6IDAuMjM1M1xuRXBvY2ggMTggKGxyID0gNy44MTI1ZS0wNyksIHRyYWluaW5nIGxvc3M6IDAuMjI3OSwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNTNcbkVwb2NoIDE5IChsciA9IDcuODEyNWUtMDcpLCB0cmFpbmluZyBsb3NzOiAwLjIyNzksIHZhbGlkYXRpb24gbG9zczogMC4yMzUzXG5FcG9jaCAyMCAobHIgPSAzLjkwNjI1ZS0wNyksIHRyYWluaW5nIGxvc3M6IDAuMjI3OSwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNTRcbkVwb2NoIDIxIChsciA9IDMuOTA2MjVlLTA3KSwgdHJhaW5pbmcgbG9zczogMC4yMjc5LCB2YWxpZGF0aW9uIGxvc3M6IDAuMjM1NFxuRXBvY2ggMjIgKGxyID0gMS45NTMxM2UtMDcpLCB0cmFpbmluZyBsb3NzOiAwLjIyNzksIHZhbGlkYXRpb24gbG9zczogMC4yMzU0XG5FcG9jaCAyMyAobHIgPSAxLjk1MzEzZS0wNyksIHRyYWluaW5nIGxvc3M6IDAuMjI3OSwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNTRcbkVwb2NoIDI0IChsciA9IDkuNzY1NjNlLTA4KSwgdHJhaW5pbmcgbG9zczogMC4yMjc4LCB2YWxpZGF0aW9uIGxvc3M6IDAuMjM1NFxuRXBvY2ggMjUgKGxyID0gOS43NjU2M2UtMDgpLCB0cmFpbmluZyBsb3NzOiAwLjIyNzgsIHZhbGlkYXRpb24gbG9zczogMC4yMzU0XG5FcG9jaCAyNiAobHIgPSA0Ljg4MjgxZS0wOCksIHRyYWluaW5nIGxvc3M6IDAuMjI3OCwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNTRcbkVwb2NoIDI3IChsciA9IDQuODgyODFlLTA4KSwgdHJhaW5pbmcgbG9zczogMC4yMjc4LCB2YWxpZGF0aW9uIGxvc3M6IDAuMjM1NFxuRXBvY2ggMjggKGxyID0gMi40NDE0MWUtMDgpLCB0cmFpbmluZyBsb3NzOiAwLjIyNzgsIHZhbGlkYXRpb24gbG9zczogMC4yMzU0XG5FcG9jaCAyOSAobHIgPSAyLjQ0MTQxZS0wOCksIHRyYWluaW5nIGxvc3M6IDAuMjI3OCwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNTRcbkVwb2NoIDMwIChsciA9IDEuMjIwN2UtMDgpLCB0cmFpbmluZyBsb3NzOiAwLjIyNzgsIHZhbGlkYXRpb24gbG9zczogMC4yMzU0XG5FcG9jaCAzMSAobHIgPSAxLjIyMDdlLTA4KSwgdHJhaW5pbmcgbG9zczogMC4yMjc4LCB2YWxpZGF0aW9uIGxvc3M6IDAuMjM1NFxuRXBvY2ggMzIgKGxyID0gMS4yMjA3ZS0wOCksIHRyYWluaW5nIGxvc3M6IDAuMjI3OCwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNTRcbkVwb2NoIDMzIChsciA9IDEuMjIwN2UtMDgpLCB0cmFpbmluZyBsb3NzOiAwLjIyNzgsIHZhbGlkYXRpb24gbG9zczogMC4yMzU0XG5FcG9jaCAzNCAobHIgPSAxLjIyMDdlLTA4KSwgdHJhaW5pbmcgbG9zczogMC4yMjc4LCB2YWxpZGF0aW9uIGxvc3M6IDAuMjM1NFxuRXBvY2ggMzUgKGxyID0gMS4yMjA3ZS0wOCksIHRyYWluaW5nIGxvc3M6IDAuMjI3OCwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNTRcbkVwb2NoIDM2IChsciA9IDEuMjIwN2UtMDgpLCB0cmFpbmluZyBsb3NzOiAwLjIyNzgsIHZhbGlkYXRpb24gbG9zczogMC4yMzU0XG5FcG9jaCAzNyAobHIgPSAxLjIyMDdlLTA4KSwgdHJhaW5pbmcgbG9zczogMC4yMjc4LCB2YWxpZGF0aW9uIGxvc3M6IDAuMjM1NFxuRXBvY2ggMzggKGxyID0gMS4yMjA3ZS0wOCksIHRyYWluaW5nIGxvc3M6IDAuMjI3OCwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNTRcbkVwb2NoIDM5IChsciA9IDEuMjIwN2UtMDgpLCB0cmFpbmluZyBsb3NzOiAwLjIyNzgsIHZhbGlkYXRpb24gbG9zczogMC4yMzU0XG5FcG9jaCA0MCAobHIgPSAxLjIyMDdlLTA4KSwgdHJhaW5pbmcgbG9zczogMC4yMjc4LCB2YWxpZGF0aW9uIGxvc3M6IDAuMjM1NFxuRXBvY2ggNDEgKGxyID0gMS4yMjA3ZS0wOCksIHRyYWluaW5nIGxvc3M6IDAuMjI3OCwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNTRcbkVwb2NoIDQyIChsciA9IDEuMjIwN2UtMDgpLCB0cmFpbmluZyBsb3NzOiAwLjIyNzgsIHZhbGlkYXRpb24gbG9zczogMC4yMzU0XG5FcG9jaCA0MyAobHIgPSAxLjIyMDdlLTA4KSwgdHJhaW5pbmcgbG9zczogMC4yMjc4LCB2YWxpZGF0aW9uIGxvc3M6IDAuMjM1NFxuRXBvY2ggNDQgKGxyID0gMS4yMjA3ZS0wOCksIHRyYWluaW5nIGxvc3M6IDAuMjI3OCwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNTRcbkVwb2NoIDQ1IChsciA9IDEuMjIwN2UtMDgpLCB0cmFpbmluZyBsb3NzOiAwLjIyNzgsIHZhbGlkYXRpb24gbG9zczogMC4yMzU0XG5FcG9jaCA0NiAobHIgPSAxLjIyMDdlLTA4KSwgdHJhaW5pbmcgbG9zczogMC4yMjc4LCB2YWxpZGF0aW9uIGxvc3M6IDAuMjM1NFxuRXBvY2ggNDcgKGxyID0gMS4yMjA3ZS0wOCksIHRyYWluaW5nIGxvc3M6IDAuMjI3OCwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNTRcbkVwb2NoIDQ4IChsciA9IDEuMjIwN2UtMDgpLCB0cmFpbmluZyBsb3NzOiAwLjIyNzgsIHZhbGlkYXRpb24gbG9zczogMC4yMzU0XG5FcG9jaCA0OSAobHIgPSAxLjIyMDdlLTA4KSwgdHJhaW5pbmcgbG9zczogMC4yMjc4LCB2YWxpZGF0aW9uIGxvc3M6IDAuMjM1NFxuRXBvY2ggNTAgKGxyID0gMS4yMjA3ZS0wOCksIHRyYWluaW5nIGxvc3M6IDAuMjI3OCwgdmFsaWRhdGlvbiBsb3NzOiAwLjIzNTRcbiJ9 -->
+<pre><code>
+Epoch 1 (lr = 0.0001), training loss: 0.2450, validation loss: 0.2367
+Epoch 2 (lr = 0.0001), training loss: 0.2399, validation loss: 0.2343
+Epoch 3 (lr = 0.0001), training loss: 0.2372, validation loss: 0.2339
+Epoch 4 (lr = 0.0001), training loss: 0.2356, validation loss: 0.2340
+Epoch 5 (lr = 0.0001), training loss: 0.2344, validation loss: 0.2343
+Epoch 6 (lr = 5e-05), training loss: 0.2325, validation loss: 0.2345
+Epoch 7 (lr = 5e-05), training loss: 0.2317, validation loss: 0.2347
+Epoch 8 (lr = 2.5e-05), training loss: 0.2304, validation loss: 0.2349
+Epoch 9 (lr = 2.5e-05), training loss: 0.2299, validation loss: 0.2350
+Epoch 10 (lr = 1.25e-05), training loss: 0.2292, validation loss: 0.2351
+Epoch 11 (lr = 1.25e-05), training loss: 0.2289, validation loss: 0.2352
+Epoch 12 (lr = 6.25e-06), training loss: 0.2285, validation loss: 0.2352
+Epoch 13 (lr = 6.25e-06), training loss: 0.2284, validation loss: 0.2353
+Epoch 14 (lr = 3.125e-06), training loss: 0.2282, validation loss: 0.2353
+Epoch 15 (lr = 3.125e-06), training loss: 0.2281, validation loss: 0.2353
+Epoch 16 (lr = 1.5625e-06), training loss: 0.2280, validation loss: 0.2353
+Epoch 17 (lr = 1.5625e-06), training loss: 0.2280, validation loss: 0.2353
+Epoch 18 (lr = 7.8125e-07), training loss: 0.2279, validation loss: 0.2353
+Epoch 19 (lr = 7.8125e-07), training loss: 0.2279, validation loss: 0.2353
+Epoch 20 (lr = 3.90625e-07), training loss: 0.2279, validation loss: 0.2354
+Epoch 21 (lr = 3.90625e-07), training loss: 0.2279, validation loss: 0.2354
+Epoch 22 (lr = 1.95313e-07), training loss: 0.2279, validation loss: 0.2354
+Epoch 23 (lr = 1.95313e-07), training loss: 0.2279, validation loss: 0.2354
+Epoch 24 (lr = 9.76563e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 25 (lr = 9.76563e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 26 (lr = 4.88281e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 27 (lr = 4.88281e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 28 (lr = 2.44141e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 29 (lr = 2.44141e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 30 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 31 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 32 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 33 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 34 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 35 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 36 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 37 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 38 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 39 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 40 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 41 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 42 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 43 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 44 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 45 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 46 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 47 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 48 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 49 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354
+Epoch 50 (lr = 1.2207e-08), training loss: 0.2278, validation loss: 0.2354</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKYGBge3J9CnRyYWluX2RmIDwtIHRhcl9yZWFkKHRyYWluKQp2YWxpZF9kZiA8LSB0YXJfcmVhZCh2YWxpZCkKYGBgCgoKYGBge3J9Cm1vZGVsIDwtIFBvaXNzb25OTiRuZXcoRGF0YXNldE5OQ291bnQsIFBvaXNzb25DQU5OMUwsIHRyYWluX2RmLCB2YWxpZF9kZikKYGBgCgpgYGB7cn0KbW9kZWwkdHJhaW4obl8xTCA9IDgpCmBgYAoKCgpgYGB7cn0KdHJhaW5fZHMgPC0gRGF0YXNldE5OQ291bnQodHJhaW5fZGYpCnZhbGlkX2RzIDwtIERhdGFzZXROTkNvdW50KHZhbGlkX2RmKQpgYGAKCmBgYHtyfQp0cmFpbl9kbCA8LSBkYXRhbG9hZGVyKHRyYWluX2RzLCBiYXRjaF9zaXplID0gMjU2LCBzaHVmZmxlID0gRikKdmFsaWRfZGwgPC0gZGF0YWxvYWRlcih2YWxpZF9kcywgYmF0Y2hfc2l6ZSA9IDI1Niwgc2h1ZmZsZSA9IEYpCmBgYAoKCmBgYHtyfQpmaXQgPC0gCiAgICAgICAgICAgIFBvaXNzb25DQU5OMUwgJT4lCiAgICAgICAgICAgIHNldHVwKAogICAgICAgICAgICAgIGxvc3MgPSBubl9wb2lzc29uX25sbF9sb3NzKGxvZ19pbnB1dCA9IEYpLAogICAgICAgICAgICAgIG9wdGltaXplciA9IG9wdGltX2FkYW0sCiAgICAgICAgICAgICAgbWV0cmljcyA9IGxpc3QobHV6X21ldHJpY19tc2UoKSkKICAgICAgICAgICAgKSAlPiUKICAgICAgICAgICAgc2V0X29wdF9ocGFyYW1zKGxyID0gMC4wMSkgJT4lIAogICAgICAgICAgICBsdXo6OmZpdCgKICAgICAgICAgICAgICB0cmFpbl9kbCwgCiAgICAgICAgICAgICAgZXBvY2hzID0gMSwgCiAgICAgICAgICAgICAgdmFsaWRfZGF0YSA9IHZhbGlkX2RsLAogICAgICAgICAgICAgIGNhbGxiYWNrcyA9IGx1el9jYWxsYmFja19lYXJseV9zdG9wcGluZyhwYXRpZW5jZSA9IDMpCiAgICAgICAgICAgICkKYGBgCgoKCgpgYGB7cn0KbmV0IDwtIE5ldXJhbE5ldCRuZXcoUG9pc3Nvbk1MUDFMLCBEYXRhc2V0Tk5Db3VudCwgdHJhaW5fZGYsIHZhbGlkX2RmKQpgYGAKCmBgYHtyfQpuZXQkdHJhaW4oYmV0YV92ZWMgPSBnbG1fcG9pc3NvbiRwYXJhbXNfZGYkZXN0aW1hdGUsIG5iX2Vwb2NocyA9IDEsIG5iX25ldXJvbnMgPSAxMjgpCmBgYAoKYGBge3J9Cm5ldCRwcmludF9tZXRyaWNzKCkKYGBgCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKYGBge3J9CnRyYWluX2RmIDwtIHRhcl9yZWFkKHRyYWluKQp2YWxpZF9kZiA8LSB0YXJfcmVhZCh2YWxpZCkKYGBgCgpgYGB7cn0KdHJhaW5fZHMgPC0gRGF0YXNldE5OQ291bnQodHJhaW5fZGYpCnZhbGlkX2RzIDwtIERhdGFzZXROTkNvdW50KHZhbGlkX2RmKQpgYGAKCmBgYHtyfQp0cmFpbl9kbCA8LSBkYXRhbG9hZGVyKHRyYWluX2RzLCBiYXRjaF9zaXplID0gMjU2LCBzaHVmZmxlID0gRikKdmFsaWRfZGwgPC0gZGF0YWxvYWRlcih2YWxpZF9kcywgYmF0Y2hfc2l6ZSA9IDI1Niwgc2h1ZmZsZSA9IEYpCmBgYAoKYGBge3J9CmZpdCA8LSAKICBQb2lzc29uQ0FOTjFMICU+JQogIHNldHVwKAogICAgbG9zcyA9IG5uX3BvaXNzb25fbmxsX2xvc3MobG9nX2lucHV0ID0gRiksCiAgICBvcHRpbWl6ZXIgPSBvcHRpbV9hZGFtLAogICAgbWV0cmljcyA9IGxpc3QobHV6X21ldHJpY19tc2UoKSkKICApICU+JQogIHNldF9vcHRfaHBhcmFtcyhsciA9IDAuMDEpICU+JSAKICBzZXRfaHBhcmFtcyhuXzFMID0gOCkgJT4lIAogIGx1ejo6Zml0KAogICAgdHJhaW5fZGwsIAogICAgZXBvY2hzID0gMTAsIAogICAgdmFsaWRfZGF0YSA9IHZhbGlkX2RsLAogICAgY2FsbGJhY2tzID0gbGlzdCgKICAgICAgbHV6X2NhbGxiYWNrX2Vhcmx5X3N0b3BwaW5nKHBhdGllbmNlID0gMyksCiAgICAgICMgbHV6X2NhbGxiYWNrX2tlZXBfYmVzdF9tb2RlbCgpLAogICAgICBsdXpfY2FsbGJhY2tfbHJfc2NoZWR1bGVyKHRvcmNoOjpscl9yZWR1Y2Vfb25fcGxhdGVhdSwgZmFjdG9yID0gMC41LCBwYXRpZW5jZSA9IDMpIywKICAgICAgIyBsdXpfY2FsbGJhY2tfbHJfc2NoZWR1bGVyKAogICAgICAjICAgbHJfb25lX2N5Y2xlLAogICAgICAjICAgbWF4X2xyID0gMC4wMSwKICAgICAgIyAgIGVwb2NocyA9IG51bV9lcG9jaHMsCiAgICAgICMgICBzdGVwc19wZXJfZXBvY2ggPSBsZW5ndGgodHJhaW5fZGwpLAogICAgICAjICAgY2FsbF9vbiA9ICJvbl9iYXRjaF9lbmQiCiAgICAgICMgKQogICAgKQogICkKYGBgCgoKCmBgYHtyfQp0cmFpbl9iYXRjaCA8LSBmdW5jdGlvbihiKSB7CiAgb3B0aW1pemVyJHplcm9fZ3JhZCgpCiAgb3V0cHV0IDwtIG1vZGVsKGJbWzFdXSkKICB0YXJnZXQgPC0gYltbMl1dCiAgbHIgPC0gb3B0aW1pemVyJHBhcmFtX2dyb3Vwc1tbMV1dJGxyCgogIGxvc3MgPC0gbm5mX3BvaXNzb25fbmxsX2xvc3Mob3V0cHV0LCB0YXJnZXQsIGxvZ19pbnB1dCA9IEYpCiAgbG9zcyRiYWNrd2FyZCgpCiAgb3B0aW1pemVyJHN0ZXAoKQoKICByZXR1cm4obGlzdChsb3NzID0gbG9zcyRpdGVtKCksIGxyID0gbHIpKQp9Cgp2YWxpZF9iYXRjaCA8LSBmdW5jdGlvbihiKSB7CiAgb3V0cHV0IDwtIG1vZGVsKGJbWzFdXSkKICB0YXJnZXQgPC0gYltbMl1dCgogIGxvc3MgPC0gbm5mX3BvaXNzb25fbmxsX2xvc3Mob3V0cHV0LCB0YXJnZXQsIGxvZ19pbnB1dCA9IEYpCiAgbG9zcyRpdGVtKCkKfQpgYGAKCmBgYHtyfQptb2RlbCA8LSBQb2lzc29uQ0FOTjFMKG5fMUwgPSA2NCkKb3B0aW1pemVyIDwtIG9wdGltX2FkYW0obW9kZWwkcGFyYW1ldGVycywgbHIgPSAwLjAwMDEpCnNjaGVkdWxlciA8LSAKICBscl9yZWR1Y2Vfb25fcGxhdGVhdSgKICAgIG9wdGltaXplciwKICAgIGZhY3RvciA9IDAuNSwKICAgIHBhdGllbmNlID0gMSwKICApCgpudW1fZXBvY2hzIDwtIDUwCgp0cmFpbl9sb3NzX21lYW5fdmVjIDwtIGMoKQp2YWxpZF9sb3NzX21lYW5fdmVjIDwtIGMoKQoKZm9yIChlcG9jaCBpbiAxOm51bV9lcG9jaHMpIHsKICBtb2RlbCR0cmFpbigpCiAgdHJhaW5fbG9zcyA8LSBjKCkKCiAgY29ybzo6bG9vcChmb3IgKGIgaW4gdHJhaW5fZGwpIHsKICAgIGxvc3MgPC0gdHJhaW5fYmF0Y2goYikkbG9zcwogICAgbHIgPC0gdHJhaW5fYmF0Y2goYikkbHIKICAgIHRyYWluX2xvc3MgPC0gYyh0cmFpbl9sb3NzLCBsb3NzKQogIH0pCgogIG1vZGVsJGV2YWwoKQogIHZhbGlkX2xvc3MgPC0gYygpCgogIHdpdGhfbm9fZ3JhZCh7IAogICAgY29ybzo6bG9vcChmb3IgKGIgaW4gdmFsaWRfZGwpIHsKICAgICAgbG9zcyA8LSB2YWxpZF9iYXRjaChiKQogICAgICB2YWxpZF9sb3NzIDwtIGModmFsaWRfbG9zcywgbG9zcykKICAgIH0pICAKICB9KQogIAogIHRyYWluX2xvc3NfbWVhbiA8LSBtZWFuKHRyYWluX2xvc3MpCiAgdmFsaWRfbG9zc19tZWFuIDwtIG1lYW4odmFsaWRfbG9zcykKICAKICB0cmFpbl9sb3NzX21lYW5fdmVjIDwtIGModHJhaW5fbG9zc19tZWFuX3ZlYywgdHJhaW5fbG9zc19tZWFuKQogIHZhbGlkX2xvc3NfbWVhbl92ZWMgPC0gYyh2YWxpZF9sb3NzX21lYW5fdmVjLCB2YWxpZF9sb3NzX21lYW4pCiAgCiAgc2NoZWR1bGVyJHN0ZXAodmFsaWRfbG9zc19tZWFuKQogIAogIGNhdChzcHJpbnRmKAogICAgIlxuRXBvY2ggJWQgKGxyID0gJWcpLCB0cmFpbmluZyBsb3NzOiAlMy40ZiwgdmFsaWRhdGlvbiBsb3NzOiAlMy40ZiIsCiAgICBlcG9jaCwgbHIsIG1lYW4odHJhaW5fbG9zcyksIG1lYW4odmFsaWRfbG9zcykKICApKQp9CmBgYAoK</div>
 
 
 

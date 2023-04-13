@@ -60,10 +60,10 @@
     },
     "Matrix": {
       "Package": "Matrix",
-      "Version": "1.4-1",
+      "Version": "1.5-4",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "699c47c606293bdfbc9fd78a93c9c8fe"
+      "Hash": "e779c7d9f35cc364438578f334cffee2"
     },
     "R6": {
       "Package": "R6",
@@ -183,6 +183,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "40415719b5a479b87949f3aa0aee737c"
+    },
+    "bookdown": {
+      "Package": "bookdown",
+      "Version": "0.33",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "948ba48e07aa772d3e5564ce8c0a7896"
     },
     "boot": {
       "Package": "boot",
@@ -562,6 +569,13 @@
       "Repository": "CRAN",
       "Hash": "7a0051eef852c301b5efe2f7913dd45f"
     },
+    "gridExtra": {
+      "Package": "gridExtra",
+      "Version": "2.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "7d7f283939f563670a697165b2cf5560"
+    },
     "gtable": {
       "Package": "gtable",
       "Version": "0.3.3",
@@ -751,6 +765,13 @@
       "Repository": "CRAN",
       "Hash": "e25f18436e3efd42c7c590a1c4c15390"
     },
+    "luz": {
+      "Package": "luz",
+      "Version": "0.3.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "df95455d1a79cbe8e40b6d09bc982042"
+    },
     "magrittr": {
       "Package": "magrittr",
       "Version": "2.0.3",
@@ -898,12 +919,26 @@
       "Repository": "CRAN",
       "Hash": "6b0c222c5071efe0f3baf3dae9aa40e2"
     },
+    "plyr": {
+      "Package": "plyr",
+      "Version": "1.8.8",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "d744387aef9047b0b48be2933d78e862"
+    },
     "png": {
       "Package": "png",
       "Version": "0.1-8",
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "bd54ba8a0a5faded999a7aab6e46b374"
+    },
+    "poissonreg": {
+      "Package": "poissonreg",
+      "Version": "1.0.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "e736653bf804154decc6f28e7a414d01"
     },
     "praise": {
       "Package": "praise",
@@ -1056,6 +1091,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "493df4ae51e2e984952ea4d5c75786a3"
+    },
+    "rmdformats": {
+      "Package": "rmdformats",
+      "Version": "1.0.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "aa65206cf3a649096a20b81d98b06f96"
     },
     "rpart": {
       "Package": "rpart",
@@ -1329,6 +1371,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "06eceb3a5d716fd0654cc23ca3d71a99"
+    },
+    "vip": {
+      "Package": "vip",
+      "Version": "0.3.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "70e6da4dbf60a40e80c57901ffef043d"
     },
     "viridisLite": {
       "Package": "viridisLite",
