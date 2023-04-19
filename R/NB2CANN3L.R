@@ -17,11 +17,7 @@ NB2CANN3L <-
       self$do3 = nn_dropout(p = p)
       
       self$linear_phi = nn_linear(1, 1, bias = F)
-      
-      # self$phi = nn_parameter(
-      #   torch_tensor(0.5, dtype = torch_float(), requires_grad = T, device = torch_device("cpu"))
-      # )
-      
+
       self$bn_skip = nn_batch_norm1d(input_size_skip)
       self$linear_skip = nn_linear(input_size_skip, 1)
       
@@ -48,7 +44,8 @@ NB2CANN3L <-
       nn_init_normal_(self$linear3$weight, std = 0.01)
       nn_init_normal_(self$linear4$weight, std = 0.01)
       
-      nn_init_constant_(self$linear_phi$weight, val = 0.5)
+      # nn_init_normal_(self$linear_phi$weight, mean = 5, std = 0)
+      # nn_init_constant_(self$linear_phi$weight, val = 5)
       
       beta_0 <- torch_tensor(beta_vec[1], dtype = torch_float())
       betas <- torch_tensor(array(beta_vec[2:(input_size_skip + 1)], dim = c(1, input_size_skip)), dtype = torch_float())
