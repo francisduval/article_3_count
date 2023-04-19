@@ -16,7 +16,11 @@ NB2CANN3L <-
       self$do2 = nn_dropout(p = p)
       self$do3 = nn_dropout(p = p)
       
-      self$disp = nn_parameter(torch_tensor(0.5, dtype = torch_float()))
+      self$linear_phi = nn_linear(1, 1, bias = F)
+      
+      # self$phi = nn_parameter(
+      #   torch_tensor(0.5, dtype = torch_float(), requires_grad = T, device = torch_device("cpu"))
+      # )
       
       self$bn_skip = nn_batch_norm1d(input_size_skip)
       self$linear_skip = nn_linear(input_size_skip, 1)
@@ -43,6 +47,8 @@ NB2CANN3L <-
       nn_init_normal_(self$linear2$weight, std = 0.01)
       nn_init_normal_(self$linear3$weight, std = 0.01)
       nn_init_normal_(self$linear4$weight, std = 0.01)
+      
+      nn_init_constant_(self$linear_phi$weight, val = 0.5)
       
       beta_0 <- torch_tensor(beta_vec[1], dtype = torch_float())
       betas <- torch_tensor(array(beta_vec[2:(input_size_skip + 1)], dim = c(1, input_size_skip)), dtype = torch_float())
@@ -79,8 +85,8 @@ NB2CANN3L <-
       nb_obs <- dim(x$x_mlp)[1]
       
       output_mu <- nnf_softplus(torch_add(self$skip(x), self$mlp(x)))
-      output_disp <- nnf_softplus(torch_full(c(nb_obs, 1), self$disp))
+      output_phi <- nnf_softplus(torch_full(c(nb_obs, 1), self$linear_phi(1)))
       
-      torch_cat(list(output_mu, output_disp), dim = 2)
+      torch_cat(list(output_mu, output_phi), dim = 2)
     }
   )
