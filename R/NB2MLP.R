@@ -19,7 +19,7 @@ NB2MLP <-
           self$dataset <- dataset
         },
         
-        train = function(train, valid, epochs, lr_start, factor, patience, batch = 64, ...) {
+        train = function(train, valid, epochs, lr_start, factor, patience, batch = 256, ...) {
           train_ds <- self$dataset(train)
           valid_ds <- self$dataset(valid)
           
