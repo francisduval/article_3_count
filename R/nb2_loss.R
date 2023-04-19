@@ -7,3 +7,5 @@ nb2_loss <- function(mu, phi, target) {
   loss_vec <- - (x1 - x2 + x3 - x4)
   mean(loss_vec)
 }
+
+
