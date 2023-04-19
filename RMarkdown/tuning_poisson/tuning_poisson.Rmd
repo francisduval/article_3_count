@@ -1,0 +1,98 @@
+---
+title: "Tuning Poisson"
+author: "Francis Duval"
+date: "2023-04-18"
+output: html_notebook
+# output: rmdformats::material
+---
+
+# Learning rate de départ et factor
+
+```{r}
+plateau_tune <- tar_read(plateau_tune)
+lr_start_factor_grid <- tar_read(lr_start_factor_grid)
+```
+
+```{r}
+dat_plateau <- 
+  map_df(plateau_tune, ~ .$valid_risk_vec) %>% 
+  set_colnames(glue("{lr_start_factor_grid$lr_start}_{lr_start_factor_grid$factor}")) %>% 
+  mutate(epoch = 1:length(plateau_tune[[1]]$valid_risk_vec)) %>% 
+  pivot_longer(cols = -epoch) %>% 
+  separate(name, into = c("lr_start", "factor"), sep = "_") %>% 
+  mutate(lr_start = factor(lr_start), factor = factor(factor))
+```
+
+```{r}
+ggplot(dat_plateau, aes(x = epoch, y = value, col = lr_start, shape = factor)) +
+  geom_point(alpha = 0.7) +
+  geom_line(linewidth = 0.8, alpha = 0.3) +
+  ylab("Validation loss")
+```
+
+# Dropout
+
+```{r}
+dropout_tune <- tar_read(dropout_tune)
+p_grid <- tar_read(p_grid)
+```
+
+```{r}
+dat_dropout <- 
+  map_df(dropout_tune, ~ .$valid_risk_vec) %>% 
+  set_colnames(glue("p_{p_grid}")) %>% 
+  mutate(epoch = 1:length(dropout_tune[[1]]$valid_risk_vec)) %>% 
+  pivot_longer(cols = -epoch)
+```
+
+```{r}
+ggplot(dat_dropout, aes(x = epoch, y = value, col = name)) +
+  geom_point(alpha = 0.7) +
+  geom_line(linewidth = 0.8, alpha = 0.3) +
+  ylab("Validation loss")
+```
+
+# Batch
+
+```{r}
+batch_tune <- tar_read(batch_tune)
+batch_grid <- tar_read(batch_grid)
+```
+
+```{r}
+dat_batch <- 
+  map_df(batch_tune, ~ .$valid_risk_vec) %>% 
+  set_colnames(glue("batch_{batch_grid}")) %>% 
+  mutate(epoch = 1:length(batch_tune[[1]]$valid_risk_vec)) %>% 
+  pivot_longer(cols = -epoch)
+```
+
+```{r}
+ggplot(dat_batch, aes(x = epoch, y = value, col = name)) +
+  geom_point(alpha = 0.7) +
+  geom_line(linewidth = 0.8, alpha = 0.3) +
+  ylab("Validation loss")
+```
+
+# Hidden units
+
+```{r}
+hu_tune <- tar_read(hu_tune)
+n_1L_grid <- tar_read(n_1L_grid)
+n_2L_grid <- tar_read(n_2L_grid)
+n_3L_grid <- tar_read(n_3L_grid)
+```
+
+
+```{r}
+map_dfc(hu_tune, ~ .$valid_risk_vec) %>% 
+  set_colnames(glue("hl_{n_1L_grid}_{n_2L_grid}_{n_3L_grid}")) %>% 
+  mutate(epoch = 1:length(hu_tune[[1]]$valid_risk_vec)) %>% 
+  pivot_longer(cols = hl_16_8_4:hl_64_128_32) %>% 
+  ggplot(aes(x = epoch, y = value, color = name)) +
+  geom_line(linewidth = 0.8, alpha = 0.5) +
+  geom_point(size = 0.5) +
+  labs(col = NULL, y = "Valid loss") +
+  ggtitle("lr_start = 0.001, factor = 0.3, patience = 2, batch = 256, p = 0.2")
+```
+

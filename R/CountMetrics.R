@@ -5,17 +5,17 @@ CountMetrics <- R6Class(
     list(
       pred_naif_vec = function() rep(mean(self$train_targets), length(self$valid_targets)),
       
-      mse_naif = function() mean((self$valid_targets - self$pred_naif_vec()) ^ 2),
-      poisson_logloss_naif = function() poisson_log_loss_vec(self$valid_targets, self$pred_naif_vec()),
-      logscore_naif = function() mean(log(abs(self$valid_targets - self$pred_naif_vec()))),
+      mse_naif = function() mean(ses(self$valid_targets, self$pred_naif_vec())),
+      poisson_logloss_naif = function() as.numeric(nnf_poisson_nll_loss(self$pred_naif_vec(), self$valid_targets, log_input = F)),
+      logscore_naif = function() mean(logs(self$valid_targets, self$pred_naif_vec())),
         
-      mse = function() mean((self$valid_targets - self$valid_preds) ^ 2),
-      poisson_logloss = function() poisson_log_loss_vec(self$valid_targets, self$valid_preds),
-      logscore = function() mean(log(abs(self$valid_targets - self$valid_preds))), 
+      mse = function() mean(ses(self$valid_targets, self$valid_preds)),
+      poisson_logloss = function() as.numeric(nnf_poisson_nll_loss(self$valid_preds, self$valid_targets, log_input = F)),
+      logscore = function() mean(logs(self$valid_targets, self$valid_preds)),
       
       mse_skill = function() 1 - self$mse() / self$mse_naif(),
       poisson_logloss_skill = function() 1 - self$poisson_logloss() / self$poisson_logloss_naif(),
-      logscore_skill = function() 1 - self$logscore_naif() / self$logscore() ,
+      logscore_skill = function() 1 - self$logscore() / self$logscore_naif(),
       
       print_metrics = function() {
         cat("Modèle naïf\n")

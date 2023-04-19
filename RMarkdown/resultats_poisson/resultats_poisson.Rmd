@@ -1,7 +1,7 @@
 ---
 title: "R Notebook"
-# output: html_notebook
-output: rmdformats::material
+output: html_notebook
+# output: rmdformats::material
 ---
 
 ```{r}
@@ -145,43 +145,43 @@ PoissonCANN1L <-
 
 On commence par un tuning simple. On considère 4 taux d'apprentissage (0.001, 0.003, 0.01 et 0.03) ainsi que 4 « nombre de neurones cachés » (8, 16, 32, 64). Voici les résultats de l'entrainement sur l'ensemble de validation:
 
-```{r}
-PoissonCANN1L_tune <- tar_read(PoissonCANN1L_tune)
-lr_n_1L_grid <- tar_read(lr_n_1L_grid)
-```
+# ```{r}
+# PoissonCANN1L_tune <- tar_read(PoissonCANN1L_tune)
+# lr_n_1L_grid <- tar_read(lr_n_1L_grid)
+# ```
 
-```{r}
-prepare_data <- function(data, params_df) {
-  data$training %>% 
-    mutate(
-      epoch = 1:nrow(.),
-      params = glue("lr = {params_df$lr}, nb_neurons = {params_df$n_1L}"),
-      lr = params_df$lr,
-      nb_neurons = params_df$n_1L
-    )
-}
-```
+# ```{r}
+# prepare_data <- function(data, params_df) {
+#   data$training %>% 
+#     mutate(
+#       epoch = 1:nrow(.),
+#       params = glue("lr = {params_df$lr}, nb_neurons = {params_df$n_1L}"),
+#       lr = params_df$lr,
+#       nb_neurons = params_df$n_1L
+#     )
+# }
+# ```
 
-```{r}
-plot_data <- map2_df(PoissonCANN1L_tune, seq(1, nrow(lr_n_1L_grid)), ~ prepare_data(.x, params_df = lr_n_1L_grid[.y, ]))
+# ```{r}
+# plot_data <- map2_df(PoissonCANN1L_tune, seq(1, nrow(lr_n_1L_grid)), ~ prepare_data(.x, params_df = lr_n_1L_grid[.y, ]))
+# 
+# plot_data <- 
+#   plot_data %>% 
+#   select(-train_loss, -train_mse) %>% 
+#   pivot_longer(cols = c(valid_loss, valid_mse))
+# ```
 
-plot_data <- 
-  plot_data %>% 
-  select(-train_loss, -train_mse) %>% 
-  pivot_longer(cols = c(valid_loss, valid_mse))
-```
-
-```{r}
-ggplot(plot_data, aes(x = epoch, y = value, col = factor(lr))) +
-  geom_point(size = 1) +
-  geom_line(size = 0.3) +
-  facet_grid(rows = vars(name), cols = vars(nb_neurons), scales = "free") +
-  scale_color_discrete(name = "Learning rate") +
-  scale_shape_discrete(name = "Nb. hidden neurons") +
-  scale_x_continuous(breaks = 1:10) +
-  ylab("Validation metric") +
-  ggtitle("Réseau à une seule couche cachée")
-```
+# ```{r}
+# ggplot(plot_data, aes(x = epoch, y = value, col = factor(lr))) +
+#   geom_point(size = 1) +
+#   geom_line(size = 0.3) +
+#   facet_grid(rows = vars(name), cols = vars(nb_neurons), scales = "free") +
+#   scale_color_discrete(name = "Learning rate") +
+#   scale_shape_discrete(name = "Nb. hidden neurons") +
+#   scale_x_continuous(breaks = 1:10) +
+#   ylab("Validation metric") +
+#   ggtitle("Réseau à une seule couche cachée")
+# ```
 
 Un learning rate de 0.001 avec 64 neurones cachés (avec 2 époques) fonctionne le mieux pour un réseau à 1 couche cachée. Réentrainons le modèle avec 2 époques et observons les résultats:
 
@@ -191,7 +191,7 @@ model$train(nb_epochs = 2, lr = 0.001, n_1L = 64)
 ```
 
 ```{r}
-model$print_metrics()
+# model$print_metrics()
 ```
 
 Déjà avec une seule couche cachée et un tuning minimal des hyperparamètres, on a une performance similaire au GLM Poisson avec les variables télématiques créées à la main.
@@ -221,3 +221,85 @@ tib %>%
   xlab(NULL) +
   ylab(NULL)
 ```
+
+# Taux d'apprentissage décroissant
+
+Ici, on utilise la stratégie "lr_reduce_on_plateau" pour diminuer le taux d'apprentissage. À chaque fois qu'on détecte que la perte sur l'ensemble de validation semble stagner, on va multiplier le taux d'apprentissage par un certain facteur. Ici, j'ai utilisé un facteur de 0.5.
+
+```{r}
+PoissonCANN1L_tune <- tar_read(PoissonCANN1L_tune)
+PoissonCANN2L_tune <- tar_read(PoissonCANN2L_tune)
+PoissonCANN3L_tune <- tar_read(PoissonCANN3L_tune)
+
+n_1L_grid <- tar_read(n_1L_grid)
+n_2L_grid <- tar_read(n_2L_grid)
+n_3L_grid <- tar_read(n_3L_grid)
+```
+
+```{r}
+map_dfc(PoissonCANN1L_tune, ~ .$valid_risk_vec) %>% 
+  set_colnames(glue("hl_{n_1L_grid}")) %>% 
+  mutate(epoch = 1:length(PoissonCANN1L_tune[[1]]$valid_risk_vec)) %>% 
+  pivot_longer(cols = hl_16:hl_128) %>% 
+  ggplot(aes(x = epoch, y = value, color = name)) +
+  geom_line(linewidth = 0.8, alpha = 0.5) +
+  geom_point(size = 0.5) +
+  labs(col = NULL, y = "Valid loss") +
+  scale_y_continuous(breaks = seq(0.23, 0.28, 0.005), limits = c(0.23, 0.265))
+```
+
+```{r}
+map_dfc(PoissonCANN2L_tune, ~ .$valid_risk_vec) %>% 
+  set_colnames(glue("hl_{n_1L_grid}_{n_2L_grid}")) %>% 
+  mutate(epoch = 1:length(PoissonCANN2L_tune[[1]]$valid_risk_vec)) %>% 
+  pivot_longer(cols = hl_16_8:hl_128_64) %>% 
+  ggplot(aes(x = epoch, y = value, color = name)) +
+  geom_line(linewidth = 0.8, alpha = 0.5) +
+  geom_point(size = 0.5) +
+  labs(col = NULL, y = "Valid loss") +
+  scale_y_continuous(breaks = seq(0.23, 0.28, 0.005), limits = c(0.23, 0.265))
+```
+
+```{r}
+map_dfc(PoissonCANN3L_tune, ~ .$valid_risk_vec) %>% 
+  set_colnames(glue("hl_{n_1L_grid}_{n_2L_grid}_{n_3L_grid}")) %>% 
+  mutate(epoch = 1:length(PoissonCANN3L_tune[[1]]$valid_risk_vec)) %>% 
+  pivot_longer(cols = hl_16_8_4:hl_128_64_32) %>% 
+  ggplot(aes(x = epoch, y = value, color = name)) +
+  geom_line(linewidth = 0.8, alpha = 0.5) +
+  geom_point(size = 0.5) +
+  labs(col = NULL, y = "Valid loss") +
+  scale_y_continuous(breaks = seq(0.23, 0.28, 0.005), limits = c(0.23, 0.265))
+```
+
+# Tuning du lr_reducre_on_plateau
+
+```{r}
+plateau_tune <- tar_read(plateau_tune)
+lr_start_grid <- tar_read(lr_start_grid)
+factor_grid <- tar_read(factor_grid)
+lr_start_factor_grid <- tar_read(lr_start_factor_grid)
+```
+
+```{r}
+dat_plateau <- 
+  map_df(plateau_tune, ~ .$valid_risk_vec) %>% 
+  set_colnames(glue("{lr_start_factor_grid$lr_start}_{lr_start_factor_grid$factor}")) %>% 
+  mutate(epoch = 1:length(plateau_tune[[1]]$valid_risk_vec)) %>% 
+  pivot_longer(cols = -epoch) %>% 
+  separate(name, into = c("lr_start", "factor"), sep = "_") %>% 
+  mutate(lr_start = factor(lr_start), factor = factor(factor))
+```
+
+```{r}
+ggplot(dat_plateau, aes(x = epoch, y = value, col = lr_start, shape = factor)) +
+  geom_point(alpha = 0.7) +
+  geom_line(linewidth = 0.8, alpha = 0.3) +
+  ylab("Validation loss")
+```
+
+
+
+
+
+

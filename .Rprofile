@@ -26,6 +26,8 @@ library(torch)
 library(luz)
 library(poissonreg)
 library(vip)
+library(magrittr)
+library(surveillance)
 
 # Conflits ======================================================================================================================
 conflicted::conflicts_prefer(

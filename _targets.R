@@ -88,19 +88,108 @@ list(
   ),
   
   # -----------------------------------------------------------------------------------------------------------------------------
-  # Réseaux de neurones ---------------------------------------------------------------------------------------------------------
+  # Tuning des hyperparamètres du réseau de neurones ----------------------------------------------------------------------------
   # -----------------------------------------------------------------------------------------------------------------------------
   
-  tar_target(n_1L_grid, c(10, 20, 40, 80)),
+  # tar_target(n_1L_grid, c(16, 32, 64, 128)),
+  # tar_target(n_2L_grid, c(8, 16, 32, 64)),
+  # tar_target(n_3L_grid, c(4, 8, 16, 32)),
+  tar_target(lr_start_grid, c(0.001, 0.0005, 0.0001, 0.00005, 0.00001)),
+  tar_target(factor_grid, c(0.5, 0.4, 0.3)),
+  
+  # tar_target(
+  #   PoissonCANN1L_tune,
+  #   {
+  #     model <- PoissonMLP$new(PoissonCANN1L, DatasetNNCount)
+  #     model$train(train, valid, epochs = 30, lr_start = 0.01, factor = 0.5, patience = 1, n_1L = n_1L_grid)
+  #     model
+  #   },
+  #   pattern = map(n_1L_grid)
+  # ),
+  # 
+  # tar_target(
+  #   PoissonCANN2L_tune,
+  #   {
+  #     model <- PoissonMLP$new(PoissonCANN2L, DatasetNNCount)
+  #     model$train(train, valid, epochs = 30, lr_start = 0.01, factor = 0.5, patience = 1, n_1L = n_1L_grid, n_2L = n_2L_grid)
+  #     model
+  #   },
+  #   pattern = map(n_1L_grid, n_2L_grid)
+  # ),
+  # 
+  # tar_target(
+  #   PoissonCANN3L_tune,
+  #   {
+  #     model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
+  #     model$train(train, valid, epochs = 30, lr_start = 0.01, factor = 0.5, patience = 1, n_1L = n_1L_grid, n_2L = n_2L_grid, n_3L = n_3L_grid)
+  #     model
+  #   },
+  #   pattern = map(n_1L_grid, n_2L_grid, n_3L_grid)
+  # ),
+
   tar_target(
-    PoissonCANN1L_tune,
+    lr_start_factor_grid,
+    tibble(lr_start = lr_start_grid, factor = factor_grid),
+    pattern = cross(lr_start_grid, factor_grid),
+    iteration = "vector"
+  ),
+  
+  # tar_target(
+  #   plateau_tune,
+  #   {
+  #     model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
+  #     model$train(train, valid, epochs = 10, lr_start = lr_start_grid, factor = factor_grid, patience = 2, n_1L = 16, n_2L = 8, n_3L = 4)
+  #     model
+  #   },
+  #   pattern = cross(lr_start_grid, factor_grid)
+  # ),
+  
+  tar_target(p_grid, c(0.2, 0.3, 0.4, 0.5)),
+  # 
+  # tar_target(
+  #   dropout_tune,
+  #   {
+  #     model <- PoissonMLP$new(PoissonCANN3L_DO, DatasetNNCount)
+  #     model$train(train, valid, epochs = 20, lr_start = 0.001, factor = 0.3, patience = 2, n_1L = 16, n_2L = 8, n_3L = 4, p = p_grid)
+  #     model
+  #   },
+  #   pattern = map(p_grid)
+  # ),
+  
+  tar_target(batch_grid, c(128, 256, 512, 1024)),
+  
+  tar_target(
+    batch_tune,
     {
-      model <- PoissonMLP$new(PoissonCANN1L, DatasetNNCount, train[1:100, ], valid[1:100,])
-      model$train(epochs = 20, lr_start = 0.0001, factor = 0.5, patience = 1, n_1L = n_1L_grid)
+      model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
+      model$train(train, valid, epochs = 20, lr_start = 0.001, factor = 0.3, patience = 2, batch = batch_grid, n_1L = 16, n_2L = 8, n_3L = 4, p = 0.2)
       model
     },
-    pattern = map(n_1L_grid)
-  )
+    pattern = map(batch_grid)
+  ),
+  
+  tar_target(n_1L_grid, c(16, 32, 64, 128, 16, 64, 128, 64)),
+  tar_target(n_2L_grid, c(8, 16, 32, 64, 16, 64, 128, 128)),
+  tar_target(n_3L_grid, c(4, 8, 16, 32, 16, 64, 128, 32)),
+  tar_target(
+    hu_tune,
+    {
+      model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
+      model$train(train, valid, epochs = 20, lr_start = 0.001, factor = 0.3, patience = 2, batch = 256, p = 0.2, n_1L = n_1L_grid, n_2L = n_2L_grid, n_3L = n_3L_grid)
+      model
+    },
+    pattern = map(n_1L_grid, n_2L_grid, n_3L_grid)
+  )#,
+
+  # tar_target(
+  #   big_tune,
+  #   {
+  #     model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
+  #     model$train(train, valid, epochs = 20, lr_start = lr_start_grid, factor = 0.3, patience = 2, batch = 256, p = p_grid, n_1L = 128, n_2L = 64, n_3L = 32)
+  #     model
+  #   },
+  #   pattern = cross(p_grid, lr_start_grid)
+  # )
   
   # tar_render(nn_poisson, here("RMarkdown", "nn_poisson", "nn_poisson.Rmd"))
 )

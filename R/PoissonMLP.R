@@ -7,8 +7,6 @@ PoissonMLP <-
       list(
         spec = NULL,
         dataset = NULL,
-        train_df = NULL,
-        valid_df = NULL,
         
         train_targets = NULL,
         valid_targets = NULL,
@@ -16,28 +14,24 @@ PoissonMLP <-
         valid_risk_vec = NULL,
         valid_preds = NULL,
         
-        initialize = function(spec, dataset, train, valid) {
+        initialize = function(spec, dataset) {
           self$spec <- spec
           self$dataset <- dataset
-          self$train_df <- train
-          self$valid_df <- valid
         },
         
-        train = function(epochs, lr_start, factor, patience, ...) {
-          args <- list(...)
-          
-          train_ds <- self$dataset(self$train_df)
-          valid_ds <- self$dataset(self$valid_df)
+        train = function(train, valid, epochs, lr_start, factor, patience, batch = 64, ...) {
+          train_ds <- self$dataset(train)
+          valid_ds <- self$dataset(valid)
           
           self$train_targets <- as.numeric(train_ds$y)
           self$valid_targets <- as.numeric(valid_ds$y)
           
-          train_dl <- dataloader(train_ds, batch_size = 256, shuffle = F)
-          valid_dl <- dataloader(valid_ds, batch_size = 256, shuffle = F)
+          train_dl <- dataloader(train_ds, batch_size = batch, shuffle = F)
+          valid_dl <- dataloader(valid_ds, batch_size = batch, shuffle = F)
           
           model <- self$spec(...)
           optimiseur <- optim_adam(model$parameters, lr = lr_start)
-
+          
           scheduler <- lr_reduce_on_plateau(optimiseur, factor = factor, patience = patience)
           
           train_risk_vec <- vector(mode = "numeric", length = epochs)
@@ -66,15 +60,15 @@ PoissonMLP <-
           # -----
           
           for (e in 1:epochs) {
-
+            
             model$train()
             train_loss_vec <- c()
-
+            
             coro::loop(for (b in train_dl) {
               loss <- train_batch(b)
               train_loss_vec <- c(train_loss_vec, loss)
             })
-
+            
             model$eval()
             valid_loss_vec <- c()
             
@@ -89,9 +83,9 @@ PoissonMLP <-
             valid_risk <- mean(valid_loss_vec)
             
             if (e == 1) {
-              best_model <- model
+              self$valid_preds <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x))
             } else if (valid_risk < valid_risk_vec[e - 1]) {
-              best_model <- model
+              self$valid_preds <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x))
             }
             
             train_risk_vec[e] <- train_risk
@@ -101,8 +95,8 @@ PoissonMLP <-
             scheduler$step(valid_risk)
             
             cat(sprintf(
-                "\nEpoch %d (lr = %g), training loss: %3.4f, validation loss: %3.4f",
-                e, lr, train_risk, valid_risk
+              "\nEpoch %d (lr = %g), training loss: %3.4f, validation loss: %3.4f",
+              e, lr, train_risk, valid_risk
             ))
           }
           
@@ -111,7 +105,6 @@ PoissonMLP <-
           self$train_risk_vec <- train_risk_vec
           self$valid_risk_vec <- valid_risk_vec
           
-          self$valid_preds <- as.double(best_model$forward(valid_ds[1:length(valid_ds)]$x))
         }
       )
   )
