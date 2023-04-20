@@ -84,8 +84,10 @@ PoissonMLP <-
             
             if (e == 1) {
               self$valid_preds <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x))
-            } else if (valid_risk < valid_risk_vec[e - 1]) {
+              best_valid_loss <- as.numeric(nnf_poisson_nll_loss(self$valid_preds, self$valid_targets, log_input = F))
+            } else if (valid_risk < best_valid_loss) {
               self$valid_preds <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x))
+              best_valid_loss <- as.numeric(nnf_poisson_nll_loss(self$valid_preds, self$valid_targets, log_input = F))
             }
             
             train_risk_vec[e] <- train_risk

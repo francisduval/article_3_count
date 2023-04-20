@@ -13,6 +13,7 @@ NB2MLP <-
         train_risk_vec = NULL,
         valid_risk_vec = NULL,
         valid_preds = NULL,
+        phi = NULL,
         
         initialize = function(spec, dataset) {
           self$spec <- spec
@@ -90,8 +91,13 @@ NB2MLP <-
             
             if (e == 1) {
               self$valid_preds <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$mu)
-            } else if (valid_risk < valid_risk_vec[e - 1]) {
+              self$phi <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$phi)
+              best_valid_loss <- nb2_loss(self$valid_preds, self$phi, self$valid_targets)
+            } else if (valid_risk < as.numeric(best_valid_loss)) {
               self$valid_preds <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$mu)
+              self$phi <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$phi)
+              best_valid_loss <- nb2_loss(self$valid_preds, self$phi, self$valid_targets)
+              print(best_valid_loss)
             }
             
             train_risk_vec[e] <- train_risk
@@ -101,8 +107,8 @@ NB2MLP <-
             scheduler$step(valid_risk)
             
             cat(sprintf(
-              "\nEpoch %d (lr = %g), training loss: %3.4f, validation loss: %3.4f",
-              e, lr, train_risk, valid_risk
+              "\nEpoch %d (lr = %g), training loss: %3.4f, validation loss: %3.4f, phi = %3.4f",
+              e, lr, train_risk, valid_risk, self$phi
             ))
           }
           

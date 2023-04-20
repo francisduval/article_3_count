@@ -91,11 +91,31 @@ list(
   # Tuning des hyperparamètres du réseau de neurones ----------------------------------------------------------------------------
   # -----------------------------------------------------------------------------------------------------------------------------
   
+  # Grilles d'hyperparamètres ---------------------------------------------------------------------------------------------------
+  
   # tar_target(n_1L_grid, c(16, 32, 64, 128)),
   # tar_target(n_2L_grid, c(8, 16, 32, 64)),
   # tar_target(n_3L_grid, c(4, 8, 16, 32)),
   tar_target(lr_start_grid, c(0.001, 0.0005, 0.0001, 0.00005, 0.00001)),
   tar_target(factor_grid, c(0.5, 0.4, 0.3)),
+  tar_target(p_grid, c(0.2, 0.3, 0.4)),
+  tar_target(batch_grid, c(128, 256, 512, 1024)),
+  
+  tar_target(
+    lr_start_factor_grid,
+    tibble(lr_start = lr_start_grid, factor = factor_grid),
+    pattern = cross(lr_start_grid, factor_grid),
+    iteration = "vector"
+  ),
+  
+  tar_target(
+    p_lr_start_grid,
+    tibble(p = p_grid, lr_start = lr_start_grid),
+    pattern = cross(p_grid, lr_start_grid),
+    iteration = "vector"
+  ),
+  
+  # Tuning ----------------------------------------------------------------------------------------------------------------------
   
   # tar_target(
   #   PoissonCANN1L_tune,
@@ -126,13 +146,6 @@ list(
   #   },
   #   pattern = map(n_1L_grid, n_2L_grid, n_3L_grid)
   # ),
-
-  tar_target(
-    lr_start_factor_grid,
-    tibble(lr_start = lr_start_grid, factor = factor_grid),
-    pattern = cross(lr_start_grid, factor_grid),
-    iteration = "vector"
-  ),
   
   # tar_target(
   #   plateau_tune,
@@ -143,8 +156,6 @@ list(
   #   },
   #   pattern = cross(lr_start_grid, factor_grid)
   # ),
-  
-  tar_target(p_grid, c(0.2, 0.3, 0.4, 0.5)),
   # 
   # tar_target(
   #   dropout_tune,
@@ -155,8 +166,6 @@ list(
   #   },
   #   pattern = map(p_grid)
   # ),
-  
-  tar_target(batch_grid, c(128, 256, 512, 1024)),
   
   tar_target(
     batch_tune,
@@ -179,17 +188,17 @@ list(
       model
     },
     pattern = map(n_1L_grid, n_2L_grid, n_3L_grid)
-  )#,
+  ),
 
-  # tar_target(
-  #   big_tune,
-  #   {
-  #     model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
-  #     model$train(train, valid, epochs = 20, lr_start = lr_start_grid, factor = 0.3, patience = 2, batch = 256, p = p_grid, n_1L = 128, n_2L = 64, n_3L = 32)
-  #     model
-  #   },
-  #   pattern = cross(p_grid, lr_start_grid)
-  # )
+  tar_target(
+    big_tune,
+    {
+      model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
+      model$train(train, valid, epochs = 20, lr_start = lr_start_grid, factor = 0.3, patience = 2, batch = 256, p = p_grid, n_1L = 128, n_2L = 64, n_3L = 32)
+      model
+    },
+    pattern = cross(p_grid, lr_start_grid)
+  )
   
   # tar_render(nn_poisson, here("RMarkdown", "nn_poisson", "nn_poisson.Rmd"))
 )

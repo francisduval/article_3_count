@@ -96,3 +96,29 @@ map_dfc(hu_tune, ~ .$valid_risk_vec) %>%
   ggtitle("lr_start = 0.001, factor = 0.3, patience = 2, batch = 256, p = 0.2")
 ```
 
+# Tuning d'un réseau 128-64-32
+
+
+```{r}
+p_lr_start_grid <- tar_read(p_lr_start_grid)
+big_tune <- tar_read(big_tune)
+```
+
+```{r}
+dat_big_tune <- 
+  map_df(big_tune, ~ .$valid_risk_vec) %>% 
+  set_colnames(glue("{p_lr_start_grid$p}_{p_lr_start_grid$lr_start}")) %>% 
+  mutate(epoch = 1:length(big_tune[[1]]$valid_risk_vec)) %>% 
+  pivot_longer(cols = -epoch) %>% 
+  separate(name, into = c("p", "lr_start"), sep = "_") %>% 
+  mutate(p = factor(p), lr_start = factor(lr_start))
+```
+
+```{r}
+ggplot(dat_big_tune, aes(x = epoch, y = value, col = lr_start, shape = p)) +
+  geom_point(alpha = 0.7) +
+  geom_line(linewidth = 0.8, alpha = 0.3) +
+  ylab("Validation loss") +
+  ggtitle("CANN Poisson 128-64-32 avec factor = 0.3, patience = 2, batch = 256")
+```
+
