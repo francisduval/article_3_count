@@ -42,8 +42,8 @@ NB2MLP <-
             output <- model(b[[1]])
             target <- b[[2]]
             
-            mu <- output[ , 1]
-            phi <- output[ , 2]
+            mu <- output$mu
+            phi <- output$phi
             
             loss <- nb2_loss(mu, phi, target)
             loss$backward()
@@ -56,8 +56,8 @@ NB2MLP <-
             output <- model(b[[1]])
             target <- b[[2]]
             
-            mu <- output[ , 1]
-            phi <- output[ , 2]
+            mu <- output$mu
+            phi <- output$phi
             
             loss <- nb2_loss(mu, phi, target)
             loss$item()
@@ -67,6 +67,7 @@ NB2MLP <-
           
           for (e in 1:epochs) {
             
+            print(model$parameters$linear_phi.weight)
             model$train()
             train_loss_vec <- c()
             
@@ -89,9 +90,9 @@ NB2MLP <-
             valid_risk <- mean(valid_loss_vec)
             
             if (e == 1) {
-              self$valid_preds <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x))
+              self$valid_preds <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$mu)
             } else if (valid_risk < valid_risk_vec[e - 1]) {
-              self$valid_preds <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x))
+              self$valid_preds <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$mu)
             }
             
             train_risk_vec[e] <- train_risk
