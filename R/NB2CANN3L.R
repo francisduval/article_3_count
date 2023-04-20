@@ -78,8 +78,6 @@ NB2CANN3L <-
     },
     
     forward = function(x) {
-      nb_obs <- dim(x$x_mlp)[1]
-      
       output_mu <- nnf_softplus(torch_add(self$skip(x), self$mlp(x)))
       output_phi <- nnf_softplus(self$linear_phi(1))
 

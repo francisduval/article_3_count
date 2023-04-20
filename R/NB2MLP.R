@@ -67,7 +67,6 @@ NB2MLP <-
           
           for (e in 1:epochs) {
             
-            print(model$parameters$linear_phi.weight)
             model$train()
             train_loss_vec <- c()
             
