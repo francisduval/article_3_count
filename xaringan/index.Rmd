@@ -205,8 +205,9 @@ with
 - Choose a specification for the regression function $\mu(\cdot)$ 
 - Minimise the negative log-likelihood over the training set:
 \begin{align}
-\underset{\mu}{\text{minimize}} \left\{ -\frac{1}{n} \sum_{i \in \mathcal{T}} y_i \ln\left[\mu(\boldsymbol{x_i})\right] - \mu(\boldsymbol{x}_i) - \ln(y_i!)\right\}
+\underset{\mu}{\text{minimize}} \left\{ -\frac{1}{n} \sum_{i \in \mathcal{T}} y_i \ln\left[\mu(\boldsymbol{x_i})\right] - \mu(\boldsymbol{x}_i)\right\}
 \end{align}
+
 
 ---
 
@@ -228,21 +229,33 @@ $$\newcommand{\Xcal}{\mathcal{X}}$$
 # Negative binomial regression
 
 **Assumptions:**
-- Given its predictors $\boldsymbol{x}_i$, the PMF for the number of claims $Y_i$ for contract $i$ is given by:
-<!-- - For each contract $i$ with predictors $\boldsymbol{x}_i$, follows a Poisson distribution: -->
+- Given its predictors $\boldsymbol{x}_i$, the PMF of $Y_i$, the number of claims for contract $i$, is given by:
 \begin{align}
-P(Y_i = y_i) = \frac{e^{-\mu(\boldsymbol{x_i})}\mu(\boldsymbol{x_i})^{y_i}}{y_i!}, \quad y_i = 0, 1, \dots
+P(Y_i = y_i) = \frac{\Gamma(y_i + \phi)}{y_i! \Gamma(\phi)} \left(\frac{\phi}{\phi + \mu(\boldsymbol{x}_i)}\right)^\phi \left( \frac{\mu(\boldsymbol{x}_i)}{\mu(\boldsymbol{x}_i) + \phi}\right)^{y_i}, \quad y_i = 0, 1, \dots,
+\end{align}
+with
+\begin{align}
+\mathbb{E}(Y_i) = \mu(\boldsymbol{x}_i) \quad \text{and} \quad \text{Var}(Y_i) = \mu(\boldsymbol{x}_i) + \frac{\mu(\boldsymbol{x}_i)^2}{\phi}
 \end{align}
 
-**Goal:**
-- Find a good regression function $\mu: \Xcal \rightarrow \mathbb{R}^+$ mapping the predictors $\boldsymbol{x}$ to the parameter $\mu$.
+**How to proceed**:
 
-**How to proceed:**
-- Choose a specification for the regression function $\mu(\cdot)$ 
-- Minimise the negative log-likelihood over the training set:
-\begin{align}
-\underset{\mu}{\text{minimize}} \left\{ -\frac{1}{n} \sum_{i \in \mathcal{T}} y_i \ln\left[\mu(\boldsymbol{x_i})\right] - \mu(\boldsymbol{x}_i) - \ln(y_i!)\right\}
-\end{align}
+- We seek for a good regression function $\mu: \Xcal \rightarrow \mathbb{R}^+$ mapping the predictors $\boldsymbol{x}$ to the parameter $\mu$ and a good estimate of $\phi$.
+- Again, we proceed by minimising the negative log-likelihood.
+- With this specification, we will need a 2-output neural network
+
+<!-- **Minimization problem**: -->
+<!-- \begin{align} -->
+<!-- \underset{\mu, \phi}{\text{minimize}} \left\{-\frac{1}{n} \sum_{i \in \mathcal{T}} y_i \ln[\mu(\boldsymbol{x_i})] - y_i\ln[\phi + \mu(\boldsymbol{x}_i)] + \phi\ln(\phi) -\phi\ln\left[\phi + \mu(\boldsymbol{x}_i)\right] + \ln[\Gamma(\phi + y_i)] - \ln[\Gamma(\phi)]\right\} -->
+<!-- \end{align} -->
+
+<!-- .ecriture-grise[There are 2 parameters to be estimated, we therefore need a 2-output neural network] -->
+
+---
+$\left(\frac{\phi}{\phi + \mu(\boldsymbol{x}_i)}\right)^\phi$ est incorrect
+$\left(\frac{\mu(\boldsymbol{x}_i)}{\mu(\boldsymbol{x}_i) + \phi}\right)^\phi$ est correct <br>
+
+$\text{Var}(Y_i) = \mu(\boldsymbol{x}_i) + \frac{\mu(\boldsymbol{x}_i)^2}{\phi}$
 
 ---
 
