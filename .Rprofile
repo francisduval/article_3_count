@@ -28,10 +28,14 @@ library(poissonreg)
 library(vip)
 library(magrittr)
 library(surveillance)
+library(MASS)
+library(xaringan)
+library(kableExtra)
 
 # Conflits ======================================================================================================================
 conflicted::conflicts_prefer(
   dplyr::filter,
+  dplyr::select,
   hms::hms
 )
 
@@ -40,4 +44,7 @@ options(scipen = 999)
 theme_set(theme_bw())
 
 # Lire les fonctions ============================================================================================================
-walk(dir_ls("R"), source)
+walk(dir_ls("R/Autres"), source)
+walk(dir_ls("R/Poisson models"), source)
+walk(dir_ls("R/NB2 models"), source)
+walk(dir_ls("R/Preprocessing"), source)

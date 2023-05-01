@@ -1,5 +1,5 @@
-CountMetrics <- R6Class(
-  classname = "CountMetrics",
+PoissonMetrics <- R6Class(
+  classname = "PoissonMetrics",
   
   public = 
     list(
@@ -9,9 +9,9 @@ CountMetrics <- R6Class(
       poisson_logloss_naif = function() as.numeric(nnf_poisson_nll_loss(self$pred_naif_vec(), self$valid_targets, log_input = F)),
       logscore_naif = function() mean(logs(self$valid_targets, self$pred_naif_vec())),
         
-      mse = function() mean(ses(self$valid_targets, self$valid_preds)),
-      poisson_logloss = function() as.numeric(nnf_poisson_nll_loss(self$valid_preds, self$valid_targets, log_input = F)),
-      logscore = function() mean(logs(self$valid_targets, self$valid_preds)),
+      mse = function() mean(ses(self$valid_targets, self$valid_mu)),
+      poisson_logloss = function() as.numeric(nnf_poisson_nll_loss(self$valid_mu, self$valid_targets, log_input = F)),
+      logscore = function() mean(logs(self$valid_targets, self$valid_mu)),
       
       mse_skill = function() 1 - self$mse() / self$mse_naif(),
       poisson_logloss_skill = function() 1 - self$poisson_logloss() / self$poisson_logloss_naif(),
@@ -31,8 +31,8 @@ CountMetrics <- R6Class(
         cat("Skill\n")
         cat("-----------------------------------------------\n")
         cat("MSE = ", scales::percent(round(self$mse_skill(), 4)), "\n")
-        cat("Poisson log-loss = ", scales::percent(round(self$poisson_logloss_skill(), 4)), "\n")
-        cat("Logarithmic score = ", scales::percent(round(self$logscore_skill(), 4)), "\n")
+        cat("Poisson log-loss = ", scales::percent(self$poisson_logloss_skill(), accuracy = 0.01), "\n")
+        cat("Logarithmic score = ", scales::percent(self$logscore_skill(), accuracy = 0.01), "\n")
       }
     )
 )

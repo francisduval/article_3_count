@@ -1,0 +1,22 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2639
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica-Bold;\f1\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww16300\viewh19080\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs36 \cf0 Telematics Combined Actuarial Neural Networks for claim count data
+\f1\b0 \
+\
+\pard\pardeftab720\ri-8197\sa400\partightenfactor0
+\cf0 For the past few years, insurers have been incorporating telematics data in their pricing models to better understand and predict claiming risk. Most of the time, human brainpower is used to extract features from raw telematics data that are thought to be correlated with claiming risk. Besides annual mileage, practitioners typically come up with handcrafted telematics features based on harsh braking/acceleration events, the percentage of driving in different time slots/speed buckets/road types, etc. Although it works, this way of extracting information is suboptimal because it relies on human judgment. This method also lacks objectivity because of the thresholds that must be set. For example, how to define night driving, harsh braking or dangerous speed?\
+\pard\pardeftab720\ri-8519\sa400\partightenfactor0
+\cf0 To address these challenges, we propose a method based on the Combined Actuarial Neural Network (CANN) approach, developed by renowned experts Mario V. W\'fcthrich and Michael Merz. The CANN approach combines the power of a classical parametric regression model, such as the generalized linear model (GLM), with the flexibility of a neural network architecture. While GLMs offer simplicity and ease of interpretation, neural networks excel at capturing complex relationships and interactions among predictors, including nonlinear patterns.\
+\pard\pardeftab720\ri-8378\partightenfactor0
+\cf0 Our claim frequency model is a neural network consisting of two distinct parts, namely the GLM and the multilayer perceptron (MLP). The latter is responsible for capturing any signal that might have been missed by the GLM. While the GLM part uses traditional rating factors as inputs, the MLP combines both traditional rating factors and minimally processed telematics data to capture a wider range of signals. For the outcome, 3 different specifications are considered - Poisson, negative binomial and negative multinomial, with the latter being a popular choice for modeling longitudinal claim count data. On a real dataset, we show that our proposed model outperforms our benchmark model that uses manually extracted telematics features.\
+\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardeftab720\ri-8068\pardirnatural\partightenfactor0
+\cf0 \
+}

@@ -1,6 +1,6 @@
 NNUtils <- R6Class(
   classname = "NNUtils",
-  inherit = CountMetrics,
+  inherit = PoissonMetrics,
   
   public = 
     list(

@@ -1,6 +1,6 @@
-NB2MLP <- 
+PoissonMLP <- 
   R6Class(
-    classname = "NB2MLP",
+    classname = "PoissonMLP",
     inherit = NNUtils,
     
     public =
@@ -12,15 +12,14 @@ NB2MLP <-
         valid_targets = NULL,
         train_risk_vec = NULL,
         valid_risk_vec = NULL,
-        valid_preds = NULL,
-        phi = NULL,
+        valid_mu = NULL,
         
         initialize = function(spec, dataset) {
           self$spec <- spec
           self$dataset <- dataset
         },
         
-        train = function(train, valid, epochs, lr_start, factor, patience, batch = 256, ...) {
+        train = function(train, valid, epochs, lr_start, factor, patience, batch = 64, ...) {
           train_ds <- self$dataset(train)
           valid_ds <- self$dataset(valid)
           
@@ -43,10 +42,7 @@ NB2MLP <-
             output <- model(b[[1]])
             target <- b[[2]]
             
-            mu <- output$mu
-            phi <- output$phi
-            
-            loss <- nb2_loss(mu, phi, target)
+            loss <- nnf_poisson_nll_loss(output, target, log_input = F)
             loss$backward()
             optimiseur$step()
             
@@ -57,10 +53,7 @@ NB2MLP <-
             output <- model(b[[1]])
             target <- b[[2]]
             
-            mu <- output$mu
-            phi <- output$phi
-            
-            loss <- nb2_loss(mu, phi, target)
+            loss <- nnf_poisson_nll_loss(output, target, log_input = F)
             loss$item()
           }
           
@@ -90,14 +83,11 @@ NB2MLP <-
             valid_risk <- mean(valid_loss_vec)
             
             if (e == 1) {
-              self$valid_preds <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$mu)
-              self$phi <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$phi)
-              best_valid_loss <- nb2_loss(self$valid_preds, self$phi, self$valid_targets)
-            } else if (valid_risk < as.numeric(best_valid_loss)) {
-              self$valid_preds <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$mu)
-              self$phi <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$phi)
-              best_valid_loss <- nb2_loss(self$valid_preds, self$phi, self$valid_targets)
-              print(best_valid_loss)
+              self$valid_mu <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x))
+              best_valid_loss <- as.numeric(nnf_poisson_nll_loss(self$valid_mu, self$valid_targets, log_input = F))
+            } else if (valid_risk < best_valid_loss) {
+              self$valid_mu <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x))
+              best_valid_loss <- as.numeric(nnf_poisson_nll_loss(self$valid_mu, self$valid_targets, log_input = F))
             }
             
             train_risk_vec[e] <- train_risk
@@ -107,8 +97,8 @@ NB2MLP <-
             scheduler$step(valid_risk)
             
             cat(sprintf(
-              "\nEpoch %d (lr = %g), training loss: %3.4f, validation loss: %3.4f, phi = %3.4f",
-              e, lr, train_risk, valid_risk, self$phi
+              "\nEpoch %d (lr = %g), training loss: %3.4f, validation loss: %3.4f",
+              e, lr, train_risk, valid_risk
             ))
           }
           

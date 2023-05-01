@@ -1,13 +1,9 @@
 PoissonGLM <- R6Class(
   classname = "PoissonGLM",
-  inherit = CountMetrics,
+  inherit = PoissonMetrics,
   
   public = list(
-    recipe = NULL, 
-    train_df = NULL,
-    train_df_juiced = NULL,
-    valid_df = NULL,
-    
+    recipe = NULL,
     predictors = NULL,
     response = NULL,
     
@@ -16,28 +12,29 @@ PoissonGLM <- R6Class(
     
     params_df = NULL,
     var_imp = NULL,
-    valid_preds = NULL,
     
-    initialize = function(recipe, valid_df) {
+    valid_mu = NULL,
+    valid_mu_naif = NULL,
+    
+    initialize = function(recipe) {
       self$recipe <- recipe
-      self$train_df <- recipe$template
-      self$train_df_juiced <- juice(prep(recipe))
-      self$valid_df <- valid_df
-      
       self$predictors <- recipe$var_info %>% filter(role == "predictor") %>% pull(variable)
       self$response <- recipe$term_info %>% filter(role == "outcome") %>% pull(variable)
-      
-      self$train_targets <- self$train_df[[self$response]]
-      self$valid_targets <- valid_df[[self$response]]
     },
     
-    train = function() {
+    train = function(valid_df) {
+      train_df <- self$recipe$template
+      
       spec <- poisson_reg(engine = "glm")
       wf <- workflow() %>% add_recipe(self$recipe) %>% add_model(spec)
-      fit <- parsnip::fit(wf, data = self$train_df)
+      fit <- parsnip::fit(wf, data = train_df)
+      
       self$params_df <- tidy(fit)
       self$var_imp <- extract_fit_parsnip(fit) %>% vip::vi()
-      self$valid_preds <- predict(fit, new_data = self$valid_df)$.pred
+      self$valid_mu <- predict(fit, new_data = valid_df)$.pred
+      
+      self$train_targets <- train_df[[self$response]]
+      self$valid_targets <- valid_df[[self$response]]
       
       invisible(self)
     },

@@ -98,7 +98,6 @@ map_dfc(hu_tune, ~ .$valid_risk_vec) %>%
 
 # Tuning d'un réseau 128-64-32
 
-
 ```{r}
 p_lr_start_grid <- tar_read(p_lr_start_grid)
 big_tune <- tar_read(big_tune)

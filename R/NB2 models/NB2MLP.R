@@ -1,7 +1,7 @@
-PoissonMLP <- 
+NB2MLP <- 
   R6Class(
-    classname = "PoissonMLP",
-    inherit = NNUtils,
+    classname = "NB2MLP",
+    inherit = NB2Metrics,
     
     public =
       list(
@@ -12,14 +12,41 @@ PoissonMLP <-
         valid_targets = NULL,
         train_risk_vec = NULL,
         valid_risk_vec = NULL,
-        valid_preds = NULL,
+        valid_mu = NULL,
+        phi = NULL,
+        
+        valid_mu_naif = NULL,
+        phi_naif = NULL,
         
         initialize = function(spec, dataset) {
           self$spec <- spec
           self$dataset <- dataset
         },
         
-        train = function(train, valid, epochs, lr_start, factor, patience, batch = 64, ...) {
+        fit_naive_model = function(train_df, valid_df) {
+          fit <- glm.nb(nb_claims ~ 1, data = train_df)
+          self$valid_mu_naif <- as.numeric(predict(fit, type = "response", newdata = valid_df))[1]
+          self$phi_naif <- 1 / fit$theta
+        },
+        
+        plot_training = function() {
+          tibble(
+            epoch = seq_along(self$train_risk_vec),
+            train_loss = self$train_risk_vec,
+            valid_loss = self$valid_risk_vec,
+          ) %>% 
+            pivot_longer(cols = -"epoch") %>% 
+            ggplot(aes(x = epoch, y = value, col = name)) +
+            geom_point(alpha = 0.7) +
+            geom_line(linewidth = 0.8, alpha = 0.3) +
+            scale_color_discrete(name = NULL) +
+            scale_x_continuous(breaks = seq_along(self$train_risk_vec)) +
+            ylab(NULL)
+        },
+        
+        train = function(train, valid, epochs, lr_start, factor, patience, batch = 256, ...) {
+          self$fit_naive_model(train, valid)
+          
           train_ds <- self$dataset(train)
           valid_ds <- self$dataset(valid)
           
@@ -42,7 +69,10 @@ PoissonMLP <-
             output <- model(b[[1]])
             target <- b[[2]]
             
-            loss <- nnf_poisson_nll_loss(output, target, log_input = F)
+            mu <- output$mu
+            phi <- output$phi
+            
+            loss <- nb2_loss(mu, phi, target)
             loss$backward()
             optimiseur$step()
             
@@ -53,7 +83,10 @@ PoissonMLP <-
             output <- model(b[[1]])
             target <- b[[2]]
             
-            loss <- nnf_poisson_nll_loss(output, target, log_input = F)
+            mu <- output$mu
+            phi <- output$phi
+            
+            loss <- nb2_loss(mu, phi, target)
             loss$item()
           }
           
@@ -83,11 +116,13 @@ PoissonMLP <-
             valid_risk <- mean(valid_loss_vec)
             
             if (e == 1) {
-              self$valid_preds <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x))
-              best_valid_loss <- as.numeric(nnf_poisson_nll_loss(self$valid_preds, self$valid_targets, log_input = F))
-            } else if (valid_risk < best_valid_loss) {
-              self$valid_preds <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x))
-              best_valid_loss <- as.numeric(nnf_poisson_nll_loss(self$valid_preds, self$valid_targets, log_input = F))
+              self$valid_mu <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$mu)
+              self$phi <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$phi)
+              best_valid_loss <- nb2_loss(self$valid_mu, self$phi, self$valid_targets)
+            } else if (valid_risk < as.numeric(best_valid_loss)) {
+              self$valid_mu <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$mu)
+              self$phi <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$phi)
+              best_valid_loss <- nb2_loss(self$valid_mu, self$phi, self$valid_targets)
             }
             
             train_risk_vec[e] <- train_risk
@@ -97,8 +132,8 @@ PoissonMLP <-
             scheduler$step(valid_risk)
             
             cat(sprintf(
-              "\nEpoch %d (lr = %g), training loss: %3.4f, validation loss: %3.4f",
-              e, lr, train_risk, valid_risk
+              "\nEpoch %d (lr = %g), training loss: %3.4f, validation loss: %3.4f, phi = %3.4f",
+              e, lr, train_risk, valid_risk, self$phi
             ))
           }
           
