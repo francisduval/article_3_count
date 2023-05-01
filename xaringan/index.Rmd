@@ -107,22 +107,29 @@ background-position: 100% 70%
 
 # Data
 
-## Traditional rating factors
+## Traditional rating factors 
+<div style="margin-top: -70px; margin-left: -130px; margin-bottom: 20px;" class="layer">
+  <div class="neuron gris"></div>
+  <div class="neuron gris"></div>
+  <div class="neuron gris"></div>
+</div>
 
-| Name                | Description                                              | Type       |
-|---------------------|----------------------------------------------------------|------------|
-| `annual_distance`   | Annual distance declared by the insured                  | Numeric    |
-| `commute_distance`  | Distance to the place of work declared by the insured    | Numeric    |
-| `conv_count_3_yrs_minor` | Number of minor contraventions in the last 3 years    | Numeric    |
-| `gender`            | Gender of the insured                                     | Categorical |
-| `marital_status`    | Marital status of the insured                             | Categorical |
-| `pmt_plan`          | Payment plan chosen by the insured                        | Categorical |
-| `veh_age`           | Vehicle age                                               | Numeric    |
-| `veh_use`           | Use of the vehicle                                        | Categorical |
-| `years_claim_free`  | Number of years since last claim                          | Numeric    |
-| `years_licensed`    | Number of years since obtaining driver's license          | Numeric    |
+<!-- <div style="margin-top: -60px; margin-left: 450px; margin-bottom: 40px;" class="neuron gris"></div> -->
 
-- The real distance driven is also used as a "traditional risk factor".
+
+| Name                | Description                                              | Type        |
+|---------------------|----------------------------------------------------------|-------------|
+| `annual_distance`   | Annual distance declared by the insured                  | Numeric     |
+| `commute_distance`  | Distance to the place of work declared by the insured    | Numeric     |
+| `conv_count_3_yrs_minor` | Number of minor contraventions in the last 3 years  | Numeric     |
+| `gender`            | Gender of the insured                                    | Categorical |
+| `marital_status`    | Marital status of the insured                            | Categorical |
+| `pmt_plan`          | Payment plan chosen by the insured                       | Categorical |
+| `veh_age`           | Vehicle age                                              | Numeric     |
+| `veh_use`           | Use of the vehicle                                       | Categorical |
+| `years_claim_free`  | Number of years since last claim                         | Numeric     |
+| `years_licensed`    | Number of years since obtaining driver's license         | Numeric     |
+| `distance`          | Real distance driven                                     | Numeric     |
 
 ---
 
@@ -151,6 +158,12 @@ background-position: 100% 70%
 
 ## Telematics inputs
 
+<div style="margin-top: -70px; margin-left: -370px; margin-bottom: 20px;" class="layer">
+  <div class="neuron vert"></div>
+  <div class="neuron vert"></div>
+  <div class="neuron vert"></div>
+</div>
+
 .ecriture-grise[We want the neural network to learn features from the telematics dataset, but we still need a minimal preprocesssing.]
 
 <div style="margin-top: -5px;"></div>
@@ -171,6 +184,31 @@ $\boldsymbol{vma} = (vma_1, vma_2, \dots, vma_{16})$ where $vma_i$ is the fracti
 $\textbf{telematics_input_vec} = (\boldsymbol{h}, \boldsymbol{p}, \boldsymbol{vmo}, \boldsymbol{vma})$
 
 ---
+$$\newcommand{\Xcal}{\mathcal{X}}$$
+# Poisson regression
+<div style="margin-top: -60px;"></div>
+**Assumptions:**
+- Given its predictors $\boldsymbol{x}_i$, the PMF of $Y_i$, the number of claims for contract $i$, is given by:
+<!-- - For each contract $i$ with predictors $\boldsymbol{x}_i$, follows a Poisson distribution: -->
+\begin{align}
+P(Y_i = y_i) = \frac{e^{-\mu(\boldsymbol{x_i})}\mu(\boldsymbol{x_i})^{y_i}}{y_i!}, \quad y_i = 0, 1, \dots,
+\end{align}
+with
+\begin{align}
+\mathbb{E}(Y_i) = \text{Var}(Y_i) = \mu(\boldsymbol{x_i})
+\end{align}
+
+**Goal:**
+- Find a good regression function $\mu: \Xcal \rightarrow \mathbb{R}^+$ mapping the predictors $\boldsymbol{x}$ to the parameter $\mu$.
+
+**How to proceed:**
+- Choose a specification for the regression function $\mu(\cdot)$ 
+- Minimise the negative log-likelihood over the training set:
+\begin{align}
+\underset{\mu}{\text{minimize}} \left\{ -\frac{1}{n} \sum_{i \in \mathcal{T}} y_i \ln\left[\mu(\boldsymbol{x_i})\right] - \mu(\boldsymbol{x}_i) - \ln(y_i!)\right\}
+\end{align}
+
+---
 
 background-image: url(images/PoissonCANN.png)
 background-size: 60%
@@ -184,6 +222,39 @@ knitr::include_graphics("images/PoissonCANN_legend.png")
 ```
 ]
 
-allo
+---
 
+$$\newcommand{\Xcal}{\mathcal{X}}$$
+# Negative binomial regression
+
+**Assumptions:**
+- Given its predictors $\boldsymbol{x}_i$, the PMF for the number of claims $Y_i$ for contract $i$ is given by:
+<!-- - For each contract $i$ with predictors $\boldsymbol{x}_i$, follows a Poisson distribution: -->
+\begin{align}
+P(Y_i = y_i) = \frac{e^{-\mu(\boldsymbol{x_i})}\mu(\boldsymbol{x_i})^{y_i}}{y_i!}, \quad y_i = 0, 1, \dots
+\end{align}
+
+**Goal:**
+- Find a good regression function $\mu: \Xcal \rightarrow \mathbb{R}^+$ mapping the predictors $\boldsymbol{x}$ to the parameter $\mu$.
+
+**How to proceed:**
+- Choose a specification for the regression function $\mu(\cdot)$ 
+- Minimise the negative log-likelihood over the training set:
+\begin{align}
+\underset{\mu}{\text{minimize}} \left\{ -\frac{1}{n} \sum_{i \in \mathcal{T}} y_i \ln\left[\mu(\boldsymbol{x_i})\right] - \mu(\boldsymbol{x}_i) - \ln(y_i!)\right\}
+\end{align}
+
+---
+
+background-image: url(images/PoissonCANN.png)
+background-size: 60%
+background-position: 80% 80%
+
+# Negative binomial CANN
+
+.pull-left[
+```{r echo = F, out.width = "60%", fig.align = "left"}
+knitr::include_graphics("images/PoissonCANN_legend.png")
+```
+]
 

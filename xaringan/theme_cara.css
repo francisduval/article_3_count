@@ -492,3 +492,27 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
   font-size: 0.8em; /* taille de la police */
   margin-right: 0.5em; /* marge à droite du triangle */
 }
+
+.layer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+}
+
+.neuron {
+  width: 40px;
+  height: 40px;
+  margin: 3px;
+  border-radius: 50%;
+  background-color: #85C1E9;
+}
+
+.gris {
+  background-color: grey;
+}
+
+.vert {
+  background-color: #ABEBC6;
+}
