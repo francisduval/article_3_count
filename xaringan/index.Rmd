@@ -184,6 +184,6 @@ knitr::include_graphics("images/PoissonCANN_legend.png")
 ```
 ]
 
-
+allo
 
 
