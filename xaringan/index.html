@@ -174,10 +174,10 @@ background-position: 100% 70%
 ---
 `$$\newcommand{\Xcal}{\mathcal{X}}$$`
 # Poisson regression
+
 &lt;div style="margin-top: -60px;"&gt;&lt;/div&gt;
 **Assumptions:**
 - Given its predictors `\(\boldsymbol{x}_i\)`, the PMF of `\(Y_i\)`, the number of claims for contract `\(i\)`, is given by:
-&lt;!-- - For each contract `\(i\)` with predictors `\(\boldsymbol{x}_i\)`, follows a Poisson distribution: --&gt;
 `\begin{align}
 P(Y_i = y_i) = \frac{e^{-\mu(\boldsymbol{x_i})}\mu(\boldsymbol{x_i})^{y_i}}{y_i!}, \quad y_i = 0, 1, \dots,
 \end{align}`
@@ -196,7 +196,6 @@ with
 \underset{\mu}{\text{minimize}} \left\{ -\frac{1}{n} \sum_{i \in \mathcal{T}} y_i \ln\left[\mu(\boldsymbol{x_i})\right] - \mu(\boldsymbol{x}_i)\right\}
 \end{align}`
 
-
 ---
 
 background-image: url(images/PoissonCANN.png)
@@ -207,6 +206,15 @@ background-position: 80% 80%
 
 .pull-left[
 &lt;img src="images/PoissonCANN_legend.png" width="60%" style="display: block; margin: auto auto auto 0;" /&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+- The output `\(\mu\)` is compared with the response `\(y\)` to compute the negative log-likelihood.
 ]
 
 ---
@@ -230,22 +238,9 @@ with
 - Again, we proceed by minimising the negative log-likelihood.
 - With this specification, we will need a 2-output neural network
 
-&lt;!-- **Minimization problem**: --&gt;
-&lt;!-- \begin{align} --&gt;
-&lt;!-- \underset{\mu, \phi}{\text{minimize}} \left\{-\frac{1}{n} \sum_{i \in \mathcal{T}} y_i \ln[\mu(\boldsymbol{x_i})] - y_i\ln[\phi + \mu(\boldsymbol{x}_i)] + \phi\ln(\phi) -\phi\ln\left[\phi + \mu(\boldsymbol{x}_i)\right] + \ln[\Gamma(\phi + y_i)] - \ln[\Gamma(\phi)]\right\} --&gt;
-&lt;!-- \end{align} --&gt;
-
-&lt;!-- .ecriture-grise[There are 2 parameters to be estimated, we therefore need a 2-output neural network] --&gt;
-
----
-`\(\left(\frac{\phi}{\phi + \mu(\boldsymbol{x}_i)}\right)^\phi\)` est incorrect
-`\(\left(\frac{\mu(\boldsymbol{x}_i)}{\mu(\boldsymbol{x}_i) + \phi}\right)^\phi\)` est correct &lt;br&gt;
-
-`\(\text{Var}(Y_i) = \mu(\boldsymbol{x}_i) + \frac{\mu(\boldsymbol{x}_i)^2}{\phi}\)`
-
 ---
 
-background-image: url(images/PoissonCANN.png)
+background-image: url(images/NB2CANN.png)
 background-size: 60%
 background-position: 80% 80%
 
@@ -253,6 +248,15 @@ background-position: 80% 80%
 
 .pull-left[
 &lt;img src="images/PoissonCANN_legend.png" width="60%" style="display: block; margin: auto auto auto 0;" /&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+- The outputs `\(\mu\)` and `\(\phi\)` are compared with the response `\(y\)` to compute the negative log-likelihood.
 ]
 
     </textarea>
