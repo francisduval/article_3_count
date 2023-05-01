@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Telematics Combined Actuarial Neural Networks for claim count data</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Francis Duval" />
+    <meta name="date" content="2023-05-01" />
+    <script src="libs/header-attrs-2.21/header-attrs.js"></script>
+    <link rel="stylesheet" href="theme_cara.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+class: title-slide
+background-image: url(images/logo_chaire.jpg), url(images/background.jpg)
+background-size: 30%, cover
+background-position: 98% 98%, center
+
+.titre-page-titre[Telematics Combined Actuarial Neural Networks for Claim Count Data]
+&lt;br /&gt;
+.sous-titre-page-titre[Co-operators Show and Share]
+&lt;br /&gt;
+&lt;br /&gt;
+***
+&lt;br /&gt;
+&lt;br /&gt;
+.sous-sous-titre-page-titre[.mon-style-bleu[par] Francis Duval &lt;br&gt; .mon-style-bleu[à] l'Université du Québec à Montréal &lt;br&gt; .mon-style-bleu[le] 17 mai 2023]
+
+---
+
+# Introduction
+
+.left-column[
+&lt;img src="images/tele_icon.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="images/brain_icon.png" width="65%" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="images/nn_icon.png" width="60%" style="display: block; margin: auto;" /&gt;
+]
+
+.right-column[
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+.ecriture-grise[For several years now, insurers have been using telematics information in their pricing models.]
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+.ecriture-grise[Most of the time, human brainpower is used to extract features from raw data that are thought to be correlated with claiming risk.]
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+.ecriture-grise[What if we automated this feature engineering process with a neural network?]
+]
+
+---
+
+# Introduction
+&lt;div class="neg-break"&gt;&lt;/div&gt;
+## Combined Actuarial Neural Network (CANN) approach
+&lt;div class="neg-break"&gt;&lt;/div&gt;
+.pull-left[
+&lt;img src="images/CANN.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+.center[Figure taken from [this paper](https://papers.ssrn.com/sol3/Delivery.cfm/SSRN_ID3320525_code769240.pdf?abstractid=3320525)
+]].
+&lt;/br&gt;
+&lt;/br&gt;
+&lt;/br&gt;
+.ecriture-grise[Consists of a .bleu-gras[classical parametric model] (often a GLM) to which a .bleu-gras[neural network] has been attached.]
+
+.ecriture-grise[The goal of the neural network part is to .bleu-gras[capture] any .bleu-gras[signal] that might have been missed by the GLM.]
+
+.ecriture-grise[Parameters for the GLM part are typically initialized at .bleu-gras[maximum likelihood], while those of the neural network part are initialized to .bleu-gras[zero].]
+
+---
+
+background-image: url(images/perceptron.png)
+background-size: 75%
+background-position: 100% 70%
+
+# GLM as a neural network
+
+.ecriture-grise[Equivalence table]
+.left-column[
+| Perceptron | GLM |
+|--------|-----------|
+| Bias `\(w_0\)` | `\(\beta_0\)` |
+| Weights `\(w_1, \dots, w_m\)` | `\(\beta_1, \dots, \beta_p\)` |
+| Activation function `\(g\)` | Inverse link function `\(g^{-1}\)` |
+]
+
+---
+
+# Data
+
+## Traditional rating factors
+
+| Name                | Description                                              | Type       |
+|---------------------|----------------------------------------------------------|------------|
+| `annual_distance`   | Annual distance declared by the insured                  | Numeric    |
+| `commute_distance`  | Distance to the place of work declared by the insured    | Numeric    |
+| `conv_count_3_yrs_minor` | Number of minor contraventions in the last 3 years    | Numeric    |
+| `gender`            | Gender of the insured                                     | Categorical |
+| `marital_status`    | Marital status of the insured                             | Categorical |
+| `pmt_plan`          | Payment plan chosen by the insured                        | Categorical |
+| `veh_age`           | Vehicle age                                               | Numeric    |
+| `veh_use`           | Use of the vehicle                                        | Categorical |
+| `years_claim_free`  | Number of years since last claim                          | Numeric    |
+| `years_licensed`    | Number of years since obtaining driver's license          | Numeric    |
+
+- The real distance driven is also used as a "traditional risk factor".
+
+---
+
+# Data
+
+## Extract from the telematics dataset
+
+| Contract ID | Trip ID | Departure datetime | Arrival datetime | Distance | Maximum speed |
+|:-----------:|:------:|:-----------------:|:----------------:|:--------:|:-------------:|
+| A | 1 | 2017-05-02 19:04:15 | 2017-05-02 19:24:24 | 25.0 | 104 |
+| A | 2 | 2017-05-02 21:31:29 | 2017-05-02 21:31:29 | 6.4 | 66 |
+| `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` |
+| A | 2320 | 2018-04-30 21:17:22 | 2018-04-30 21:18:44 | 0.2 | 27 |
+| B | 1 | 2017-03-26 11:46:07 | 2017-03-26 11:53:29 | 1.5 | 76 |
+| B | 2 | 2017-03-26 15:18:23 | 2017-03-26 15:51:46 | 35.1 | 119 |
+| `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` |
+| B | 1485 | 2018-03-23 20:07:08 | 2018-03-23 20:20:30 | 10.1 | 92 |
+| C | 1 | 2017-11-20 08:14:34 | 2017-11-20 08:40:21 | 9.7 | 78 |
+| `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` |
+
+---
+
+# Data
+
+&lt;div style="margin-top: -30px;"&gt;&lt;/div&gt;
+
+## Telematics inputs
+
+.ecriture-grise[We want the neural network to learn features from the telematics dataset, but we still need a minimal preprocesssing.]
+
+&lt;div style="margin-top: -5px;"&gt;&lt;/div&gt;
+.ecriture-grise[We thus define the following vectors:]
+
+.bloc.bleu[
+`\(\boldsymbol{h} = (h_1, h_2, \dots, h_{24})\)` where `\(h_i\)` is the fraction of driving in the `\(i^\text{th}\)` hour of the day.
+
+`\(\boldsymbol{p} = (p_1, p_2, \dots, p_7)\)` where `\(p_i\)` is the fraction of driving in the `\(i^\text{th}\)` day of the week.
+
+`\(\boldsymbol{vmo} = (vmo_1, vmo_2, \dots, vmo_{14})\)` where `\(vmo_i\)` is the fraction of trips in the `\(i^\text{th}\)` interval of average speed.
+
+`\(\boldsymbol{vma} = (vma_1, vma_2, \dots, vma_{16})\)` where `\(vma_i\)` is the fraction of trips in the `\(i^\text{th}\)` interval of maximum speed.
+]
+
+.ecriture-grise[We then concatenate these 4 vectors into a big input vector of dimension 24 + 7 + 14 + 16 = 61, which will be given as input to the MLP part of the CANN model:]
+
+`\(\textbf{telematics_input_vec} = (\boldsymbol{h}, \boldsymbol{p}, \boldsymbol{vmo}, \boldsymbol{vma})\)`
+
+---
+
+background-image: url(images/PoissonCANN.png)
+background-size: 60%
+background-position: 80% 80%
+
+# Poisson CANN
+
+.pull-left[
+&lt;img src="images/PoissonCANN_legend.png" width="60%" style="display: block; margin: auto auto auto 0;" /&gt;
+]
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
