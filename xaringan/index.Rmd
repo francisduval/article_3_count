@@ -21,6 +21,11 @@ background-image: url(images/logo_chaire.jpg), url(images/background.jpg)
 background-size: 30%, cover
 background-position: 98% 98%, center
 
+
+```{r xaringanExtra-scribble, echo = F}
+xaringanExtra::use_scribble()
+```
+
 .titre-page-titre[Telematics Combined Actuarial Neural Networks for Claim Count Data]
 <br />
 .sous-titre-page-titre[Co-operators Show and Share]
@@ -153,8 +158,8 @@ background-position: 100% 70%
 
 # Data
 
-## Traditional rating factors 
-<div style="margin-top: -70px; margin-left: -130px; margin-bottom: 20px;" class="layer">
+## traditional risk factors 
+<div style="margin-top: -70px; margin-left: 100px; margin-bottom: 20px;" class="layer">
   <div class="neuron gris"></div>
   <div class="neuron gris"></div>
   <div class="neuron gris"></div>
@@ -179,7 +184,7 @@ background-position: 100% 70%
 
 ???
 
-- Here are the traditional rating factors that we use. Note that we include the real distance driven since it is a telematics feature known to have a lot of predictive power.
+- Here are the traditional risk factors that we use. Note that we include the real distance driven since it is a telematics feature known to have a lot of predictive power.
 - In the computational graphs that I will show later, these rating factors are represented by grey circles.
 
 ---
@@ -258,7 +263,7 @@ $$\newcommand{\Xcal}{\mathcal{X}}$$
 **Assumptions:**
 - Given its predictors $\boldsymbol{x}_i$, the PMF of $Y_i$, the number of claims for contract $i$, is given by:
 \begin{align}
-P(Y_i = y_i) = \frac{e^{-\mu(\boldsymbol{x_i})}\mu(\boldsymbol{x_i})^{y_i}}{y_i!}, \quad y_i = 0, 1, \dots,
+P(Y_i = y_i|\boldsymbol{X}_i) = \frac{e^{-\mu(\boldsymbol{x_i})}\mu(\boldsymbol{x_i})^{y_i}}{y_i!}, \quad y_i = 0, 1, \dots,
 \end{align}
 with
 \begin{align}
@@ -274,6 +279,13 @@ with
 \begin{align}
 \underset{\mu}{\text{minimize}} \left\{ -\frac{1}{n} \sum_{i \in \mathcal{T}} y_i \ln\left[\mu(\boldsymbol{x_i})\right] - \mu(\boldsymbol{x}_i)\right\}
 \end{align}
+
+???
+
+- First specification we consider is Poisson, which means the number of claims is assumed to follow a Poisson distribution.
+- The goal is the find a good regression function mapping the predictors x to the mean parameter mu.
+- A way to proceed is to first choose a specification for the regression function space: it can be a GLM, a neural network, a random forest, etc.
+- Then, we can search the function space and try to minimize the negative log-likelihood. With NN, this minimization procedure is carried on with gradient descent.
 
 ---
 
@@ -298,6 +310,15 @@ knitr::include_graphics("images/PoissonCANN_legend.png")
 - The output $\mu$ is compared with the response $y$ to compute the negative log-likelihood.
 ]
 
+???
+
+- This is the CANN architecture for the Poisson specification.
+- The GLM part has only the traditional risk factors as inputs, while the network part, which is a MLP, has both traditional risk factors and the telematics vector as inputs. This allows to consider traditional-telematics interactions.
+- Note that the MLP part has in fact 3 hidden layers, and not 2 as shown.
+- So the output of the GLM part is added to the output of the MLP part, and then this sum is passed through the softplus function to ensure a positive mu output.
+- The loss function used is the Poisson negative log-likelihood.
+- I will not go through the details of the MLP part, but you can simply think of it as a complex function approximation machine that complements the GLM.
+
 ---
 
 $$\newcommand{\Xcal}{\mathcal{X}}$$
@@ -318,6 +339,12 @@ with
 - We seek for a good regression function $\mu: \Xcal \rightarrow \mathbb{R}^+$ mapping the predictors $\boldsymbol{x}$ to the parameter $\mu$ and a good estimate of $\phi$.
 - Again, we proceed by minimising the negative log-likelihood.
 - With this specification, we will need a 2-output neural network
+
+???
+
+- The second specification we consider is the negative binomial.
+- The number of claim is now assumed to follow a NB distribution, which has a parameter allowing for overdipersion, which is often the case with claim count data.
+- Since the distribution has 2 parameters, we will need a NN with 2 outputs.
 
 ---
 
@@ -341,6 +368,12 @@ knitr::include_graphics("images/PoissonCANN_legend.png")
 <br>
 - The outputs $\mu$ and $\phi$ are compared with the response $y$ to compute the negative log-likelihood.
 ]
+
+???
+
+- This is the CANN architecture for the NB specification.
+- The only thing that changes is the loss function and the addition of an output neuron to accomodate the new parameter phi.
+- Note that we did not include heterogeneity in the phi parameter. 
 
 ---
 
@@ -373,6 +406,17 @@ where $\alpha = \phi + \sum_{t' = 1}^t y_{it'}$ and $\gamma = \phi + \sum_{t' = 
 
 .ecriture-grise[In essence, modeling longitudinal claim counts with a MVNB is equivalent to modeling with a NB using past history.]
 
+???
+
+- With the Poisson and NB specifications, we assume that the contracts are independent, which is not true.
+- Indeed, each insured is observed over many contracts, and the contracts of insured are not independent.
+- It is therefore better to have a longitudinal model, and one of the most popular specifications for this is the MVNB.
+- So the assumption is that the claim vector for an insured follows a MVNB distribution.
+- It is not straightforward to train a NN with a multivariate specification, but fortunately, we can break that down to a univariate problem.
+- Indeed, we can show that with the MVNB specification, the number of claims at time t follows a NB distribution with parameters depending on the insured's history.
+- This is really the heart of the project because to my knowledge, there is no such model in the actuarial literature.
+- Unfortunately, I did not yet code this model, but I'm about to do it. It is not as straightforward to code in Torch as the 2 other specifications because I need to take care of updating the distribution parameters (which depend on past contracts) at each iteration.
+
 ---
 
 # Results
@@ -383,8 +427,8 @@ where $\alpha = \phi + \sum_{t' = 1}^t y_{it'}$ and $\gamma = \phi + \sum_{t' = 
 | Model | Mean Squared error | Logarithmic score | 
 |:-------------------------------------|:------:|:-----------------:|
 | Naïve model (no heterogeneity) | 0.0674 | 0.2441 |
-| GLM (only traditional rating factors) | 1.47 % | 3.21 % |
-| GLM (traditional rating factors + handcrafted telematics features) | 1.72 % | 3.64 % |
+| GLM (only <div class="hover-container"> traditional risk factors <ul class="hover-list"><li>expo</li><li>annual_distance</li><li>commute_distance</li><li>conv_count_3_yrs_minor</li><li>gender</li><li>marital_status</li><li>pmt_plan</li><li>veh_age</li><li>veh_use</li><li>years_claim_free</li><li>years_licensed</li><li>distance</li></ul></div>) | 1.47 % | 3.21 % |
+| GLM (traditional risk factors + <div class="hover-container"> handcrafted telematics features <ul class="hover-list"><li>avg_daily_nb_trips</li><li>med_trip_avg_speed</li><li>med_trip_distance</li><li>med_trip_max_speed</li><li>max_trip_max_speed</li><li>prop_long_trip</li><li>frac_expo_night</li><li>frac_expo_noon</li><li>frac_expo_evening</li><li>frac_expo_peak_morning</li><li>frac_expo_peak_evening</li><li>frac_expo_mon_to_thu</li><li>frac_expo_fri_sat</li></ul></div>) | 1.72 % | 3.64 % |
 | CANN | 1.78 % | 3.66 % |
 
 **Negative binomial specification**
@@ -400,6 +444,13 @@ where $\alpha = \phi + \sum_{t' = 1}^t y_{it'}$ and $\gamma = \phi + \sum_{t' = 
 **% = improvement over the naïve model**
 
 ---
-class: inverse, center, middle
+class: inverse, middle
 
 # Thank you for your attention!
+
+.taille-25[
+- Code for the project:
+  - [.blanc[github.com/francisduval/article_3_count]](https://github.com/francisduval/article_3_count)
+- Link to the slideshow:
+  - [.blanc[telematics-cann.netlify.app]](https://telematics-cann.netlify.app)
+]

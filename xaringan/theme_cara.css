@@ -301,11 +301,8 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
   line-height: 1.1cm;
 }
 
-.rouge-italique-gras-geant {
-  font-weight: bold;
-  font-style: italic;
-  font-size: 5em;
-  color: red;
+.taille-25 {
+  font-size: 25px;
 }
 
 .blanc {
@@ -516,3 +513,37 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
 .vert {
   background-color: #ABEBC6;
 }
+
+
+
+
+
+.hover-container {
+  position: relative;
+  display: inline-block;
+}
+
+.hover-list {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 100%;
+  background-color: #f1f1f1;
+  padding: 5px;
+  border-radius: 4px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.hover-container:hover .hover-list {
+  display: block;
+}
+
+.hover-container {
+  font-size: 16px; /* Adjust the font size to your desired value */
+}
+
+.hover-container:hover {
+  text-decoration: underline;
+  color: #0855a0;
+}
+
