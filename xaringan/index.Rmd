@@ -159,7 +159,7 @@ background-position: 100% 70%
 # Data
 
 ## Traditional risk factors 
-<div style="margin-top: -70px; margin-left: 50px; margin-bottom: 20px;" class="layer">
+<div style="margin-top: -70px; margin-left: -110px; margin-bottom: 20px;" class="layer">
   <div class="neuron gris"></div>
   <div class="neuron gris"></div>
   <div class="neuron gris"></div>
