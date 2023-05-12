@@ -25,7 +25,13 @@ background-position: 98% 98%, center
 ***
 &lt;br /&gt;
 &lt;br /&gt;
-.sous-sous-titre-page-titre[.mon-style-bleu[par] Francis Duval &lt;br&gt; .mon-style-bleu[à] l'Université du Québec à Montréal &lt;br&gt; .mon-style-bleu[le] 17 mai 2023]
+.sous-sous-titre-page-titre[.mon-style-bleu[par] Francis Duval (Jean-Philippe Boucher, Mathieu Pigeon) &lt;br&gt; .mon-style-bleu[à] l'Université du Québec à Montréal &lt;br&gt; .mon-style-bleu[le] 17 mai 2023]
+
+???
+
+- Francis Duval, PhD candidate member of the CARA Chair.
+- Research project that is part of my thesis.
+- Many thanks to Marc Morin from the BI team for helping me with the coding of the neural networks in Torch and for helping me developing my intuition in deep learning.
 
 ---
 
@@ -54,6 +60,22 @@ background-position: 98% 98%, center
 .ecriture-grise[What if we automated this feature engineering process with a neural network?]
 ]
 
+???
+
+- Insurers have been leveraging telematics data in their pricing models for several years now.
+- Using telematics data in pricing model has many benefits:
+  - More precise pure premium
+  - Incentive for safer and less frequent driving (less accidents, congestion and pollution)
+  - Substitute to sensible rating factors
+  - Etc.
+- Insurers will most of the time take the raw telematics data and try to extract features from it that they think are correlated with the claiming risk:
+  - harsh acceleration/braking
+  - % night driving
+  - % driving in different speed buckets
+  - Etc.
+- Good ad hoc approach, but might be suboptimal
+- Since we know that deep neural networks are good at learning useful features from raw data, why not feed the telematics data to a multilayer perceptron and let it extract the features itself?
+
 ---
 
 # Introduction
@@ -74,6 +96,23 @@ background-position: 98% 98%, center
 
 .ecriture-grise[Parameters for the GLM part are typically initialized at .bleu-gras[maximum likelihood], while those of the neural network part are initialized to .bleu-gras[zero].]
 
+???
+
+- Here is the generic neural network (NN) architecture we use to model the number of claims.
+- Developed by Mario V. Wüthrich And Michael Merz, it is called the "Combined Actuarial Neural Network", or CANN for short.
+- It's a NN that consists of 2 parts: the GLM part and the network part.
+- The GLM part acts like a regular GLM, while the network attached to it aims at capturing the signal that have been missed by the GLM.
+- Indeed, a GLM is not able to capture interactions between predictors and can only approximate linear functions of predictors. The network part helps to improve performance.
+- One will usually initialize the parameters of the GLM part at maximum likelihood, while the parameters of the network part will be initialized at zero.
+- That way, the whole NN already gives decent predictions at initialization. When the training starts, the network part is in fact trained on the residuals of the GLM, and we can thus see the procedure as a NN boosting of the GLM.
+- This CANN architecture is good because:
+  - The GLM part allows to have more interpretability
+  - The CANN is initialized at decent GLM predictions, which makes the training faster.
+  - It is very flexible. In this example, both parts are fed with the same inputs. However, one could include other types of inputs in the network part. In general, we know that NN are good at dealing with unstructured data such as telematics data and text data.
+  - The fact that the network part is attached to the GLM part ensures that the network does not catch the signal that has already been caught by the GLM.
+- It would even be possible, with this architecture, to extract features from the hidden layers and then use them in a regular GLM.
+- In brief, this architecture could be useful in any supervised learning problem, particularly when unstructured data is available.
+
 ---
 
 background-image: url(images/perceptron.png)
@@ -90,6 +129,13 @@ background-position: 100% 70%
 | Weights `\(w_1, \dots, w_m\)` | `\(\beta_1, \dots, \beta_p\)` |
 | Activation function `\(g\)` | Inverse link function `\(g^{-1}\)` |
 ]
+
+???
+
+- You may wonder how it is possible to embed a GLM with a neural network.
+- In fact, this is easy because the prediction function of a GLM is the same as a perceptron, which is the building block of neural networks.
+- So in both in a GLM and a perceptron, the inputs are each multiplied by a weight. the products are then added together before being passed to an activation function. Here the activation function is the sigmoid, so we have a Bernoulli GLM, or logistic regression.
+- Since we want to model claim count, our activation function will be the sofplus since we want positive outputs.
 
 ---
 
@@ -119,6 +165,11 @@ background-position: 100% 70%
 | `years_licensed`    | Number of years since obtaining driver's license         | Numeric     |
 | `distance`          | Real distance driven                                     | Numeric     |
 
+???
+
+- Here are the traditional rating factors that we use. Note that we include the real distance driven since it is a telematics feature known to have a lot of predictive power.
+- In the computational graphs that I will show later, these rating factors are represented by grey circles.
+
 ---
 
 # Data
@@ -137,6 +188,12 @@ background-position: 100% 70%
 | B | 1485 | 2018-03-23 20:07:08 | 2018-03-23 20:20:30 | 10.1 | 92 |
 | C | 1 | 2017-11-20 08:14:34 | 2017-11-20 08:40:21 | 9.7 | 78 |
 | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` |
+
+???
+
+- This is the telematics dataset I have a my disposal. Each row is a trip, which is depicted by 4 attributes: the departure and arrival datetime, the distance driven and the maximum speed reached.
+- For instance, contract A has 2320 trips.
+- Even though neural networks are known to perform well on raw data, this dataset still needs a minimal amount of preprocessing in order to make it more informative to the NN.
 
 ---
 
@@ -170,6 +227,16 @@ background-position: 100% 70%
 .ecriture-grise[We then concatenate these 4 vectors into a big input vector of dimension 24 + 7 + 14 + 16 = 61, which will be given as input to the MLP part of the CANN model:]
 
 `\(\textbf{telematics_input_vec} = (\boldsymbol{h}, \boldsymbol{p}, \boldsymbol{vmo}, \boldsymbol{vma})\)`
+
+???
+
+- From this telematics dataset, we therefore create 4 telematics vectors.
+- The first one, h, is of dimension 24 (for the 24 hours of the day), and each elements is the fraction of driving in the correponding hour of the day. For instance, `\(h_1\)` is the fraction of driving for a given contract made between midnight and 1:00.
+- The second one is similar, but instead records the fraction of driving in each day of the week.
+- vmo records the fraction of trips made in different buckets of average speed. I made 10 kilometers per hour buckets, so for instance, vmo_1 is the fraction of trips made at an average speed between 0 and 10 kph. 
+- vma is the same, but for maximum speed. 
+- We then concatenate these 4 vectors into 1 big telematics vector, which summarises the driving habits of a given contract.
+- These telematics inputs are represented by green circles.
 
 ---
 `$$\newcommand{\Xcal}{\mathcal{X}}$$`
