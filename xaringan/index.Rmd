@@ -275,3 +275,35 @@ knitr::include_graphics("images/PoissonCANN_legend.png")
 - The outputs $\mu$ and $\phi$ are compared with the response $y$ to compute the negative log-likelihood.
 ]
 
+---
+
+# Multivariate Negative Binomial (MVNB) Regression
+
+<!-- .ecriture-grise[Suited for longitudinal count data]  -->
+
+**Assumptions:**
+
+- The claim vector for insured $i$, $(Y_{i1}, \dots, Y_{iT_i})$, follows a MVNB distribution:
+
+\begin{align}
+  (Y_{i1}, \dots, Y_{iT_i}) \sim MVNB
+\end{align}
+
+<!-- \begin{align} -->
+<!-- P(Y_{i1} = y_{i1}, \dots, Y_{i,T_i} = y_{i,T_i}) = \left(\prod_{t=1}^{T_i} \frac{\mu(\boldsymbol{x}_{it})^{y_{it}}}{y_{it}!}\right) \frac{\Gamma(y_{i\bullet} + \nu)}{\Gamma(\nu)} \left(\frac{\nu}{\sum_{t=1}^{T_i} \mu(\boldsymbol{x}_{it}) + \nu}\right)^\nu \left(\sum_{t=1}^{T_i} \mu(\boldsymbol{x}_{it}) + \nu\right)^{-y_{i\bullet}}, -->
+<!-- \end{align} -->
+<!-- where $y_{i\bullet} = \sum_{t=1}^{T_i}y_{it}$. -->
+
+- Hard to train a neural network with a multivariate distribution, but fortunately, we can show that
+\begin{align}
+P(Y_{i1} = y_{i1}|\boldsymbol{X}_{i1}) = \frac{\Gamma(y_{i1} + \phi)}{y_{i1}! \Gamma(\phi)} \left(\frac{\phi}{\phi + \mu(\boldsymbol{x}_{i1})}\right)^\phi \left( \frac{\mu(\boldsymbol{x}_{i1})}{\mu(\boldsymbol{x}_{i1}) + \phi}\right)^{y_{i1}}
+\end{align}
+and that
+\begin{align}
+P(Y_{it} = y_{it}|\boldsymbol{Y}_{i, t-1}, \boldsymbol{X}_{i1}, \dots, \boldsymbol{X}_{i, t-1}) = \frac{\Gamma(y_{it} + \alpha)}{y_{it}! \Gamma(\alpha)} \left(\frac{\gamma}{\gamma + \mu(\boldsymbol{x}_{it})}\right)^\alpha \left( \frac{\mu(\boldsymbol{x}_{it})}{\mu(\boldsymbol{x}_{it}) + \gamma}\right)^{y_{it}},\quad t = 2, 3, \dots, T_i.
+\end{align}
+where $\alpha = \phi + \sum_{t' = 1}^t y_{it'}$ and $\gamma = \phi + \sum_{t' = 1}^t \mu(\boldsymbol{x}_{it'})$.
+
+.ecriture-grise[In essence, modeling longitudinal claim counts with a MVNB is equivalent to modeling with a NB using past history.]
+
+---
