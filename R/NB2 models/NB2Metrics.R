@@ -30,7 +30,7 @@ NB2Metrics <- R6Class(
         cat("Logarithmic score = ", round(self$logscore(), 4), "\n\n")
         cat("Skill\n")
         cat("-----------------------------------------------\n")
-        cat("MSE = ", scales::percent(round(self$mse_skill(), 4)), "\n")
+        cat("MSE = ", scales::percent(self$mse_skill(), accuracy = 0.01), "\n")
         cat("Nb2 log-loss = ", scales::percent(self$logloss_skill(), accuracy = 0.01), "\n")
         cat("Logarithmic score = ", scales::percent(self$logscore_skill(), accuracy = 0.01), "\n")
       }

@@ -291,6 +291,35 @@ where `\(\alpha = \phi + \sum_{t' = 1}^t y_{it'}\)` and `\(\gamma = \phi + \sum_
 .ecriture-grise[In essence, modeling longitudinal claim counts with a MVNB is equivalent to modeling with a NB using past history.]
 
 ---
+
+# Results
+
+.center[
+**Poisson specification**
+
+| Model | Mean Squared error | Logarithmic score | 
+|:-------------------------------------|:------:|:-----------------:|
+| Naïve model (no heterogeneity) | 0.0674 | 0.2441 |
+| GLM (only traditional rating factors) | 1.47 % | 3.21 % |
+| GLM (traditional rating factors + handcrafted telematics features) | 1.72 % | 3.64 % |
+| CANN | 1.78 % | 3.66 % |
+
+**Negative binomial specification**
+
+| Model | Mean Squared error | Logarithmic score | 
+|:-------------------------------------|:------:|:-----------------:|
+| Naïve model (no heterogeneity) | 0.0674 | 0.2437 |
+| GLM (no telematics) | 1.47 % | 3.12 % |
+| GLM (with handcrafted telematics features) | 1.72 % | 3.54 % |
+| CANN | 1.80 % | 3.57 % |
+]
+
+**% = improvement over the naïve model**
+
+---
+class: inverse, center, middle
+
+# Thank you for your attention!
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

@@ -224,7 +224,7 @@ list(
     nn_poisson,
     {
       model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
-      model$train(train, valid, epochs = 20, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+      model$train(train, valid, epochs = 22, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
       model
     }
   ),
@@ -233,7 +233,7 @@ list(
     nn_nb2,
     {
       model <- NB2MLP$new(NB2CANN3L, DatasetNNCount)
-      model$train(train, valid, epochs = 20, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+      model$train(train, valid, epochs = 22, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
       model
     }
   )
