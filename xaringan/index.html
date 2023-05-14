@@ -4,7 +4,7 @@
     <title>Telematics Combined Actuarial Neural Networks for claim count data</title>
     <meta charset="utf-8" />
     <meta name="author" content="Francis Duval" />
-    <meta name="date" content="2023-05-12" />
+    <meta name="date" content="2023-05-14" />
     <script src="libs/header-attrs-2.21/header-attrs.js"></script>
     <script src="libs/fabric-4.3.1/fabric.min.js"></script>
     <link href="libs/xaringanExtra-scribble-0.0.1/scribble.css" rel="stylesheet" />
@@ -315,7 +315,7 @@ background-position: 80% 80%
 **Assumptions:**
 - Given its predictors `\(\boldsymbol{x}_i\)`, the PMF of `\(Y_i\)`, the number of claims for contract `\(i\)`, is given by:
 `\begin{align}
-P(Y_i = y_i) = \frac{\Gamma(y_i + \phi)}{y_i! \Gamma(\phi)} \left(\frac{\phi}{\phi + \mu(\boldsymbol{x}_i)}\right)^\phi \left( \frac{\mu(\boldsymbol{x}_i)}{\mu(\boldsymbol{x}_i) + \phi}\right)^{y_i}, \quad y_i = 0, 1, \dots,
+P(Y_i = y_i|\boldsymbol{X}_i) = \frac{\Gamma(y_i + \phi)}{y_i! \Gamma(\phi)} \left(\frac{\phi}{\phi + \mu(\boldsymbol{x}_i)}\right)^\phi \left( \frac{\mu(\boldsymbol{x}_i)}{\mu(\boldsymbol{x}_i) + \phi}\right)^{y_i}, \quad y_i = 0, 1, \dots,
 \end{align}`
 with
 `\begin{align}
@@ -422,12 +422,20 @@ where `\(\alpha = \phi + \sum_{t' = 1}^t y_{it'}\)` and `\(\gamma = \phi + \sum_
 | Model | Mean Squared error | Logarithmic score | 
 |:-------------------------------------|:------:|:-----------------:|
 | Naïve model (no heterogeneity) | 0.0674 | 0.2437 |
-| GLM (no telematics) | 1.47 % | 3.12 % |
-| GLM (with handcrafted telematics features) | 1.72 % | 3.54 % |
+| GLM (only traditional risk factors) | 1.47 % | 3.12 % |
+| GLM (traditional risk factors + handcrafted telematics features) | 1.72 % | 3.54 % |
 | CANN | 1.80 % | 3.57 % |
 ]
 
 **% = improvement over the naïve model**
+
+???
+
+- Here are the results for both Poisson and NB specifications on the validation set. I also kept a separate test set that I do not use until the very end of the project to estimate the generalization performance as reliably as possible.
+- The naive model is a model without any predictor and with parameters estimated by maximum likelihood.
+- The benchmark against which the CANN model is compared is a GLM with traditional risk factors and handcrafted telematics features as predictors. Indeed, we want to know if a neural network is better than human judgement to extract features.
+- The percentages shown correspond to the improvement over the naive model. As can be seen, our CANN model offers a modest improvement over the benchmark GLM using traditional risk factors and handcrafted telematics features.
+- Even though the improvement is small over the benchmark, I still believe it can be a useful model. Indeed, a richer telematics dataset could further improve performance. I also do not have a lot of experience in hyperparameter tuning and I did not use a sophisticated method for this, and other architectures may yield better results. Finally, the claim count framework is known to have a lot of randomness. Indeed, we can see that the shift from a naive model to a GLM with traditional risk feature only improve the performance by about 1.5% for the MSE and 3% for the log-score.
 
 ---
 class: inverse, middle
