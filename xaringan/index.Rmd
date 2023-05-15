@@ -87,8 +87,12 @@ knitr::include_graphics("images/nn_icon.png")
   - % night driving
   - % driving in different speed buckets
   - Etc.
-- Good ad hoc approach, but might be suboptimal
-- Since we know that deep neural networks are good at learning useful features from raw data, why not feed the telematics data to a multilayer perceptron and let it extract the features itself?
+- This is a good approach, but it heavily relies on human judgement, with its flaws and biases.
+- For instance, how do we define "night driving" or "harsh braking"?
+- An alternative approach is to let the data speak more freely by training a model that automatically learns useful features from raw data.
+- This is what we do in this project, by training a neural network directly on raw telematics data, wih minimal human intervention.
+- Indeed, NNs are known for being good at extracting features from minimally processed data.
+- More specifically, we consider a special architecture called "Combined Actuarial Neural Network", which we compare with a benchmark that uses handcrafted telematics features.
 
 ---
 
@@ -115,19 +119,20 @@ knitr::include_graphics("images/CANN.png")
 ???
 
 - Here is the generic neural network (NN) architecture we use to model the number of claims.
-- Developed by Mario V. Wüthrich And Michael Merz, it is called the "Combined Actuarial Neural Network", or CANN for short.
-- It's a NN that consists of 2 parts: the GLM part and the network part.
-- The GLM part acts like a regular GLM, while the network attached to it aims at capturing the signal that have been missed by the GLM.
-- Indeed, a GLM is not able to capture interactions between predictors and can only approximate linear functions of predictors. The network part helps to improve performance.
-- One will usually initialize the parameters of the GLM part at maximum likelihood, while the parameters of the network part will be initialized at zero.
-- That way, the whole NN already gives decent predictions at initialization. When the training starts, the network part is in fact trained on the residuals of the GLM, and we can thus see the procedure as a NN boosting of the GLM.
-- This CANN architecture is good because:
-  - The GLM part allows to have more interpretability
-  - The CANN is initialized at decent GLM predictions, which makes the training faster.
-  - It is very flexible. In this example, both parts are fed with the same inputs. However, one could include other types of inputs in the network part. In general, we know that NN are good at dealing with unstructured data such as telematics data and text data.
-  - The fact that the network part is attached to the GLM part ensures that the network does not catch the signal that has already been caught by the GLM.
-- It would even be possible, with this architecture, to extract features from the hidden layers and then use them in a regular GLM.
-- In brief, this architecture could be useful in any supervised learning problem, particularly when unstructured data is available.
+- Developed by Mario V. Wüthrich and Michael Merz, it is called the "Combined Actuarial Neural Network" or CANN for short.
+- CANN is a two-part neural network consisting of the GLM part and the network part.
+- The GLM part functions like a regular GLM, while the network attached to it aims to capture signals that may have been missed by the GLM.
+- A GLM is limited in its ability to capture interactions between predictors and can only approximate linear functions of predictors. The network part helps improve performance by complementing the GLM.
+- Typically, the parameters of the GLM part are initialized using maximum likelihood, while the parameters of the network part are initialized at zero.
+- This initialization allows the entire neural network to provide decent predictions from the start. During training, the network part is trained on the residuals of the GLM, which can be seen as a neural network boosting of the GLM
+- The CANN architecture offers several advantages:
+  - The GLM part allows for better interpretability.
+  - CANN starts with decent predictions from the GLM, resulting in faster training.
+  - It is a flexible approach. In this example, both parts are fed with the same inputs, but the network part can also accommodate other types of inputs. Neural networks are known to be effective with unstructured data such as telematics data and text data.
+- Another interesting aspect of this approach is that it can be used for feature extraction, with the extracted features then used in a separate GLM. This allows for leveraging the strengths of both neural networks and GLMs: neural networks for complex function approximation and GLMs for their desirable properties.
+- Additionally, the features created in the hidden layers can be visualized using dimensionality reduction techniques, potentially providing insights into telematics data.
+- In summary, this architecture could be valuable in various supervised learning problems, particularly when dealing with unstructured data.
+- In fact, the project consists of training this architecture with telematics information incorporated into the network part. To accomplish this, we consider three popular distribution specifications for count data: Poisson and negative binomial for cross-sectional data, and the Multivariate Negative Binomial for longitudinal data.
 
 ---
 
