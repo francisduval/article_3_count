@@ -157,6 +157,7 @@ background-position: 100% 70%
 ---
 
 # Data
+<div class="neg-break"></div>
 
 ## Traditional risk factors 
 <div style="margin-top: -70px; margin-left: -110px; margin-bottom: 20px;" class="layer">
@@ -167,12 +168,12 @@ background-position: 100% 70%
 
 <!-- <div style="margin-top: -60px; margin-left: 450px; margin-bottom: 40px;" class="neuron gris"></div> -->
 
-
 | Name                | Description                                              | Type        |
 |---------------------|----------------------------------------------------------|-------------|
 | `annual_distance`   | Annual distance declared by the insured                  | Numeric     |
 | `commute_distance`  | Distance to the place of work declared by the insured    | Numeric     |
 | `conv_count_3_yrs_minor` | Number of minor contraventions in the last 3 years  | Numeric     |
+| `expo`              | Contract duration                                        | Numeric     |
 | `gender`            | Gender of the insured                                    | Categorical |
 | `marital_status`    | Marital status of the insured                            | Categorical |
 | `pmt_plan`          | Payment plan chosen by the insured                       | Categorical |
