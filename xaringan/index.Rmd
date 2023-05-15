@@ -17,7 +17,7 @@ output:
 ---
 
 class: title-slide
-background-image: url(images/logo_chaire.jpg), url(images/background.jpg)
+background-image: url(xaringan/images/logo_chaire.jpg), url(xaringan/images/background.jpg)
 background-size: 30%, cover
 background-position: 98% 98%, center
 
@@ -48,15 +48,15 @@ xaringanExtra::use_scribble()
 
 .left-column[
 ```{r echo = F, out.width = "60%", fig.align = "center"}
-knitr::include_graphics("images/tele_icon.png")
+knitr::include_graphics("xaringan/images/tele_icon.png")
 ```
 
 ```{r echo = F, out.width = "65%", fig.align = "center"}
-knitr::include_graphics("images/brain_icon.png")
+knitr::include_graphics("xaringan/images/brain_icon.png")
 ```
 
 ```{r echo = F, out.width = "60%", fig.align = "center"}
-knitr::include_graphics("images/nn_icon.png")
+knitr::include_graphics("xaringan/images/nn_icon.png")
 ```
 ]
 
@@ -99,7 +99,7 @@ knitr::include_graphics("images/nn_icon.png")
 <div class="neg-break"></div>
 .pull-left[
 ```{r echo = F, out.width = "90%", fig.align = "center"}
-knitr::include_graphics("images/CANN.png")
+knitr::include_graphics("xaringan/images/CANN.png")
 ```
 
 .center[Figure taken from [this paper](https://papers.ssrn.com/sol3/Delivery.cfm/SSRN_ID3320525_code769240.pdf?abstractid=3320525)
@@ -132,7 +132,7 @@ knitr::include_graphics("images/CANN.png")
 
 ---
 
-background-image: url(images/perceptron.png)
+background-image: url(xaringan/images/perceptron.png)
 background-size: 75%
 background-position: 100% 70%
 
@@ -290,7 +290,7 @@ with
 
 ---
 
-background-image: url(images/PoissonCANN.png)
+background-image: url(xaringan/images/PoissonCANN.png)
 background-size: 60%
 background-position: 80% 80%
 
@@ -298,7 +298,7 @@ background-position: 80% 80%
 
 .pull-left[
 ```{r echo = F, out.width = "60%", fig.align = "left"}
-knitr::include_graphics("images/PoissonCANN_legend.png")
+knitr::include_graphics("xaringan/images/PoissonCANN_legend.png")
 ```
 <br>
 <br>
@@ -357,7 +357,7 @@ background-position: 80% 80%
 
 .pull-left[
 ```{r echo = F, out.width = "60%", fig.align = "left"}
-knitr::include_graphics("images/PoissonCANN_legend.png")
+knitr::include_graphics("xaringan/images/PoissonCANN_legend.png")
 ```
 <br>
 <br>
