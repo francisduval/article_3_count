@@ -129,7 +129,7 @@ knitr::include_graphics("images/CANN.png")
   - The GLM part allows for better interpretability.
   - CANN starts with decent predictions from the GLM, resulting in faster training.
   - It is a flexible approach. In this example, both parts are fed with the same inputs, but the network part can also accommodate other types of inputs. Neural networks are known to be effective with unstructured data such as telematics data and text data.
-- Another interesting aspect of this approach is that it can be used for feature extraction, with the extracted features then used in a separate GLM. This allows for leveraging the strengths of both neural networks and GLMs: neural networks for complex function approximation and GLMs for their desirable properties.
+- Another interesting aspect of this approach is that it can be used for feature extraction, with the extracted features then used in a separate GLM. This would allow to leverage the strengths of both neural networks and GLMs: neural networks for complex function approximation and GLMs for their desirable properties.
 - Additionally, the features created in the hidden layers can be visualized using dimensionality reduction techniques, potentially providing insights into telematics data.
 - In summary, this architecture could be valuable in various supervised learning problems, particularly when dealing with unstructured data.
 - In fact, the project consists of training this architecture with telematics information incorporated into the network part. To accomplish this, we consider three popular distribution specifications for count data: Poisson and negative binomial for cross-sectional data, and the Multivariate Negative Binomial for longitudinal data.
