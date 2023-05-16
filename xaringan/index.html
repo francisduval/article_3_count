@@ -4,7 +4,7 @@
     <title>Telematics Combined Actuarial Neural Networks for claim count data</title>
     <meta charset="utf-8" />
     <meta name="author" content="Francis Duval" />
-    <meta name="date" content="2023-05-15" />
+    <meta name="date" content="2023-05-16" />
     <script src="libs/header-attrs-2.21/header-attrs.js"></script>
     <script src="libs/fabric-4.3.1/fabric.min.js"></script>
     <link href="libs/xaringanExtra-scribble-0.0.1/scribble.css" rel="stylesheet" />
@@ -130,7 +130,7 @@ background-image: url(images/perceptron.png)
 background-size: 75%
 background-position: 100% 70%
 
-# GLM as a neural network
+# GLM as a Neural Network
 
 .ecriture-grise[Equivalence table]
 .left-column[
@@ -203,7 +203,9 @@ background-position: 100% 70%
 
 ???
 
-- This is the telematics dataset I have a my disposal. Each row is a trip, which is depicted by 4 attributes: the departure and arrival datetime, the distance driven and the maximum speed reached.
+- This is the telematics dataset I have a my disposal. 
+- It consists of summarized data collected with an OBD device for the EnRoute program, spanning from 2015 to 2018.
+- Each row is a trip, which is depicted by 4 attributes: the departure and arrival datetime, the distance driven and the maximum speed reached.
 - For instance, contract A has 2320 trips.
 - Even though neural networks are known to perform well on raw data, this dataset still needs a minimal amount of preprocessing in order to make it more informative to the NN.
 
@@ -252,7 +254,7 @@ background-position: 100% 70%
 
 ---
 `$$\newcommand{\Xcal}{\mathcal{X}}$$`
-# Poisson regression
+# Poisson Regression
 
 &lt;div style="margin-top: -60px;"&gt;&lt;/div&gt;
 **Assumptions:**
@@ -278,9 +280,8 @@ with
 ???
 
 - First specification we consider is Poisson, which means the number of claims is assumed to follow a Poisson distribution.
-- The goal is the find a good regression function mapping the predictors x to the mean parameter mu.
-- A way to proceed is to first choose a specification for the regression function space: it can be a GLM, a neural network, a random forest, etc.
-- Then, we can search the function space and try to minimize the negative log-likelihood. With NN, this minimization procedure is carried on with gradient descent.
+- The goal is to find a good regression function that maps the predictors x to the mean parameter mu.
+- A good regression function is often chosen such as to minimize the Poisson negative log-likelihood over the training set.
 
 ---
 
@@ -315,7 +316,7 @@ background-position: 80% 80%
 ---
 
 `$$\newcommand{\Xcal}{\mathcal{X}}$$`
-# Negative binomial regression
+# Negative Binomial Regression
 
 **Assumptions:**
 - Given its predictors `\(\boldsymbol{x}_i\)`, the PMF of `\(Y_i\)`, the number of claims for contract `\(i\)`, is given by:
@@ -336,7 +337,7 @@ with
 ???
 
 - The second specification we consider is the negative binomial.
-- The number of claim is now assumed to follow a NB distribution, which has a parameter allowing for overdipersion, which is often the case with claim count data.
+- This specification is often better suited for claim count data since it has an extra parameter, phi, allowing for overdispersion.
 - Since the distribution has 2 parameters, we will need a NN with 2 outputs.
 
 ---
@@ -345,7 +346,7 @@ background-image: url(images/NB2CANN.png)
 background-size: 60%
 background-position: 80% 80%
 
-# Negative binomial CANN
+# Negative Binomial CANN
 
 .pull-left[
 &lt;img src="images/PoissonCANN_legend.png" width="60%" style="display: block; margin: auto auto auto 0;" /&gt;
@@ -399,25 +400,29 @@ where `\(\alpha = \phi + \sum_{t' = 1}^t y_{it'}\)` and `\(\gamma = \phi + \sum_
 
 ???
 
-- With the Poisson and NB specifications, we assume that the contracts are independent, which is not true.
-- Indeed, each insured is observed over many contracts, and the contracts of insured are not independent.
-- It is therefore better to have a longitudinal model, and one of the most popular specifications for this is the MVNB.
-- So the assumption is that the claim vector for an insured follows a MVNB distribution.
-- It is not straightforward to train a NN with a multivariate specification, but fortunately, we can break that down to a univariate problem.
-- Indeed, we can show that with the MVNB specification, the number of claims at time t follows a NB distribution with parameters depending on the insured's history.
-- This is really the heart of the project because to my knowledge, there is no such model in the actuarial literature.
-- Unfortunately, I did not yet code this model, but I'm about to do it. It is not as straightforward to code in Torch as the 2 other specifications because I need to take care of updating the distribution parameters (which depend on past contracts) at each iteration.
+- With the Poisson and NB specifications, we assume that the contracts are independent, which is not accurate.
+- Each insured is indeed observed over multiple contracts, and these contracts are not independent from one another.
+- To account for the dependence between contracts, a longitudinal model can be used, and one popular specification is the MVNB (Multivariate Negative Binomial).
+- The assumption is that the claim vector for an insured follows an MVNB distribution.
+- Note that just like the negative binomial, this distribution also accomodates for overdispersion.
+- Training a neural network with a multivariate specification is not straightforward, but fortunately, we can break it down into a univariate problem.
+- Specifically, with the MVNB specification, the number of claims at time t follows a Negative Binomial distribution with parameters that depend on the insured's history.
+- This is the core of the project because, to my knowledge, such a model does not exist yet in the actuarial literature.
+- Unfortunately, I have not yet implemented this model, but I am currently working on it. Coding it in Torch is not as straightforward as the other two specifications because I need to handle the updating of distribution parameters (which depend on past contracts) at each iteration.
 
 ---
 
 # Results
 
 .center[
+| Model | Mean Squared error | Logarithmic score | 
+|:-------------------------------------|:------:|:-----------------:|
+| Naive model (no heterogeneity) | 0.0674 | 0.2441 |
+
 **Poisson specification**
 
 | Model | Mean Squared error | Logarithmic score | 
 |:-------------------------------------|:------:|:-----------------:|
-| Naïve model (no heterogeneity) | 0.0674 | 0.2441 |
 | GLM (only &lt;div class="hover-container"&gt; traditional risk factors &lt;ul class="hover-list"&gt;&lt;li&gt;expo&lt;/li&gt;&lt;li&gt;annual_distance&lt;/li&gt;&lt;li&gt;commute_distance&lt;/li&gt;&lt;li&gt;conv_count_3_yrs_minor&lt;/li&gt;&lt;li&gt;gender&lt;/li&gt;&lt;li&gt;marital_status&lt;/li&gt;&lt;li&gt;pmt_plan&lt;/li&gt;&lt;li&gt;veh_age&lt;/li&gt;&lt;li&gt;veh_use&lt;/li&gt;&lt;li&gt;years_claim_free&lt;/li&gt;&lt;li&gt;years_licensed&lt;/li&gt;&lt;li&gt;distance&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;) | 1.47 % | 3.21 % |
 | GLM (traditional risk factors + &lt;div class="hover-container"&gt; handcrafted telematics features &lt;ul class="hover-list"&gt;&lt;li&gt;avg_daily_nb_trips&lt;/li&gt;&lt;li&gt;med_trip_avg_speed&lt;/li&gt;&lt;li&gt;med_trip_distance&lt;/li&gt;&lt;li&gt;med_trip_max_speed&lt;/li&gt;&lt;li&gt;max_trip_max_speed&lt;/li&gt;&lt;li&gt;prop_long_trip&lt;/li&gt;&lt;li&gt;frac_expo_night&lt;/li&gt;&lt;li&gt;frac_expo_noon&lt;/li&gt;&lt;li&gt;frac_expo_evening&lt;/li&gt;&lt;li&gt;frac_expo_peak_morning&lt;/li&gt;&lt;li&gt;frac_expo_peak_evening&lt;/li&gt;&lt;li&gt;frac_expo_mon_to_thu&lt;/li&gt;&lt;li&gt;frac_expo_fri_sat&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;) | 1.72 % | 3.64 % |
 | CANN | 1.78 % | 3.66 % |
@@ -426,20 +431,20 @@ where `\(\alpha = \phi + \sum_{t' = 1}^t y_{it'}\)` and `\(\gamma = \phi + \sum_
 
 | Model | Mean Squared error | Logarithmic score | 
 |:-------------------------------------|:------:|:-----------------:|
-| Naïve model (no heterogeneity) | 0.0674 | 0.2437 |
-| GLM (only traditional risk factors) | 1.47 % | 3.12 % |
-| GLM (traditional risk factors + handcrafted telematics features) | 1.72 % | 3.54 % |
-| CANN | 1.80 % | 3.57 % |
+| GLM (only traditional risk factors) | 1.47 % | 3.26 % |
+| GLM (traditional risk factors + handcrafted telematics features) | 1.72 % | 3.69 % |
+| CANN | 1.80 % | 3.72 % |
 ]
 
-**% = improvement over the naïve model**
+**% = improvement over the naive model**
 
 ???
 
 - Here are the results for both Poisson and NB specifications on the validation set. I also kept a separate test set that I do not use until the very end of the project to estimate the generalization performance as reliably as possible.
-- The naive model is a model without any predictor and with parameters estimated by maximum likelihood.
-- The benchmark against which the CANN model is compared is a GLM with traditional risk factors and handcrafted telematics features as predictors. Indeed, we want to know if a neural network is better than human judgement to extract features.
+- The naive model is a model that predicts the average claim frequency for all contracts, that is to say about 0.07.
+- The benchmark against which the CANN model is compared is a GLM with traditional risk factors and handcrafted telematics features as predictors. The objective is indeed to assess whether a neural network outperforms human judgment in feature extraction capabilities.
 - The percentages shown correspond to the improvement over the naive model. As can be seen, our CANN model offers a modest improvement over the benchmark GLM using traditional risk factors and handcrafted telematics features.
+- The NB specification also offers an improvement over the Poisson specification.
 - Even though the improvement is small over the benchmark, I still believe it can be a useful model. Indeed, a richer telematics dataset could further improve performance. I also do not have a lot of experience in hyperparameter tuning and I did not use a sophisticated method for this, and other architectures may yield better results. Finally, the claim count framework is known to have a lot of randomness. Indeed, we can see that the shift from a naive model to a GLM with traditional risk feature only improve the performance by about 1.5% for the MSE and 3% for the log-score.
 
 ---
