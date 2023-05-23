@@ -119,9 +119,9 @@ MVNBMLP <-
             valid_risk <- mean(valid_loss_vec)
             
             mu <- as.double(model$mu(valid_ds[1:length(valid_ds)]$x))
-            phi <- as.double(model$phi(valid_ds[1:length(valid_ds)]$x)); print(phi)
+            phi <- as.double(model$phi(valid_ds[1:length(valid_ds)]$x))
             alpha <- as.double(model$alpha(valid_ds[1:length(valid_ds)]$x))
-            gamma <- as.double(model$gamma(valid_ds[1:length(valid_ds)]$x)); print(mu[1:10]); print(gamma[1:10])
+            gamma <- as.double(model$gamma(valid_ds[1:length(valid_ds)]$x))
             
             if (e == 1) {
               self$mu <- mu

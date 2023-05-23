@@ -85,6 +85,8 @@ list(
       step_normalize(all_predictors())
   ),
   
+  # ----------
+  
   tar_target(
     rec_class_tele_mvnb,
     recipe(nb_claims ~ ., data = select(train, nb_claims:frac_expo_fri_sat, -avg_daily_distance, -nb_trips, vin)) %>%
@@ -274,6 +276,15 @@ list(
     {
       model <- NB2MLP$new(NB2CANN3L, DatasetNNCount)
       model$train(train, valid, epochs = 22, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+      model
+    }
+  ),
+  
+  tar_target(
+    nn_mvnb,
+    {
+      model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
+      model$train(train_mvnb, valid_mvnb, epochs = 22, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
       model
     }
   )

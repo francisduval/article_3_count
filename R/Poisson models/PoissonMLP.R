@@ -42,7 +42,7 @@ PoissonMLP <-
             output <- model(b[[1]])
             target <- b[[2]]
             
-            loss <- nnf_poisson_nll_loss(output, target, log_input = F)
+            loss <- nnf_poisson_nll_loss(output, target, log_input = F, full = T)
             loss$backward()
             optimiseur$step()
             
@@ -53,7 +53,7 @@ PoissonMLP <-
             output <- model(b[[1]])
             target <- b[[2]]
             
-            loss <- nnf_poisson_nll_loss(output, target, log_input = F)
+            loss <- nnf_poisson_nll_loss(output, target, log_input = F, full = T)
             loss$item()
           }
           
@@ -84,10 +84,10 @@ PoissonMLP <-
             
             if (e == 1) {
               self$valid_mu <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x))
-              best_valid_loss <- as.numeric(nnf_poisson_nll_loss(self$valid_mu, self$valid_targets, log_input = F))
+              best_valid_loss <- as.numeric(nnf_poisson_nll_loss(self$valid_mu, self$valid_targets, log_input = F, full = T))
             } else if (valid_risk < best_valid_loss) {
               self$valid_mu <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x))
-              best_valid_loss <- as.numeric(nnf_poisson_nll_loss(self$valid_mu, self$valid_targets, log_input = F))
+              best_valid_loss <- as.numeric(nnf_poisson_nll_loss(self$valid_mu, self$valid_targets, log_input = F, full = T))
             }
             
             train_risk_vec[e] <- train_risk
