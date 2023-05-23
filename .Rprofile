@@ -31,6 +31,7 @@ library(surveillance)
 library(MASS)
 library(xaringan)
 library(kableExtra)
+library(tictoc)
 
 # Conflits ======================================================================================================================
 conflicted::conflicts_prefer(
@@ -47,4 +48,6 @@ theme_set(theme_bw())
 walk(dir_ls("R/Autres"), source)
 walk(dir_ls("R/Poisson models"), source)
 walk(dir_ls("R/NB2 models"), source)
+walk(dir_ls("R/MVNB models"), source)
 walk(dir_ls("R/Preprocessing"), source)
+

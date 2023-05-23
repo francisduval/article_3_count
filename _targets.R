@@ -48,6 +48,10 @@ list(
   tar_target(valid, join_class_tele_nn(valid_class, valid_tele, valid_nn)),
   tar_target(test, join_class_tele_nn(test_class, test_tele, test_nn)),
   
+  tar_target(train_mvnb, train %>% compute_sum_past_claims() %>% compute_sum_past_mu()),
+  tar_target(valid_mvnb, valid %>% compute_sum_past_claims() %>% compute_sum_past_mu()),
+  tar_target(test_mvnb, test %>% compute_sum_past_claims() %>% compute_sum_past_mu()),
+  
 
   # -----------------------------------------------------------------------------------------------------------------------------
   # Modèles GLM -----------------------------------------------------------------------------------------------------------------
@@ -63,11 +67,31 @@ list(
   ),
   
   tar_target(
+    rec_class_mvnb,
+    recipe(nb_claims ~ ., data = select(train, nb_claims:distance, vin)) %>%
+      update_role(vin, new_role = "ID") %>% 
+      step_impute_median(commute_distance, years_claim_free) %>%
+      step_other(all_nominal_predictors(), threshold = 0.05) %>%
+      step_dummy(all_nominal_predictors()) %>% 
+      step_normalize(all_predictors())
+  ),
+  
+  tar_target(
     rec_class_tele,
     recipe(nb_claims ~ ., data = select(train, nb_claims:frac_expo_fri_sat, -avg_daily_distance, -nb_trips)) %>%
       step_impute_median(commute_distance, years_claim_free) %>%
       step_other(all_nominal(), threshold = 0.05) %>%
       step_dummy(all_nominal()) %>% 
+      step_normalize(all_predictors())
+  ),
+  
+  tar_target(
+    rec_class_tele_mvnb,
+    recipe(nb_claims ~ ., data = select(train, nb_claims:frac_expo_fri_sat, -avg_daily_distance, -nb_trips, vin)) %>%
+      update_role(vin, new_role = "ID") %>% 
+      step_impute_median(commute_distance, years_claim_free) %>%
+      step_other(all_nominal_predictors(), threshold = 0.05) %>%
+      step_dummy(all_nominal_predictors()) %>% 
       step_normalize(all_predictors())
   ),
 
@@ -99,6 +123,22 @@ list(
     glm_nb2_class_tele,
     {
       model <- NB2Reg$new(rec_class_tele)
+      model$train(valid)
+    }
+  ),
+  
+  tar_target(
+    glm_mvnb_class,
+    {
+      model <- MVNBReg$new(rec_class_mvnb)
+      model$train(valid)
+    }
+  ),
+  
+  tar_target(
+    glm_mvnb_class_tele,
+    {
+      model <- MVNBReg$new(rec_class_tele_mvnb)
       model$train(valid)
     }
   ),
