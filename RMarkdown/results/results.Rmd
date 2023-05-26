@@ -1,0 +1,81 @@
+---
+title: "Résultats"
+author: "Francis Duval"
+date: "2023-05-26"
+output: html_document
+---
+
+```{r setup, include = F, echo = F}
+knitr::opts_chunk$set(echo = T)
+```
+
+```{r}
+nn_poisson <- tar_read(nn_poisson)
+nn_nb2 <- tar_read(nn_nb2)
+nn_mvnb <- tar_read(nn_mvnb)
+
+glm_poisson_class_tele <- tar_read(glm_poisson_class_tele)
+glm_nb2_class_tele <- tar_read(glm_nb2_class_tele)
+glm_mvnb_class_tele <- tar_read(glm_mvnb_class_tele)
+```
+
+Regression Poisson, NB2 et MVNB: variables classique + télématique créées à la main <br>
+CANN Poisson, NB2 et MVNB: variables classiques + vecteur télématique
+
+Les % correspondent au pourcentage d'amélioration de la métrique par rapport au modèle naïf, qui est une régression Poisson sans prédicteur. 
+
+# Poisson
+
+```{r echo = F}
+glm <- glm_poisson_class_tele
+cann <- nn_poisson
+```
+
+| Métrique                  | Régression Poisson                               | Poisson CANN                                      |
+|:--------------------------|:------------------------------------------------:|:-------------------------------------------------:|
+| Poisson deviance          | `r percent(glm$dev_skill(), accuracy = 0.01)`    | `r percent(cann$dev_skill(), accuracy = 0.01)`    |
+| Logarithmic score         | `r percent(glm$logs_skill(), accuracy = 0.01)`   | `r percent(cann$logs_skill(), accuracy = 0.01)`   |
+| Absolute error score      | `r percent(glm$aes_skill(), accuracy = 0.01)`    | `r percent(cann$aes_skill(), accuracy = 0.01)`    |
+| Square error score        | `r percent(glm$ses_skill(), accuracy = 0.01)`    | `r percent(cann$ses_skill(), accuracy = 0.01)`    |
+| Dawid-Sebastiani score    | `r percent(glm$dss_skill(), accuracy = 0.01)`    | `r percent(cann$dss_skill(), accuracy = 0.01)`    |
+| Quadratic score           | `r percent(glm$qs_skill(), accuracy = 0.01)`     | `r percent(cann$qs_skill(), accuracy = 0.01)`     |
+| Spherical score           | `r percent(glm$sphs_naif(), accuracy = 0.01)`    | `r percent(cann$sphs_naif(), accuracy = 0.01)`    |
+| Ranked probability score  | `r percent(glm$rps_naif(), accuracy = 0.01)`     | `r percent(cann$rps_naif(), accuracy = 0.01)`     |
+
+
+# NB2
+
+```{r echo = F}
+glm <- glm_nb2_class_tele
+cann <- nn_nb2
+```
+
+| Métrique                  | Régression NB2                                   | NB2 CANN                                          |
+|:--------------------------|:------------------------------------------------:|:-------------------------------------------------:|
+| Poisson deviance          | `r percent(glm$dev_skill(), accuracy = 0.01)`    | `r percent(cann$dev_skill(), accuracy = 0.01)`    |
+| Logarithmic score         | `r percent(glm$logs_skill(), accuracy = 0.01)`   | `r percent(cann$logs_skill(), accuracy = 0.01)`   |
+| Absolute error score      | `r percent(glm$aes_skill(), accuracy = 0.01)`    | `r percent(cann$aes_skill(), accuracy = 0.01)`    |
+| Square error score        | `r percent(glm$ses_skill(), accuracy = 0.01)`    | `r percent(cann$ses_skill(), accuracy = 0.01)`    |
+| Dawid-Sebastiani score    | `r percent(glm$dss_skill(), accuracy = 0.01)`    | `r percent(cann$dss_skill(), accuracy = 0.01)`    |
+| Quadratic score           | `r percent(glm$qs_skill(), accuracy = 0.01)`     | `r percent(cann$qs_skill(), accuracy = 0.01)`     |
+| Spherical score           | `r percent(glm$sphs_naif(), accuracy = 0.01)`    | `r percent(cann$sphs_naif(), accuracy = 0.01)`    |
+| Ranked probability score  | `r percent(glm$rps_naif(), accuracy = 0.01)`     | `r percent(cann$rps_naif(), accuracy = 0.01)`     |
+
+
+# MVNB
+
+```{r echo = F}
+glm <- glm_mvnb_class_tele
+cann <- nn_mvnb
+```
+
+| Métrique                  | Régression MVNB                                  | MVNB CANN                                         |
+|:--------------------------|:------------------------------------------------:|:-------------------------------------------------:|
+| Poisson deviance          | `r percent(glm$dev_skill(), accuracy = 0.01)`    | `r percent(cann$dev_skill(), accuracy = 0.01)`    |
+| Logarithmic score         | `r percent(glm$logs_skill(), accuracy = 0.01)`   | `r percent(cann$logs_skill(), accuracy = 0.01)`   |
+| Absolute error score      | `r percent(glm$aes_skill(), accuracy = 0.01)`    | `r percent(cann$aes_skill(), accuracy = 0.01)`    |
+| Square error score        | `r percent(glm$ses_skill(), accuracy = 0.01)`    | `r percent(cann$ses_skill(), accuracy = 0.01)`    |
+| Dawid-Sebastiani score    | `r percent(glm$dss_skill(), accuracy = 0.01)`    | `r percent(cann$dss_skill(), accuracy = 0.01)`    |
+| Quadratic score           | `r percent(glm$qs_skill(), accuracy = 0.01)`     | `r percent(cann$qs_skill(), accuracy = 0.01)`     |
+| Spherical score           | `r percent(glm$sphs_naif(), accuracy = 0.01)`    | `r percent(cann$sphs_naif(), accuracy = 0.01)`    |
+| Ranked probability score  | `r percent(glm$rps_naif(), accuracy = 0.01)`     | `r percent(cann$rps_naif(), accuracy = 0.01)`     |

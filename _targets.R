@@ -171,7 +171,7 @@ list(
     tibble(p = p_grid, lr_start = lr_start_grid),
     pattern = cross(p_grid, lr_start_grid),
     iteration = "vector"
-  )#,
+  ),
   
   # Tuning ----------------------------------------------------------------------------------------------------------------------
   
@@ -263,32 +263,32 @@ list(
   # Réseaux de neurones ---------------------------------------------------------------------------------------------------------
   # -----------------------------------------------------------------------------------------------------------------------------
   
-  # tar_target(
-  #   nn_poisson,
-  #   {
-  #     model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
-  #     model$train(train[1:500, ], valid[1:500, ], epochs = 10, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
-  #     model
-  #   }
-  # ),
-  # 
-  # tar_target(
-  #   nn_nb2,
-  #   {
-  #     model <- NB2MLP$new(NB2CANN3L, DatasetNNCount)
-  #     model$train(train[1:500, ], valid[1:500, ], epochs = 10, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
-  #     model
-  #   }
-  # ),
-  # 
-  # tar_target(
-  #   nn_mvnb,
-  #   {
-  #     model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
-  #     model$train(train_mvnb[1:500, ], valid_mvnb[1:500, ], epochs = 10, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
-  #     model
-  #   }
-  # )
+  tar_target(
+    nn_poisson,
+    {
+      model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
+      model$train(train, valid, epochs = 22, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+      model
+    }
+  ),
+
+  tar_target(
+    nn_nb2,
+    {
+      model <- NB2MLP$new(NB2CANN3L, DatasetNNCount)
+      model$train(train, valid, epochs = 22, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+      model
+    }
+  ),
+
+  tar_target(
+    nn_mvnb,
+    {
+      model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
+      model$train(train_mvnb, valid_mvnb, epochs = 22, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+      model
+    }
+  )
   
   # -----------------------------------------------------------------------------------------------------------------------------
   # Rapports RMarkdown ----------------------------------------------------------------------------------------------------------
