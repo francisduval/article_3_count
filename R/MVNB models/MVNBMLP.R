@@ -1,7 +1,7 @@
 MVNBMLP <- 
   R6Class(
     classname = "MVNBMLP",
-    # inherit = NB2Metrics,
+    inherit = CountMetrics,
     
     public =
       list(
@@ -13,36 +13,18 @@ MVNBMLP <-
         train_risk_vec = NULL,
         valid_risk_vec = NULL,
         
-        mu = NULL,
-        phi = NULL,
-        alpha = NULL,
-        gamma = NULL,
+        valid_res = NULL,
         
         initialize = function(spec, dataset) {
           self$spec <- spec
           self$dataset <- dataset
         },
         
-        plot_training = function() {
-          tibble(
-            epoch = seq_along(self$train_risk_vec),
-            train_loss = self$train_risk_vec,
-            valid_loss = self$valid_risk_vec,
-          ) %>% 
-            pivot_longer(cols = -"epoch") %>% 
-            ggplot(aes(x = epoch, y = value, col = name)) +
-            geom_point(alpha = 0.7) +
-            geom_line(linewidth = 0.8, alpha = 0.3) +
-            scale_color_discrete(name = NULL) +
-            scale_x_continuous(breaks = seq_along(self$train_risk_vec)) +
-            ylab(NULL)
-        },
-        
         train = function(train, valid, epochs, lr_start, factor, patience, batch = 256, ...) {
           model <- self$spec(...)
           optimiseur <- optim_adam(model$parameters, lr = lr_start)
           scheduler <- lr_reduce_on_plateau(optimiseur, factor = factor, patience = patience)
-          
+
           train_risk_vec <- vector(mode = "numeric", length = epochs)
           valid_risk_vec <- vector(mode = "numeric", length = epochs)
           
@@ -124,16 +106,16 @@ MVNBMLP <-
             gamma <- as.double(model$gamma(valid_ds[1:length(valid_ds)]$x))
             
             if (e == 1) {
-              self$mu <- mu
-              self$phi <- phi
-              self$alpha <- alpha
-              self$gamma <- gamma
+              best_valid_mu <- mu
+              best_phi <- phi
+              best_valid_alpha <- alpha
+              best_valid_gamma <- gamma
               best_valid_loss <- mvnb_loss(mu, alpha, gamma, self$valid_targets)
             } else if (valid_risk < as.numeric(best_valid_loss)) {
-              self$mu <- mu
-              self$phi <- phi
-              self$alpha <- alpha
-              self$gamma <- gamma
+              best_valid_mu <- mu
+              best_phi <- phi
+              best_valid_alpha <- alpha
+              best_valid_gamma <- gamma
               best_valid_loss <- mvnb_loss(mu, alpha, gamma, self$valid_targets)
             }
             
@@ -154,6 +136,48 @@ MVNBMLP <-
           self$train_risk_vec <- train_risk_vec
           self$valid_risk_vec <- valid_risk_vec
           
+          sum_p_2_pois <- function(mu) sum(map_dbl(0:30, ~ dpois(., lambda = mu) ^ 2))
+          sum_p_2_mvnb <- function(mu, alpha, gamma) sum(map_dbl(0:30, ~ dnb2gen(., mu = mu, alpha = alpha, gamma = gamma) ^ 2))
+          
+          self$valid_res <-
+            valid %>%
+            mutate(mu = best_valid_mu) %>% 
+            group_by(vin) %>%
+            mutate(
+              mu_bullet = cumsum(mu) - mu,
+              y_bullet = cumsum(nb_claims) - nb_claims
+            ) %>%
+            ungroup() %>%
+            select(vin, contract_start_date, nb_claims, mu_bullet, y_bullet, mu) %>% 
+            mutate(
+              alpha = best_phi + y_bullet,
+              gamma = best_phi + mu_bullet,
+              phi = best_phi,
+              mean = mu * alpha / gamma,
+              sd = sqrt(mu * alpha * (gamma + mu) * gamma ^ (-2)),
+              prob = dnb2gen(self$valid_targets, mu = mu, alpha = alpha, gamma = gamma),
+              norm_carre_p = pmap_dbl(list(mu, alpha, gamma), ~ sum_p_2_mvnb(mu = ..1, alpha = ..2, gamma = ..3)),
+              
+              pred_naif = rep(mean(self$train_targets), length(self$valid_targets)),
+              prob_naif = dpois(self$valid_targets, pred_naif),
+              norm_carre_p_naif = map_dbl(pred_naif, sum_p_2_pois)
+            )
+          
+        },
+        
+        plot_training = function() {
+          tibble(
+            epoch = seq_along(self$train_risk_vec),
+            train_loss = self$train_risk_vec,
+            valid_loss = self$valid_risk_vec,
+          ) %>% 
+            pivot_longer(cols = -"epoch") %>% 
+            ggplot(aes(x = epoch, y = value, col = name)) +
+            geom_point(alpha = 0.7) +
+            geom_line(linewidth = 0.8, alpha = 0.3) +
+            scale_color_discrete(name = NULL) +
+            scale_x_continuous(breaks = seq_along(self$train_risk_vec)) +
+            ylab(NULL)
         }
       )
   )

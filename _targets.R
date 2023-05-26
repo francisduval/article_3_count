@@ -85,8 +85,6 @@ list(
       step_normalize(all_predictors())
   ),
   
-  # ----------
-  
   tar_target(
     rec_class_tele_mvnb,
     recipe(nb_claims ~ ., data = select(train, nb_claims:frac_expo_fri_sat, -avg_daily_distance, -nb_trips, vin)) %>%
@@ -96,6 +94,8 @@ list(
       step_dummy(all_nominal_predictors()) %>% 
       step_normalize(all_predictors())
   ),
+  
+  # ----------
 
   tar_target(
     glm_poisson_class,
@@ -120,7 +120,7 @@ list(
       model$train(valid)
     }
   ),
-  
+
   tar_target(
     glm_nb2_class_tele,
     {
@@ -128,7 +128,7 @@ list(
       model$train(valid)
     }
   ),
-  
+
   tar_target(
     glm_mvnb_class,
     {
@@ -136,7 +136,7 @@ list(
       model$train(valid)
     }
   ),
-  
+
   tar_target(
     glm_mvnb_class_tele,
     {
@@ -171,7 +171,7 @@ list(
     tibble(p = p_grid, lr_start = lr_start_grid),
     pattern = cross(p_grid, lr_start_grid),
     iteration = "vector"
-  ),
+  )#,
   
   # Tuning ----------------------------------------------------------------------------------------------------------------------
   
@@ -235,59 +235,60 @@ list(
   #   pattern = map(batch_grid)
   # ),
   
-  tar_target(n_1L_grid, c(16, 32, 64, 128, 16, 64, 128, 64)),
-  tar_target(n_2L_grid, c(8, 16, 32, 64, 16, 64, 128, 128)),
-  tar_target(n_3L_grid, c(4, 8, 16, 32, 16, 64, 128, 32)),
-  tar_target(
-    hu_tune,
-    {
-      model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
-      model$train(train, valid, epochs = 20, lr_start = 0.001, factor = 0.3, patience = 2, batch = 256, p = 0.2, n_1L = n_1L_grid, n_2L = n_2L_grid, n_3L = n_3L_grid)
-      model
-    },
-    pattern = map(n_1L_grid, n_2L_grid, n_3L_grid)
-  ),
+  # tar_target(n_1L_grid, c(16, 32, 64, 128, 16, 64, 128, 64)),
+  # tar_target(n_2L_grid, c(8, 16, 32, 64, 16, 64, 128, 128)),
+  # tar_target(n_3L_grid, c(4, 8, 16, 32, 16, 64, 128, 32)),
   
-  tar_target(
-    big_tune,
-    {
-      model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
-      model$train(train, valid, epochs = 20, lr_start = p_lr_start_grid[[2]], factor = 0.3, patience = 2, batch = 256, p = p_lr_start_grid[[1]], n_1L = 128, n_2L = 64, n_3L = 32)
-      model
-    },
-    pattern = map(p_lr_start_grid)
-  ),
+  # tar_target(
+  #   hu_tune,
+  #   {
+  #     model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
+  #     model$train(train, valid, epochs = 20, lr_start = 0.001, factor = 0.3, patience = 2, batch = 256, p = 0.2, n_1L = n_1L_grid, n_2L = n_2L_grid, n_3L = n_3L_grid)
+  #     model
+  #   },
+  #   pattern = map(n_1L_grid, n_2L_grid, n_3L_grid)
+  # ),]1:500, ]
+  
+  # tar_target(
+  #   big_tune,
+  #   {
+  #     model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
+  #     model$train(train, valid, epochs = 20, lr_start = p_lr_start_grid[[2]], factor = 0.3, patience = 2, batch = 256, p = p_lr_start_grid[[1]], n_1L = 128, n_2L = 64, n_3L = 32)
+  #     model
+  #   },
+  #   pattern = map(p_lr_start_grid)
+  # ),
   
   # -----------------------------------------------------------------------------------------------------------------------------
   # Réseaux de neurones ---------------------------------------------------------------------------------------------------------
   # -----------------------------------------------------------------------------------------------------------------------------
   
-  tar_target(
-    nn_poisson,
-    {
-      model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
-      model$train(train, valid, epochs = 22, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
-      model
-    }
-  ),
-  
-  tar_target(
-    nn_nb2,
-    {
-      model <- NB2MLP$new(NB2CANN3L, DatasetNNCount)
-      model$train(train, valid, epochs = 22, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
-      model
-    }
-  ),
-  
-  tar_target(
-    nn_mvnb,
-    {
-      model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
-      model$train(train_mvnb, valid_mvnb, epochs = 22, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
-      model
-    }
-  )
+  # tar_target(
+  #   nn_poisson,
+  #   {
+  #     model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
+  #     model$train(train[1:500, ], valid[1:500, ], epochs = 10, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+  #     model
+  #   }
+  # ),
+  # 
+  # tar_target(
+  #   nn_nb2,
+  #   {
+  #     model <- NB2MLP$new(NB2CANN3L, DatasetNNCount)
+  #     model$train(train[1:500, ], valid[1:500, ], epochs = 10, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+  #     model
+  #   }
+  # ),
+  # 
+  # tar_target(
+  #   nn_mvnb,
+  #   {
+  #     model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
+  #     model$train(train_mvnb[1:500, ], valid_mvnb[1:500, ], epochs = 10, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+  #     model
+  #   }
+  # )
   
   # -----------------------------------------------------------------------------------------------------------------------------
   # Rapports RMarkdown ----------------------------------------------------------------------------------------------------------

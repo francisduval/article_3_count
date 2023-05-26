@@ -1,7 +1,7 @@
 PoissonMLP <- 
   R6Class(
     classname = "PoissonMLP",
-    inherit = NNUtils,
+    inherit = CountMetrics,
     
     public =
       list(
@@ -12,7 +12,8 @@ PoissonMLP <-
         valid_targets = NULL,
         train_risk_vec = NULL,
         valid_risk_vec = NULL,
-        valid_mu = NULL,
+        
+        valid_res = NULL,
         
         initialize = function(spec, dataset) {
           self$spec <- spec
@@ -82,12 +83,14 @@ PoissonMLP <-
             train_risk <- mean(train_loss_vec)
             valid_risk <- mean(valid_loss_vec)
             
+            mu <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x))
+            
             if (e == 1) {
-              self$valid_mu <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x))
-              best_valid_loss <- as.numeric(nnf_poisson_nll_loss(self$valid_mu, self$valid_targets, log_input = F, full = T))
+              best_valid_mu <- mu
+              best_valid_loss <- as.numeric(nnf_poisson_nll_loss(best_valid_mu, self$valid_targets, log_input = F, full = T))
             } else if (valid_risk < best_valid_loss) {
-              self$valid_mu <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x))
-              best_valid_loss <- as.numeric(nnf_poisson_nll_loss(self$valid_mu, self$valid_targets, log_input = F, full = T))
+              best_valid_mu <- mu
+              best_valid_loss <- as.numeric(nnf_poisson_nll_loss(best_valid_mu, self$valid_targets, log_input = F, full = T))
             }
             
             train_risk_vec[e] <- train_risk
@@ -107,6 +110,38 @@ PoissonMLP <-
           self$train_risk_vec <- train_risk_vec
           self$valid_risk_vec <- valid_risk_vec
           
+          sum_p_2 <- function(mu) sum(map_dbl(0:30, ~ dpois(., lambda = mu) ^ 2))
+          
+          self$valid_res <- 
+            valid %>% 
+            select(vin, contract_start_date, nb_claims) %>% 
+            mutate(
+              mu = best_valid_mu,
+              mean = mu,
+              sd = sqrt(mu),
+              prob = dpois(self$valid_targets, mu),
+              norm_carre_p = map_dbl(mu, sum_p_2),
+              
+              pred_naif = rep(mean(self$train_targets), length(self$valid_targets)),
+              prob_naif = dpois(self$valid_targets, pred_naif),
+              norm_carre_p_naif = map_dbl(pred_naif, sum_p_2)
+            )
+          
+        },
+        
+        plot_training = function() {
+          tibble(
+            epoch = seq_along(self$train_risk_vec),
+            train_loss = self$train_risk_vec,
+            valid_loss = self$valid_risk_vec,
+          ) %>% 
+            pivot_longer(cols = -"epoch") %>% 
+            ggplot(aes(x = epoch, y = value, col = name)) +
+            geom_point(shape = 21) +
+            geom_line() +
+            scale_color_discrete(name = NULL) +
+            scale_x_continuous(breaks = seq_along(self$train_risk_vec)) +
+            ylab(NULL)
         }
       )
   )

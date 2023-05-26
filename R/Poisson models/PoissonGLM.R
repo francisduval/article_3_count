@@ -1,6 +1,6 @@
 PoissonGLM <- R6Class(
   classname = "PoissonGLM",
-  inherit = PoissonMetrics,
+  inherit = CountMetrics,
   
   public = list(
     recipe = NULL,
@@ -10,11 +10,10 @@ PoissonGLM <- R6Class(
     train_targets = NULL,
     valid_targets = NULL,
     
+    valid_res = NULL,
+    
     params_df = NULL,
     var_imp = NULL,
-    
-    valid_mu = NULL,
-    valid_mu_naif = NULL,
     
     initialize = function(recipe) {
       self$recipe <- recipe
@@ -29,12 +28,28 @@ PoissonGLM <- R6Class(
       wf <- workflow() %>% add_recipe(self$recipe) %>% add_model(spec)
       fit <- parsnip::fit(wf, data = train_df)
       
-      self$params_df <- tidy(fit)
-      self$var_imp <- extract_fit_parsnip(fit) %>% vip::vi()
-      self$valid_mu <- predict(fit, new_data = valid_df)$.pred
+      sum_p_2 <- function(mu) sum(map_dbl(0:30, ~ dpois(., lambda = mu) ^ 2))
       
       self$train_targets <- train_df[[self$response]]
       self$valid_targets <- valid_df[[self$response]]
+      
+      self$valid_res <- 
+        valid_df %>% 
+        select(vin, contract_start_date, nb_claims) %>% 
+        mutate(
+          mu = predict(fit, new_data = valid_df)$.pred,
+          mean = mu,
+          sd = sqrt(mu),
+          prob = dpois(self$valid_targets, mu),
+          norm_carre_p = map_dbl(mu, sum_p_2),
+          
+          pred_naif = rep(mean(self$train_targets), length(self$valid_targets)),
+          prob_naif = dpois(self$valid_targets, pred_naif),
+          norm_carre_p_naif = map_dbl(pred_naif, sum_p_2)
+        )
+      
+      self$params_df <- tidy(fit)
+      self$var_imp <- extract_fit_parsnip(fit) %>% vip::vi()
       
       invisible(self)
     },

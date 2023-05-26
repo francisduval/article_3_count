@@ -1,31 +1,18 @@
 MVNBReg <- R6Class(
   classname = "MVNBReg",
-  inherit = MVNBMetrics,
+  inherit = CountMetrics,
   
   public = list(
     recipe = NULL,
     predictors = NULL,
     response = NULL,
-    
+
     train_targets = NULL,
     valid_targets = NULL,
+
+    valid_res = NULL,
     
     betas = NULL,
-    phi = NULL,
-    
-    betas_naif = NULL,
-    phi_naif = NULL,
-    
-    valid_mu = NULL,
-    valid_alpha = NULL,
-    valid_gamma = NULL,
-    
-    valid_mu_naif = NULL,
-    valid_alpha_naif = NULL,
-    valid_gamma_naif = NULL,
-    
-    valid_prime = NULL,
-    valid_prime_naif = NULL,
     
     initialize = function(recipe) {
       self$recipe <- recipe
@@ -45,13 +32,6 @@ MVNBReg <- R6Class(
       nb_fit <- glm.nb(form, data = train_df_juiced)
       betas_start <- tidy(nb_fit)$estimate
       phi_start <- log(1 / nb_fit$theta)
-      
-      # Fit a NB2 for starting values (naive model) ---
-      
-      form_naif <- reformulate("1", response = self$response)
-      nb_fit_naif <- glm.nb(form_naif, data = train_df_juiced)
-      betas_start_naif <- tidy(nb_fit_naif)$estimate
-      phi_start_naif <- log(1 / nb_fit_naif$theta)
       
       # MBNV negative log-likelihood ---
       
@@ -93,66 +73,44 @@ MVNBReg <- R6Class(
       betas <- opt$par[seq_len(ncol(x_train))]
       phi <- as.numeric(exp(opt$par[ncol(x_train) + 1]))
       
-      # Fit MVNB (naive) ---
+      # Useful functions ---
       
-      x_train_naif <- train_df_juiced %>% bind_cols(Intercept = 1, .) %>% select(Intercept) %>% as.matrix()
-      opt_naif <- optim(c(betas_start_naif, phi_start_naif), fn = optim_fn(x_train_naif), control = list(maxit = 20000), method = c("L-BFGS-B"))
-      betas_naif <- opt_naif$par[seq_len(ncol(x_train_naif))]
-      phi_naif <- exp(opt_naif$par[ncol(x_train_naif) + 1])
+      sum_p_2_pois <- function(mu) sum(map_dbl(0:30, ~ dpois(., lambda = mu) ^ 2))
+      sum_p_2_mvnb <- function(mu, alpha, gamma) sum(map_dbl(0:30, ~ dnb2gen(., mu = mu, alpha = alpha, gamma = gamma) ^ 2))
       
-      # Obtain mu, alpha and gamma vectors on valid set ---
+      # Assign attributes ---
       
       x_valid <- valid_df_juiced %>% select(-nb_claims, -vin) %>% bind_cols(Intercept = 1, .) %>% as.matrix()
       valid_mu <- exp(x_valid %*% betas) %>% as.vector()
       
-      x_valid_naif <- valid_df_juiced %>% bind_cols(Intercept = 1, .) %>% select(Intercept) %>% as.matrix()
-      valid_mu_naif <- exp(x_valid_naif %*% betas_naif) %>% as.vector()
+      self$train_targets <- train_df_juiced[[self$response]]
+      self$valid_targets <- valid_df_juiced[[self$response]]
       
-      res_valid <-
+      self$valid_res <-
         valid_df %>%
-        mutate(
-          mu = valid_mu,
-          mu_naif = valid_mu_naif
-        ) %>% 
+        mutate(mu = valid_mu) %>% 
         group_by(vin) %>%
         mutate(
           mu_bullet = cumsum(mu) - mu,
-          mu_bullet_naif = cumsum(mu_naif) - mu_naif,
           y_bullet = cumsum(nb_claims) - nb_claims
         ) %>%
         ungroup() %>%
+        select(vin, contract_start_date, nb_claims, mu_bullet, y_bullet, mu) %>% 
         mutate(
           alpha = phi + y_bullet,
           gamma = phi + mu_bullet,
-          alpha_naif = phi_naif + y_bullet,
-          gamma_naif = phi_naif + mu_bullet_naif
-        ) %>% 
-        mutate(
-          prime = mu * alpha / gamma,
-          prime_naif = mu_naif * alpha_naif / gamma_naif
+          phi = phi,
+          mean = mu * alpha / gamma,
+          sd = sqrt(mu * alpha * (gamma + mu) * gamma ^ (-2)),
+          prob = dnb2gen(self$valid_targets, mu = mu, alpha = alpha, gamma = gamma),
+          norm_carre_p = pmap_dbl(list(mu, alpha, gamma), ~ sum_p_2_mvnb(mu = ..1, alpha = ..2, gamma = ..3)),
+          
+          pred_naif = rep(mean(self$train_targets), length(self$valid_targets)),
+          prob_naif = dpois(self$valid_targets, pred_naif),
+          norm_carre_p_naif = map_dbl(pred_naif, sum_p_2_pois)
         )
       
-      # Assign attributes ---
-      
       self$betas <- betas
-      self$phi <- phi
-      
-      self$betas_naif <- betas_naif
-      self$phi_naif <- phi_naif
-      
-      self$valid_mu <- valid_mu
-      self$valid_alpha <- res_valid$alpha
-      self$valid_gamma <- res_valid$gamma
-      
-      self$valid_mu_naif <- valid_mu_naif
-      self$valid_alpha_naif <- res_valid$alpha_naif
-      self$valid_gamma_naif <- res_valid$gamma_naif
-      
-      self$valid_prime <- res_valid$prime
-      self$valid_prime_naif <- res_valid$prime_naif
-      
-      self$train_targets <- train_df_juiced[[self$response]]
-      self$valid_targets <- valid_df_juiced[[self$response]]
       
       invisible(self)
     },

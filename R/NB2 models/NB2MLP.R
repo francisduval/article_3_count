@@ -1,7 +1,7 @@
 NB2MLP <- 
   R6Class(
     classname = "NB2MLP",
-    inherit = NB2Metrics,
+    inherit = CountMetrics,
     
     public =
       list(
@@ -12,41 +12,15 @@ NB2MLP <-
         valid_targets = NULL,
         train_risk_vec = NULL,
         valid_risk_vec = NULL,
-        valid_mu = NULL,
-        phi = NULL,
         
-        valid_mu_naif = NULL,
-        phi_naif = NULL,
+        valid_res = NULL,
         
         initialize = function(spec, dataset) {
           self$spec <- spec
           self$dataset <- dataset
         },
         
-        fit_naive_model = function(train_df, valid_df) {
-          fit <- glm.nb(nb_claims ~ 1, data = train_df)
-          self$valid_mu_naif <- as.numeric(predict(fit, type = "response", newdata = valid_df))[1]
-          self$phi_naif <- 1 / fit$theta
-        },
-        
-        plot_training = function() {
-          tibble(
-            epoch = seq_along(self$train_risk_vec),
-            train_loss = self$train_risk_vec,
-            valid_loss = self$valid_risk_vec,
-          ) %>% 
-            pivot_longer(cols = -"epoch") %>% 
-            ggplot(aes(x = epoch, y = value, col = name)) +
-            geom_point(alpha = 0.7) +
-            geom_line(linewidth = 0.8, alpha = 0.3) +
-            scale_color_discrete(name = NULL) +
-            scale_x_continuous(breaks = seq_along(self$train_risk_vec)) +
-            ylab(NULL)
-        },
-        
         train = function(train, valid, epochs, lr_start, factor, patience, batch = 256, ...) {
-          self$fit_naive_model(train, valid)
-          
           train_ds <- self$dataset(train)
           valid_ds <- self$dataset(valid)
           
@@ -115,14 +89,17 @@ NB2MLP <-
             train_risk <- mean(train_loss_vec)
             valid_risk <- mean(valid_loss_vec)
             
+            mu <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$mu)
+            phi <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$phi)
+            
             if (e == 1) {
-              self$valid_mu <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$mu)
-              self$phi <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$phi)
-              best_valid_loss <- nb2_loss(self$valid_mu, self$phi, self$valid_targets)
+              best_valid_mu <- mu
+              best_phi <- phi
+              best_valid_loss <- nb2_loss(best_valid_mu, best_phi, self$valid_targets)
             } else if (valid_risk < as.numeric(best_valid_loss)) {
-              self$valid_mu <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$mu)
-              self$phi <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$phi)
-              best_valid_loss <- nb2_loss(self$valid_mu, self$phi, self$valid_targets)
+              best_valid_mu <- mu
+              best_phi <- phi
+              best_valid_loss <- nb2_loss(best_valid_mu, best_phi, self$valid_targets)
             }
             
             train_risk_vec[e] <- train_risk
@@ -132,8 +109,8 @@ NB2MLP <-
             scheduler$step(valid_risk)
             
             cat(sprintf(
-              "\nEpoch %d (lr = %g), training loss: %3.4f, validation loss: %3.4f, phi = %3.4f",
-              e, lr, train_risk, valid_risk, self$phi
+              "\nEpoch %d (lr = %g), training loss: %3.4f, validation loss: %3.4f, phi = %3.8f",
+              e, lr, train_risk, valid_risk, phi
             ))
           }
           
@@ -142,6 +119,40 @@ NB2MLP <-
           self$train_risk_vec <- train_risk_vec
           self$valid_risk_vec <- valid_risk_vec
           
+          sum_p_2_pois <- function(mu) sum(map_dbl(0:30, ~ dpois(., lambda = mu) ^ 2))
+          sum_p_2_nb2 <- function(mu, phi) sum(map_dbl(0:30, ~ dnbinom(., mu = mu, size = 1 / phi) ^ 2))
+          
+          self$valid_res <- 
+            valid %>% 
+            select(vin, contract_start_date, nb_claims) %>% 
+            mutate(
+              mu = best_valid_mu,
+              mean = mu,
+              phi = best_phi,
+              sd = sqrt(mu + (mu ^ 2) / phi),
+              prob = dnbinom(self$valid_targets, mu = mu, size = 1 / phi),
+              norm_carre_p = map2_dbl(mu, phi, ~ sum_p_2_nb2(.x, phi = .y)),
+              
+              pred_naif = rep(mean(self$train_targets), length(self$valid_targets)),
+              prob_naif = dpois(self$valid_targets, pred_naif),
+              norm_carre_p_naif = map_dbl(pred_naif, sum_p_2_pois)
+            )
+          
+        },
+        
+        plot_training = function() {
+          tibble(
+            epoch = seq_along(self$train_risk_vec),
+            train_loss = self$train_risk_vec,
+            valid_loss = self$valid_risk_vec,
+          ) %>% 
+            pivot_longer(cols = -"epoch") %>% 
+            ggplot(aes(x = epoch, y = value, col = name)) +
+            geom_point(alpha = 0.7) +
+            geom_line(linewidth = 0.8, alpha = 0.3) +
+            scale_color_discrete(name = NULL) +
+            scale_x_continuous(breaks = seq_along(self$train_risk_vec)) +
+            ylab(NULL)
         }
       )
   )

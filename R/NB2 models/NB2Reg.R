@@ -1,6 +1,6 @@
 NB2Reg <- R6Class(
   classname = "NB2Reg",
-  inherit = NB2Metrics,
+  inherit = CountMetrics,
   
   public = list(
     recipe = NULL,
@@ -10,13 +10,9 @@ NB2Reg <- R6Class(
     train_targets = NULL,
     valid_targets = NULL,
     
+    valid_res = NULL,
+    
     params_df = NULL,
-    
-    valid_mu = NULL,
-    phi = NULL,
-    
-    valid_mu_naif = NULL,
-    phi_naif = NULL,
     
     initialize = function(recipe) {
       self$recipe <- recipe
@@ -30,20 +26,33 @@ NB2Reg <- R6Class(
       
       x_form <- names(select(train_df_juiced, -self$response))
       form <- reformulate(x_form, response = self$response)
-      form_naif <- reformulate("1", response = self$response)
-      
       fit <- glm.nb(form, data = train_df_juiced)
-      fit_naif <- glm.nb(form_naif, data = train_df_juiced)
       
-      self$params_df <- tidy(fit)
-      self$valid_mu <- as.numeric(predict(fit, type = "response", newdata = valid_df_juiced))
-      self$phi <- 1 / fit$theta
+      sum_p_2_pois <- function(mu) sum(map_dbl(0:30, ~ dpois(., lambda = mu) ^ 2))
+      sum_p_2_nb2 <- function(mu, phi) sum(map_dbl(0:30, ~ dnbinom(., mu = mu, size = 1 / phi) ^ 2))
       
-      self$valid_mu_naif <- as.numeric(predict(fit_naif, type = "response", newdata = valid_df_juiced))[1]
-      self$phi_naif <- 1 / fit_naif$theta
+      # ---
       
       self$train_targets <- train_df_juiced[[self$response]]
       self$valid_targets <- valid_df_juiced[[self$response]]
+      
+      self$valid_res <- 
+        valid_df %>% 
+        select(vin, contract_start_date, nb_claims) %>% 
+        mutate(
+          mu = predict(fit, type = "response", newdata = valid_df_juiced),
+          phi = 1 / fit$theta,
+          mean = mu,
+          sd = sqrt(mu + (mu ^ 2) / phi),
+          prob = dnbinom(self$valid_targets, mu = mu, size = 1 / phi),
+          norm_carre_p = map2_dbl(mu, phi, ~sum_p_2_nb2(.x, phi = .y)),
+          
+          pred_naif = rep(mean(self$train_targets), length(self$valid_targets)),
+          prob_naif = dpois(self$valid_targets, pred_naif),
+          norm_carre_p_naif = map_dbl(pred_naif, sum_p_2_pois)
+        )
+      
+      self$params_df <- tidy(fit)
 
       invisible(self)
     },
