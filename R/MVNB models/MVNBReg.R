@@ -10,6 +10,7 @@ MVNBReg <- R6Class(
     train_targets = NULL,
     valid_targets = NULL,
 
+    train_res = NULL,
     valid_res = NULL,
     
     betas = NULL,
@@ -24,7 +25,8 @@ MVNBReg <- R6Class(
       train_df_juiced <- juice(prep(self$recipe))
       valid_df_juiced <- bake(prep(self$recipe), new_data = valid_df)
       
-      x_form <- names(select(train_df_juiced, -self$response, -vin))
+      id_vars <- self$recipe$var_info$variable[self$recipe$var_info$role == "ID"]
+      x_form <- names(select(train_df_juiced, -all_of(id_vars), -self$response))
       
       # Fit a NB2 for starting values ---
       
@@ -68,7 +70,7 @@ MVNBReg <- R6Class(
       
       # Fit MVNB ---
       
-      x_train <- train_df_juiced %>% select(-nb_claims, -vin) %>% bind_cols(Intercept = 1, .) %>% as.matrix()
+      x_train <- train_df_juiced %>% select(-nb_claims, -all_of(id_vars)) %>% bind_cols(Intercept = 1, .) %>% as.matrix()
       opt <- optim(c(betas_start, phi_start), fn = optim_fn(x_train), control = list(maxit = 20000), method = c("L-BFGS-B"))
       betas <- opt$par[seq_len(ncol(x_train))]
       phi <- as.numeric(exp(opt$par[ncol(x_train) + 1]))
@@ -80,8 +82,9 @@ MVNBReg <- R6Class(
       
       # Assign attributes ---
       
-      x_valid <- valid_df_juiced %>% select(-nb_claims, -vin) %>% bind_cols(Intercept = 1, .) %>% as.matrix()
+      x_valid <- valid_df_juiced %>% select(-nb_claims, -all_of(id_vars)) %>% bind_cols(Intercept = 1, .) %>% as.matrix()
       valid_mu <- exp(x_valid %*% betas) %>% as.vector()
+      train_mu <- exp(x_train %*% betas) %>% as.vector()
       
       self$train_targets <- train_df_juiced[[self$response]]
       self$valid_targets <- valid_df_juiced[[self$response]]
@@ -108,6 +111,26 @@ MVNBReg <- R6Class(
           pred_naif = rep(mean(self$train_targets), length(self$valid_targets)),
           prob_naif = dpois(self$valid_targets, pred_naif),
           norm_carre_p_naif = map_dbl(pred_naif, sum_p_2_pois)
+        )
+      
+      self$train_res <-
+        self$recipe$template %>%
+        mutate(mu = train_mu) %>% 
+        group_by(vin) %>%
+        mutate(
+          mu_bullet = cumsum(mu) - mu,
+          y_bullet = cumsum(nb_claims) - nb_claims
+        ) %>%
+        ungroup() %>%
+        select(vin, contract_start_date, nb_claims, mu_bullet, y_bullet, mu) %>% 
+        mutate(
+          alpha = phi + y_bullet,
+          gamma = phi + mu_bullet,
+          phi = phi,
+          mean = mu * alpha / gamma,
+          sd = sqrt(mu * alpha * (gamma + mu) * gamma ^ (-2)),
+          prob = dnb2gen(self$valid_targets, mu = mu, alpha = alpha, gamma = gamma),
+          norm_carre_p = pmap_dbl(list(mu, alpha, gamma), ~ sum_p_2_mvnb(mu = ..1, alpha = ..2, gamma = ..3))
         )
       
       self$betas <- betas

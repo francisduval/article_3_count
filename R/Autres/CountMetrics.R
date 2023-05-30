@@ -28,6 +28,8 @@ CountMetrics <- R6Class(
       
       # ---
       
+      logs_train = function() mean(-log(self$train_res$prob)),
+      
       dev = function() mean(map2_dbl(self$valid_res$mean, self$valid_targets, ~ self$dev_one_obs(.x, .y))),
       logs = function() mean(-log(self$valid_res$prob)),
       aes = function() mean(abs(self$valid_targets - self$valid_res$mean)),
@@ -51,6 +53,10 @@ CountMetrics <- R6Class(
       # ---
       
       print_metrics = function() {
+        cat("-----------------------------------------------\n")
+        cat("Training set logarithmic score\n")
+        cat("-----------------------------------------------\n")
+        cat("Logarithmic score = ", round(self$logs_train(), 5), "\n\n")
         cat("-----------------------------------------------\n")
         cat("Modèle naïf\n")
         cat("-----------------------------------------------\n")

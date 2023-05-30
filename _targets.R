@@ -52,24 +52,51 @@ list(
   tar_target(valid_mvnb, valid %>% compute_sum_past_claims() %>% compute_sum_past_mu()),
   tar_target(test_mvnb, test %>% compute_sum_past_claims() %>% compute_sum_past_mu()),
   
-
+  tar_target(
+    vars_class, 
+    c(
+      "expo",
+      "annual_distance",
+      "commute_distance",
+      "conv_count_3_yrs_minor",
+      "gender",
+      "marital_status",
+      "pmt_plan",
+      "veh_age",
+      "veh_use",
+      "years_claim_free",
+      "years_licensed",
+      "distance"
+    )
+  ),
+  
+  tar_target(
+    vars_tele, 
+    c(
+      "avg_daily_nb_trips",
+      "med_trip_avg_speed",
+      "med_trip_distance",
+      "med_trip_max_speed",
+      "max_trip_max_speed",
+      "prop_long_trip",
+      "frac_expo_night",
+      "frac_expo_noon",
+      "frac_expo_evening",
+      "frac_expo_peak_morning",
+      "frac_expo_peak_evening",
+      "frac_expo_mon_to_thu",
+      "frac_expo_fri_sat"
+    )
+  ),
+  
   # -----------------------------------------------------------------------------------------------------------------------------
   # Modèles GLM -----------------------------------------------------------------------------------------------------------------
   # -----------------------------------------------------------------------------------------------------------------------------
   
   tar_target(
     rec_class,
-    recipe(nb_claims ~ ., data = select(train, nb_claims:distance)) %>%
-      step_impute_median(commute_distance, years_claim_free) %>%
-      step_other(all_nominal(), threshold = 0.05) %>%
-      step_dummy(all_nominal()) %>% 
-      step_normalize(all_predictors())
-  ),
-  
-  tar_target(
-    rec_class_mvnb,
-    recipe(nb_claims ~ ., data = select(train, nb_claims:distance, vin)) %>%
-      update_role(vin, new_role = "ID") %>% 
+    recipe(nb_claims ~ ., data = train) %>%
+      update_role(-all_of(vars_class), -nb_claims, new_role = "ID") %>% 
       step_impute_median(commute_distance, years_claim_free) %>%
       step_other(all_nominal_predictors(), threshold = 0.05) %>%
       step_dummy(all_nominal_predictors()) %>% 
@@ -78,17 +105,28 @@ list(
   
   tar_target(
     rec_class_tele,
-    recipe(nb_claims ~ ., data = select(train, nb_claims:frac_expo_fri_sat, -avg_daily_distance, -nb_trips)) %>%
+    recipe(nb_claims ~ ., data = train) %>%
+      update_role(-all_of(vars_class), -all_of(vars_tele), -nb_claims, new_role = "ID") %>% 
       step_impute_median(commute_distance, years_claim_free) %>%
-      step_other(all_nominal(), threshold = 0.05) %>%
-      step_dummy(all_nominal()) %>% 
+      step_other(all_nominal_predictors(), threshold = 0.05) %>%
+      step_dummy(all_nominal_predictors()) %>% 
+      step_normalize(all_predictors())
+  ),
+  
+  tar_target(
+    rec_class_mvnb,
+    recipe(nb_claims ~ ., data = train_mvnb) %>%
+      update_role(-all_of(vars_class), -nb_claims, new_role = "ID") %>% 
+      step_impute_median(commute_distance, years_claim_free) %>%
+      step_other(all_nominal_predictors(), threshold = 0.05) %>%
+      step_dummy(all_nominal_predictors()) %>% 
       step_normalize(all_predictors())
   ),
   
   tar_target(
     rec_class_tele_mvnb,
-    recipe(nb_claims ~ ., data = select(train, nb_claims:frac_expo_fri_sat, -avg_daily_distance, -nb_trips, vin)) %>%
-      update_role(vin, new_role = "ID") %>% 
+    recipe(nb_claims ~ ., data = train_mvnb) %>%
+      update_role(-all_of(vars_class), -all_of(vars_tele), -nb_claims, new_role = "ID") %>% 
       step_impute_median(commute_distance, years_claim_free) %>%
       step_other(all_nominal_predictors(), threshold = 0.05) %>%
       step_dummy(all_nominal_predictors()) %>% 
@@ -104,7 +142,7 @@ list(
       model$train(valid)
     }
   ),
-  
+
   tar_target(
     glm_poisson_class_tele,
     {
@@ -112,7 +150,7 @@ list(
       model$train(valid)
     }
   ),
-  
+
   tar_target(
     glm_nb2_class,
     {
@@ -133,7 +171,7 @@ list(
     glm_mvnb_class,
     {
       model <- MVNBReg$new(rec_class_mvnb)
-      model$train(valid)
+      model$train(valid_mvnb)
     }
   ),
 
@@ -141,7 +179,7 @@ list(
     glm_mvnb_class_tele,
     {
       model <- MVNBReg$new(rec_class_tele_mvnb)
-      model$train(valid)
+      model$train(valid_mvnb)
     }
   ),
   

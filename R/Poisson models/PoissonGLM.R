@@ -10,6 +10,7 @@ PoissonGLM <- R6Class(
     train_targets = NULL,
     valid_targets = NULL,
     
+    train_res = NULL,
     valid_res = NULL,
     
     params_df = NULL,
@@ -46,6 +47,17 @@ PoissonGLM <- R6Class(
           pred_naif = rep(mean(self$train_targets), length(self$valid_targets)),
           prob_naif = dpois(self$valid_targets, pred_naif),
           norm_carre_p_naif = map_dbl(pred_naif, sum_p_2)
+        )
+      
+      self$train_res <- 
+        self$recipe$template %>% 
+        select(vin, contract_start_date, nb_claims) %>% 
+        mutate(
+          mu = predict(fit, new_data = train_df)$.pred,
+          mean = mu,
+          sd = sqrt(mu),
+          prob = dpois(self$train_targets, mu),
+          norm_carre_p = map_dbl(mu, sum_p_2)
         )
       
       self$params_df <- tidy(fit)

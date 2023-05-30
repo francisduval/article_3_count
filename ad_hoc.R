@@ -1,27 +1,48 @@
-train_df <- tar_read(train_mvnb)
-valid_df <- tar_read(valid_mvnb)
+valid_df <- tar_read(valid)[1:1000, ]
+train_df <- tar_read(train)[1:5000, ]
+train_df_mvnb <- tar_read(train_mvnb)[1:5000, ]
+valid_df_mvnb <- tar_read(valid_mvnb)[1:5000, ]
 
-model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
-model$train(train_df[1:500, ], valid_df[1:500, ], epochs = 10, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+vars_class <- 
+  c(
+    "expo",
+    "annual_distance",
+    "commute_distance",
+    "conv_count_3_yrs_minor",
+    "gender",
+    "marital_status",
+    "pmt_plan",
+    "veh_age",
+    "veh_use",
+    "years_claim_free",
+    "years_licensed",
+    "distance"
+  )
 
-model$print_metrics()
+rec_class <- 
+  recipe(nb_claims ~ ., data = train_df) %>%
+  update_role(-all_of(vars_class), -nb_claims, new_role = "ID") %>% 
+  step_impute_median(commute_distance, years_claim_free) %>%
+  step_other(all_nominal_predictors(), threshold = 0.05) %>%
+  step_dummy(all_nominal_predictors()) %>% 
+  step_normalize(all_predictors())
+
+model <- NB2Reg$new(rec_class)
+model$train(valid_df)
 
 
-model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
-model$train(train_df[1:500, ], valid_df[1:500, ], epochs = 10, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+rec_class_mvnb <- 
+  recipe(nb_claims ~ ., data = train_df_mvnb) %>%
+  update_role(-all_of(vars_class), -nb_claims, new_role = "ID") %>% 
+  step_impute_median(commute_distance, years_claim_free) %>%
+  step_other(all_nominal_predictors(), threshold = 0.05) %>%
+  step_dummy(all_nominal_predictors()) %>% 
+  step_normalize(all_predictors())
 
-model$print_metrics()
+model2 <- MVNBReg$new(rec_class_mvnb)
+model2$train(valid_df_mvnb)
+model2$print_metrics()
 
-
-
-train_df <- tar_read(train_mvnb)
-valid_df <- tar_read(valid_mvnb)
-
-modele <- MVNBMLP$new(spec = MVNBCANN3L, dataset = DatasetNNMVNB)
-modele$train(train_df[1:500, ], valid_df[1:500, ], epochs = 10, lr_start = 0.01, factor = 0.5, patience = 2, n_1L = 16, n_2L = 8, n_3L = 4)
-
-
-nn_poisson <- tar_read(nn_poisson)
-nn_nb2 <- tar_read(nn_nb2)
-nn_mvnb <- tar_read(nn_mvnb)
-
+model3 <- PoissonGLM$new(rec_class)
+model3$train(valid_df)
+model3$print_metrics()
