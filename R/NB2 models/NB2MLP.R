@@ -13,6 +13,7 @@ NB2MLP <-
         train_risk_vec = NULL,
         valid_risk_vec = NULL,
         
+        train_res = NULL,
         valid_res = NULL,
         
         initialize = function(spec, dataset) {
@@ -90,14 +91,17 @@ NB2MLP <-
             valid_risk <- mean(valid_loss_vec)
             
             mu <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$mu)
+            train_mu <- as.double(model$forward(train_ds[1:length(train_ds)]$x)$mu)
             phi <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x)$phi)
             
             if (e == 1) {
               best_valid_mu <- mu
+              best_train_mu <- train_mu
               best_phi <- phi
               best_valid_loss <- nb2_loss(best_valid_mu, best_phi, self$valid_targets)
             } else if (valid_risk < as.numeric(best_valid_loss)) {
               best_valid_mu <- mu
+              best_train_mu <- train_mu
               best_phi <- phi
               best_valid_loss <- nb2_loss(best_valid_mu, best_phi, self$valid_targets)
             }
@@ -138,6 +142,17 @@ NB2MLP <-
               norm_carre_p_naif = map_dbl(pred_naif, sum_p_2_pois)
             )
           
+          self$train_res <- 
+            train %>% 
+            select(vin, contract_start_date, nb_claims) %>% 
+            mutate(
+              mu = best_train_mu,
+              mean = mu,
+              phi = best_phi,
+              sd = sqrt(mu + (mu ^ 2) / phi),
+              prob = dnbinom(self$train_targets, mu = mu, size = 1 / phi),
+              norm_carre_p = map2_dbl(mu, phi, ~ sum_p_2_nb2(.x, phi = .y))
+            )
         },
         
         plot_training = function() {

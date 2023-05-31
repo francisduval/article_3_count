@@ -13,6 +13,7 @@ PoissonMLP <-
         train_risk_vec = NULL,
         valid_risk_vec = NULL,
         
+        train_res = NULL,
         valid_res = NULL,
         
         initialize = function(spec, dataset) {
@@ -84,12 +85,15 @@ PoissonMLP <-
             valid_risk <- mean(valid_loss_vec)
             
             mu <- as.double(model$forward(valid_ds[1:length(valid_ds)]$x))
+            train_mu <- as.double(model$forward(train_ds[1:length(train_ds)]$x))
             
             if (e == 1) {
               best_valid_mu <- mu
+              best_train_mu <- train_mu
               best_valid_loss <- as.numeric(nnf_poisson_nll_loss(best_valid_mu, self$valid_targets, log_input = F, full = T))
             } else if (valid_risk < best_valid_loss) {
               best_valid_mu <- mu
+              best_train_mu <- train_mu
               best_valid_loss <- as.numeric(nnf_poisson_nll_loss(best_valid_mu, self$valid_targets, log_input = F, full = T))
             }
             
@@ -127,6 +131,16 @@ PoissonMLP <-
               norm_carre_p_naif = map_dbl(pred_naif, sum_p_2)
             )
           
+          self$train_res <- 
+            train %>% 
+            select(vin, contract_start_date, nb_claims) %>% 
+            mutate(
+              mu = best_train_mu,
+              mean = mu,
+              sd = sqrt(mu),
+              prob = dpois(self$train_targets, mu),
+              norm_carre_p = map_dbl(mu, sum_p_2)
+            )
         },
         
         plot_training = function() {

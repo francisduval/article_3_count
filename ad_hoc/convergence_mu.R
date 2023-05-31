@@ -1,3 +1,6 @@
+train_mvnb <- tar_read(train_mvnb)[1:1000, ]
+valid_mvnb <- tar_read(valid_mvnb)[1:250, ]
+
 MVNBMLP <- 
   R6Class(
     classname = "MVNBMLP",
@@ -16,6 +19,8 @@ MVNBMLP <-
         train_res = NULL,
         valid_res = NULL,
         
+        mu_list = NULL,
+        
         initialize = function(spec, dataset) {
           self$spec <- spec
           self$dataset <- dataset
@@ -25,7 +30,7 @@ MVNBMLP <-
           model <- self$spec(...)
           optimiseur <- optim_adam(model$parameters, lr = lr_start)
           scheduler <- lr_reduce_on_plateau(optimiseur, factor = factor, patience = patience)
-
+          
           train_risk_vec <- vector(mode = "numeric", length = epochs)
           valid_risk_vec <- vector(mode = "numeric", length = epochs)
           
@@ -61,14 +66,21 @@ MVNBMLP <-
           
           # -----
           
+          mu_list <- list()
+          
           for (e in 1:epochs) {
             
             if (e > 1) {
+              mu_tibble <- tibble(mu_before = train$mu)
+              
               train$mu <- as.double(model$mu(train_ds[1:length(train_ds)]$x))
               train <- compute_sum_past_mu(train)
               
               valid$mu <- as.double(model$mu(valid_ds[1:length(valid_ds)]$x))
               valid <- compute_sum_past_mu(valid)
+              
+              mu_tibble <- mutate(mu_tibble, mu_after = train$mu)
+              mu_list <- c(mu_list, list(mu_tibble))
             }
             
             train_ds <- self$dataset(train)
@@ -186,6 +198,8 @@ MVNBMLP <-
               prob = dnb2gen(self$train_targets, mu = mu, alpha = alpha, gamma = gamma),
               norm_carre_p = pmap_dbl(list(mu, alpha, gamma), ~ sum_p_2_mvnb(mu = ..1, alpha = ..2, gamma = ..3))
             )
+          
+          self$mu_list <- mu_list
         },
         
         plot_training = function() {
@@ -203,4 +217,36 @@ MVNBMLP <-
             ylab(NULL)
         }
       )
+  )
+
+
+model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
+model$train(train_mvnb, valid_mvnb, epochs = 10, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+
+combined_df <- bind_rows(model$mu_list, .id = "epoch")
+
+
+# Function to calculate R-squared
+calculate_r2 <- function(df) {
+  lm_model <- lm(mu_after ~ mu_before, data = df)
+  r_squared <- summary(lm_model)$r.squared
+  return(r_squared)
+}
+
+# Calculate R-squared for each tibble
+r_squared_values <- map_dbl(model$mu_list, calculate_r2)
+
+# Add R-squared as a column in combined_df
+combined_df$r_squared <- rep(r_squared_values, each = nrow(train_mvnb))
+
+ggplot(combined_df, aes(x = mu_before, y = mu_after)) +
+  geom_point(alpha = 0.1) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+  labs(title = "Convergence des mus", x = "Mu before epoch", y = "Mu after epoch") +
+  facet_wrap(vars(epoch), nrow = 3) +
+  geom_text(
+    mapping = aes(x = 0.15, y = 0.4, label = paste("R² =", round(r_squared, 2))), 
+    hjust = 1, 
+    vjust = 1, 
+    size = 3
   )

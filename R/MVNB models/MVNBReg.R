@@ -129,7 +129,7 @@ MVNBReg <- R6Class(
           phi = phi,
           mean = mu * alpha / gamma,
           sd = sqrt(mu * alpha * (gamma + mu) * gamma ^ (-2)),
-          prob = dnb2gen(self$valid_targets, mu = mu, alpha = alpha, gamma = gamma),
+          prob = dnb2gen(self$train_targets, mu = mu, alpha = alpha, gamma = gamma),
           norm_carre_p = pmap_dbl(list(mu, alpha, gamma), ~ sum_p_2_mvnb(mu = ..1, alpha = ..2, gamma = ..3))
         )
       

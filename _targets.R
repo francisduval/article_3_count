@@ -48,9 +48,9 @@ list(
   tar_target(valid, join_class_tele_nn(valid_class, valid_tele, valid_nn)),
   tar_target(test, join_class_tele_nn(test_class, test_tele, test_nn)),
   
-  tar_target(train_mvnb, train %>% compute_sum_past_claims() %>% compute_sum_past_mu()),
-  tar_target(valid_mvnb, valid %>% compute_sum_past_claims() %>% compute_sum_past_mu()),
-  tar_target(test_mvnb, test %>% compute_sum_past_claims() %>% compute_sum_past_mu()),
+  tar_target(train_mvnb, prepare_mvnb(train, mu_vec = glm_mvnb_class$train_res$mu)),
+  tar_target(valid_mvnb, prepare_mvnb(valid, mu_vec = glm_mvnb_class$valid_res$mu)),
+  # tar_target(test_mvnb, test %>% compute_sum_past_claims() %>% compute_sum_past_mu()),
   
   tar_target(
     vars_class, 
@@ -115,7 +115,7 @@ list(
   
   tar_target(
     rec_class_mvnb,
-    recipe(nb_claims ~ ., data = train_mvnb) %>%
+    recipe(nb_claims ~ ., data = train) %>%
       update_role(-all_of(vars_class), -nb_claims, new_role = "ID") %>% 
       step_impute_median(commute_distance, years_claim_free) %>%
       step_other(all_nominal_predictors(), threshold = 0.05) %>%
@@ -125,7 +125,7 @@ list(
   
   tar_target(
     rec_class_tele_mvnb,
-    recipe(nb_claims ~ ., data = train_mvnb) %>%
+    recipe(nb_claims ~ ., data = train) %>%
       update_role(-all_of(vars_class), -all_of(vars_tele), -nb_claims, new_role = "ID") %>% 
       step_impute_median(commute_distance, years_claim_free) %>%
       step_other(all_nominal_predictors(), threshold = 0.05) %>%
@@ -171,7 +171,7 @@ list(
     glm_mvnb_class,
     {
       model <- MVNBReg$new(rec_class_mvnb)
-      model$train(valid_mvnb)
+      model$train(valid)
     }
   ),
 
@@ -179,7 +179,7 @@ list(
     glm_mvnb_class_tele,
     {
       model <- MVNBReg$new(rec_class_tele_mvnb)
-      model$train(valid_mvnb)
+      model$train(valid)
     }
   ),
   
@@ -305,7 +305,7 @@ list(
     nn_poisson,
     {
       model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
-      model$train(train, valid, epochs = 22, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+      model$train(train, valid, epochs = 40, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
       model
     }
   ),
@@ -314,7 +314,7 @@ list(
     nn_nb2,
     {
       model <- NB2MLP$new(NB2CANN3L, DatasetNNCount)
-      model$train(train, valid, epochs = 22, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+      model$train(train, valid, epochs = 40, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
       model
     }
   ),
@@ -323,7 +323,7 @@ list(
     nn_mvnb,
     {
       model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
-      model$train(train_mvnb, valid_mvnb, epochs = 22, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+      model$train(train_mvnb, valid_mvnb, epochs = 40, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
       model
     }
   )
