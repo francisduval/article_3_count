@@ -16,6 +16,8 @@ MVNBMLP <-
         train_res = NULL,
         valid_res = NULL,
         
+        mu_list = NULL,
+        
         initialize = function(spec, dataset) {
           self$spec <- spec
           self$dataset <- dataset
@@ -61,14 +63,18 @@ MVNBMLP <-
           
           # -----
           
+          mu_list <- list()
+          
           for (e in 1:epochs) {
             
             if (e > 1) {
+              mu_tibble <- tibble(mu_before = train$mu)
+              
               train$mu <- as.double(model$mu(train_ds[1:length(train_ds)]$x))
               train <- compute_sum_past_mu(train)
               
-              valid$mu <- as.double(model$mu(valid_ds[1:length(valid_ds)]$x))
-              valid <- compute_sum_past_mu(valid)
+              mu_tibble <- mutate(mu_tibble, mu_after = train$mu)
+              mu_list <- c(mu_list, list(mu_tibble))
             }
             
             train_ds <- self$dataset(train)

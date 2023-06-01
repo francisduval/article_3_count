@@ -56,7 +56,8 @@ MVNBCANN3L <-
       nn_init_normal_(self$linear3$weight, std = 0.01)
       nn_init_normal_(self$linear4$weight, std = 0.01)
       
-      nn_init_constant_(self$linear_phi$weight, val = -0.8548)
+      # nn_init_constant_(self$linear_phi$weight, val = -0.8548)
+      nn_init_constant_(self$linear_phi$weight, val = 3.9261)
       
       beta_0 <- torch_tensor(beta_vec[1], dtype = torch_float())
       betas <- torch_tensor(array(beta_vec[2:(input_size_skip + 1)], dim = c(1, input_size_skip)), dtype = torch_float())

@@ -213,6 +213,27 @@ list(
   
   # Tuning ----------------------------------------------------------------------------------------------------------------------
   
+  tar_target(
+    MVNBCANN3L_tune_p,
+    {
+      model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
+      model$train(train_mvnb, valid_mvnb, epochs = 30, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = p_grid, n_1L = 128, n_2L = 64, n_3L = 32)
+      model
+    },
+    pattern = map(p_grid)
+  ),
+  
+  tar_target(
+    MVNBCANN3L_tune_factor,
+    {
+      model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
+      model$train(train_mvnb, valid_mvnb, epochs = 30, lr_start = 0.00001, factor = factor_grid, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+      model
+    },
+    pattern = map(factor_grid)
+  ),
+  
+  
   # tar_target(
   #   PoissonCANN1L_tune,
   #   {
