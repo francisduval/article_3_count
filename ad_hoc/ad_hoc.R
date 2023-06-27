@@ -12,3 +12,15 @@ glm_mvnb_class$valid_res$phi
 model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
 model$train(train_mvnb, valid_mvnb, epochs = 20, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
 
+
+train <- tar_read(train)
+valid <- tar_read(valid)
+test <- tar_read(test)
+
+total <- bind_rows(train, valid, test)
+
+
+
+nrow(tar_read(atd_train))
+nrow(tar_read(atd_valid))
+nrow(tar_read(atd_test))

@@ -1,0 +1,136 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+df_grid <- tar_read(df_grid)
+poisson_tune <- tar_read(poisson_tune)
+nb2_tune <- tar_read(nb2_tune)
+mvnb_tune <- tar_read(mvnb_tune)
+```
+
+# Visualiser le tuning
+```{r}
+create_plot_data <- function(tuning) {
+  tuning %>% 
+    map_df(~ .$valid_risk_vec) %>% 
+    set_colnames(glue("{df_grid$lr_start}_{df_grid$factor}_{df_grid$p}")) %>% 
+    mutate(epoch = 1:length(tuning[[1]]$valid_risk_vec)) %>% 
+    pivot_longer(cols = -epoch) %>% 
+    separate(name, into = c("lr_start", "factor", "p"), sep = "_") %>% 
+    mutate(lr_start = factor(lr_start), factor = factor(factor), p = factor(p))
+}
+```
+
+```{r}
+plot_dat_poisson <- create_plot_data(poisson_tune)
+plot_dat_nb2 <- create_plot_data(nb2_tune)
+plot_dat_mvnb <- create_plot_data(mvnb_tune)
+```
+
+## Poisson
+```{r}
+ggplot(filter(plot_dat_poisson, p == "0.2"), aes(x = epoch, y = value, col = lr_start, shape = factor)) +
+  geom_point(alpha = 0.7) +
+  geom_line(linewidth = 0.8, alpha = 0.3) +
+  ylab("Validation loss") +
+  labs(subtitle = "p = 0.2")
+```
+
+```{r}
+ggplot(filter(plot_dat_poisson, p == "0.3"), aes(x = epoch, y = value, col = lr_start, shape = factor)) +
+  geom_point(alpha = 0.7) +
+  geom_line(linewidth = 0.8, alpha = 0.3) +
+  ylab("Validation loss") +
+  labs(subtitle = "p = 0.3")
+```
+
+```{r}
+ggplot(filter(plot_dat_poisson, p == "0.4"), aes(x = epoch, y = value, col = lr_start, shape = factor)) +
+  geom_point(alpha = 0.7) +
+  geom_line(linewidth = 0.8, alpha = 0.3) +
+  ylab("Validation loss") +
+  labs(subtitle = "p = 0.4")
+```
+
+## NB2
+```{r}
+ggplot(filter(plot_dat_nb2, p == "0.2"), aes(x = epoch, y = value, col = lr_start, shape = factor)) +
+  geom_point(alpha = 0.7) +
+  geom_line(linewidth = 0.8, alpha = 0.3) +
+  ylab("Validation loss") +
+  labs(subtitle = "p = 0.2")
+```
+
+```{r}
+ggplot(filter(plot_dat_nb2, p == "0.3"), aes(x = epoch, y = value, col = lr_start, shape = factor)) +
+  geom_point(alpha = 0.7) +
+  geom_line(linewidth = 0.8, alpha = 0.3) +
+  ylab("Validation loss") +
+  labs(subtitle = "p = 0.3")
+```
+
+```{r}
+ggplot(filter(plot_dat_nb2, p == "0.4"), aes(x = epoch, y = value, col = lr_start, shape = factor)) +
+  geom_point(alpha = 0.7) +
+  geom_line(linewidth = 0.8, alpha = 0.3) +
+  ylab("Validation loss") +
+  labs(subtitle = "p = 0.4")
+```
+
+## MVNB
+```{r}
+ggplot(filter(plot_dat_mvnb, p == "0.2"), aes(x = epoch, y = value, col = lr_start, shape = factor)) +
+  geom_point(alpha = 0.7) +
+  geom_line(linewidth = 0.8, alpha = 0.3) +
+  ylab("Validation loss") +
+  labs(subtitle = "p = 0.2")
+```
+
+```{r}
+ggplot(filter(plot_dat_mvnb, p == "0.3"), aes(x = epoch, y = value, col = lr_start, shape = factor)) +
+  geom_point(alpha = 0.7) +
+  geom_line(linewidth = 0.8, alpha = 0.3) +
+  ylab("Validation loss") +
+  labs(subtitle = "p = 0.3")
+```
+
+```{r}
+ggplot(filter(plot_dat_mvnb, p == "0.4"), aes(x = epoch, y = value, col = lr_start, shape = factor)) +
+  geom_point(alpha = 0.7) +
+  geom_line(linewidth = 0.8, alpha = 0.3) +
+  ylab("Validation loss") +
+  labs(subtitle = "p = 0.4")
+```
+
+# Vecteurs pour l'article
+```{r}
+poisson_log_score_vec <- map_dbl(poisson_tune, ~ .x$logs())
+poisson_df <- bind_cols(df_grid, log_score = poisson_log_score_vec)
+poisson_log_score_vec %>% as.numeric() %>% round(4)
+```
+
+```{r}
+nb2_log_score_vec <- map_dbl(nb2_tune, ~ .x$logs())
+nb2_df <- bind_cols(df_grid, log_score = nb2_log_score_vec)
+nb2_log_score_vec %>% as.numeric() %>% round(4)
+```
+```{r}
+mvnb_log_score_vec <- map_dbl(mvnb_tune, ~ .x$logs())
+mvnb_df <- bind_cols(df_grid, log_score = mvnb_log_score_vec)
+mvnb_log_score_vec %>% as.numeric() %>% round(4)
+```
+# Nombre d'époques
+```{r}
+map_dbl(poisson_tune, ~ which.min(.$valid_risk_vec)) %>% as.integer()
+```
+
+```{r}
+map_dbl(nb2_tune, ~ which.min(.$valid_risk_vec)) %>% as.integer()
+```
+
+
+```{r}
+map_dbl(mvnb_tune, ~ which.min(.$valid_risk_vec)) %>% as.integer()
+```

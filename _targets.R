@@ -47,10 +47,12 @@ list(
   tar_target(train, join_class_tele_nn(train_class, train_tele, train_nn)),
   tar_target(valid, join_class_tele_nn(valid_class, valid_tele, valid_nn)),
   tar_target(test, join_class_tele_nn(test_class, test_tele, test_nn)),
+  tar_target(learn, bind_rows(train, valid)),
   
   tar_target(train_mvnb, prepare_mvnb(train, mu_vec = glm_mvnb_class$train_res$mu)),
   tar_target(valid_mvnb, prepare_mvnb(valid, mu_vec = glm_mvnb_class$valid_res$mu)),
-  # tar_target(test_mvnb, test %>% compute_sum_past_claims() %>% compute_sum_past_mu()),
+  tar_target(test_mvnb, prepare_mvnb(test, mu_vec = glm_mvnb_class_learn$valid_res$mu)),
+  tar_target(learn_mvnb, bind_rows(train_mvnb, valid_mvnb)),
   
   tar_target(
     vars_class, 
@@ -93,6 +95,8 @@ list(
   # Modèles GLM -----------------------------------------------------------------------------------------------------------------
   # -----------------------------------------------------------------------------------------------------------------------------
   
+  # Recipes for training set ----------------------------------------------------------------------------------------------------
+  
   tar_target(
     rec_class,
     recipe(nb_claims ~ ., data = train) %>%
@@ -133,7 +137,49 @@ list(
       step_normalize(all_predictors())
   ),
   
-  # ----------
+  # Recipes for learning set ----------------------------------------------------------------------------------------------------
+  
+  tar_target(
+    rec_class_learn,
+    recipe(nb_claims ~ ., data = learn) %>%
+      update_role(-all_of(vars_class), -nb_claims, new_role = "ID") %>% 
+      step_impute_median(commute_distance, years_claim_free) %>%
+      step_other(all_nominal_predictors(), threshold = 0.05) %>%
+      step_dummy(all_nominal_predictors()) %>% 
+      step_normalize(all_predictors())
+  ),
+  
+  tar_target(
+    rec_class_tele_learn,
+    recipe(nb_claims ~ ., data = learn) %>%
+      update_role(-all_of(vars_class), -all_of(vars_tele), -nb_claims, new_role = "ID") %>% 
+      step_impute_median(commute_distance, years_claim_free) %>%
+      step_other(all_nominal_predictors(), threshold = 0.05) %>%
+      step_dummy(all_nominal_predictors()) %>% 
+      step_normalize(all_predictors())
+  ),
+  
+  tar_target(
+    rec_class_mvnb_learn,
+    recipe(nb_claims ~ ., data = learn) %>%
+      update_role(-all_of(vars_class), -nb_claims, new_role = "ID") %>% 
+      step_impute_median(commute_distance, years_claim_free) %>%
+      step_other(all_nominal_predictors(), threshold = 0.05) %>%
+      step_dummy(all_nominal_predictors()) %>% 
+      step_normalize(all_predictors())
+  ),
+  
+  tar_target(
+    rec_class_tele_mvnb_learn,
+    recipe(nb_claims ~ ., data = learn) %>%
+      update_role(-all_of(vars_class), -all_of(vars_tele), -nb_claims, new_role = "ID") %>% 
+      step_impute_median(commute_distance, years_claim_free) %>%
+      step_other(all_nominal_predictors(), threshold = 0.05) %>%
+      step_dummy(all_nominal_predictors()) %>% 
+      step_normalize(all_predictors())
+  ),
+  
+  # GLMs on training set --------------------------------------------------------------------------------------------------------
 
   tar_target(
     glm_poisson_class,
@@ -183,55 +229,153 @@ list(
     }
   ),
   
+  # GLMs on learning set --------------------------------------------------------------------------------------------------------
+  
+  tar_target(
+    glm_poisson_class_learn,
+    {
+      model <- PoissonGLM$new(rec_class_learn)
+      model$train(test)
+    }
+  ),
+  
+  tar_target(
+    glm_poisson_class_tele_learn,
+    {
+      model <- PoissonGLM$new(rec_class_tele_learn)
+      model$train(test)
+    }
+  ),
+  
+  tar_target(
+    glm_nb2_class_learn,
+    {
+      model <- NB2Reg$new(rec_class_learn)
+      model$train(test)
+    }
+  ),
+  
+  tar_target(
+    glm_nb2_class_tele_learn,
+    {
+      model <- NB2Reg$new(rec_class_tele_learn)
+      model$train(test)
+    }
+  ),
+  
+  tar_target(
+    glm_mvnb_class_learn,
+    {
+      model <- MVNBReg$new(rec_class_mvnb_learn)
+      model$train(test)
+    }
+  ),
+  
+  tar_target(
+    glm_mvnb_class_tele_learn,
+    {
+      model <- MVNBReg$new(rec_class_tele_mvnb_learn)
+      model$train(test)
+    }
+  ),
+  
   # -----------------------------------------------------------------------------------------------------------------------------
   # Tuning des hyperparamètres du réseau de neurones ----------------------------------------------------------------------------
   # -----------------------------------------------------------------------------------------------------------------------------
   
   # Grilles d'hyperparamètres ---------------------------------------------------------------------------------------------------
   
-  tar_target(n_1L_grid2, c(16, 32, 64, 128)),
-  tar_target(n_2L_grid2, c(8, 16, 32, 64)),
-  tar_target(n_3L_grid2, c(4, 8, 16, 32)),
-  tar_target(lr_start_grid, c(0.001, 0.0005, 0.0001, 0.00005, 0.00001)),
-  tar_target(factor_grid, c(0.5, 0.4, 0.3)),
+  tar_target(lr_start_grid, c(0.00001, 0.00005, 0.0001, 0.0005, 0.001)),
+  tar_target(factor_grid, c(0.3, 0.4, 0.5)),
   tar_target(p_grid, c(0.2, 0.3, 0.4)),
-  tar_target(batch_grid, c(128, 256, 512, 1024)),
   
   tar_target(
-    lr_start_factor_grid,
-    tibble(lr_start = lr_start_grid, factor = factor_grid),
-    pattern = cross(lr_start_grid, factor_grid),
+    df_grid,
+    tibble(lr_start = lr_start_grid, factor = factor_grid, p = p_grid),
+    pattern = cross(lr_start_grid, factor_grid, p_grid),
     iteration = "vector"
   ),
   
   tar_target(
-    p_lr_start_grid,
-    tibble(p = p_grid, lr_start = lr_start_grid),
-    pattern = cross(p_grid, lr_start_grid),
-    iteration = "vector"
+    poisson_tune,
+    {
+      model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
+      model$train(train, valid, epochs = 30, lr_start = lr_start_grid, factor = factor_grid, p = p_grid, patience = 2, n_1L = 128, n_2L = 64, n_3L = 32)
+      model
+    },
+    pattern = cross(lr_start_grid, factor_grid, p_grid)
   ),
+  
+  tar_target(
+    nb2_tune,
+    {
+      model <- NB2MLP$new(NB2CANN3L, DatasetNNCount)
+      model$train(train, valid, epochs = 30, lr_start = lr_start_grid, factor = factor_grid, p = p_grid, patience = 2, n_1L = 128, n_2L = 64, n_3L = 32)
+      model
+    },
+    pattern = cross(lr_start_grid, factor_grid, p_grid)
+  ),
+  
+  tar_target(
+    mvnb_tune,
+    {
+      model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
+      model$train(train_mvnb, valid_mvnb, epochs = 30, lr_start = lr_start_grid, factor = factor_grid, p = p_grid, patience = 2, n_1L = 128, n_2L = 64, n_3L = 32)
+      model
+    },
+    pattern = cross(lr_start_grid, factor_grid, p_grid)
+  ),
+  
+  
+  # -----------------------------------------------------------------------------------------------------------------------------
+  # Tuning des hyperparamètres du réseau de neurones ----------------------------------------------------------------------------
+  # -----------------------------------------------------------------------------------------------------------------------------
+  
+  # Grilles d'hyperparamètres ---------------------------------------------------------------------------------------------------
+  
+  # tar_target(n_1L_grid2, c(16, 32, 64, 128)),
+  # tar_target(n_2L_grid2, c(8, 16, 32, 64)),
+  # tar_target(n_3L_grid2, c(4, 8, 16, 32)),
+  # tar_target(lr_start_grid, c(0.001, 0.0005, 0.0001, 0.00005, 0.00001)),
+  # tar_target(factor_grid, c(0.5, 0.4, 0.3)),
+  # tar_target(p_grid, c(0.2, 0.3, 0.4)),
+  # tar_target(batch_grid, c(128, 256, 512, 1024)),
+  # 
+  # tar_target(
+  #   lr_start_factor_grid,
+  #   tibble(lr_start = lr_start_grid, factor = factor_grid),
+  #   pattern = cross(lr_start_grid, factor_grid),
+  #   iteration = "vector"
+  # ),
+  # 
+  # tar_target(
+  #   p_lr_start_grid,
+  #   tibble(p = p_grid, lr_start = lr_start_grid),
+  #   pattern = cross(p_grid, lr_start_grid),
+  #   iteration = "vector"
+  # ),
   
   # Tuning ----------------------------------------------------------------------------------------------------------------------
   
-  tar_target(
-    MVNBCANN3L_tune_p,
-    {
-      model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
-      model$train(train_mvnb, valid_mvnb, epochs = 30, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = p_grid, n_1L = 128, n_2L = 64, n_3L = 32)
-      model
-    },
-    pattern = map(p_grid)
-  ),
-  
-  tar_target(
-    MVNBCANN3L_tune_factor,
-    {
-      model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
-      model$train(train_mvnb, valid_mvnb, epochs = 30, lr_start = 0.00001, factor = factor_grid, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
-      model
-    },
-    pattern = map(factor_grid)
-  ),
+  # tar_target(
+  #   MVNBCANN3L_tune_p,
+  #   {
+  #     model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
+  #     model$train(train_mvnb, valid_mvnb, epochs = 30, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = p_grid, n_1L = 128, n_2L = 64, n_3L = 32)
+  #     model
+  #   },
+  #   pattern = map(p_grid)
+  # ),
+  # 
+  # tar_target(
+  #   MVNBCANN3L_tune_factor,
+  #   {
+  #     model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
+  #     model$train(train_mvnb, valid_mvnb, epochs = 30, lr_start = 0.00001, factor = factor_grid, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+  #     model
+  #   },
+  #   pattern = map(factor_grid)
+  # ),
   
   
   # tar_target(
@@ -323,28 +467,28 @@ list(
   # -----------------------------------------------------------------------------------------------------------------------------
   
   tar_target(
-    nn_poisson,
+    nn_poisson_valid,
     {
       model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
-      model$train(train, valid, epochs = 40, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+      model$train(train, valid, epochs = 100, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
       model
     }
   ),
 
   tar_target(
-    nn_nb2,
+    nn_nb2_valid,
     {
       model <- NB2MLP$new(NB2CANN3L, DatasetNNCount)
-      model$train(train, valid, epochs = 40, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+      model$train(train, valid, epochs = 100, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
       model
     }
   ),
 
   tar_target(
-    nn_mvnb,
+    nn_mvnb_valid,
     {
       model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
-      model$train(train_mvnb, valid_mvnb, epochs = 40, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+      model$train(train_mvnb, valid_mvnb, epochs = 100, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
       model
     }
   )
