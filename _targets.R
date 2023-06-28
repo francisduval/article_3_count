@@ -466,6 +466,8 @@ list(
   # Réseaux de neurones ---------------------------------------------------------------------------------------------------------
   # -----------------------------------------------------------------------------------------------------------------------------
   
+  # CANNs on training set -------------------------------------------------------------------------------------------------------
+  
   tar_target(
     nn_poisson_valid,
     {
@@ -489,6 +491,35 @@ list(
     {
       model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
       model$train(train_mvnb, valid_mvnb, epochs = 100, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
+      model
+    }
+  ),
+  
+  # CANNs on learning set -------------------------------------------------------------------------------------------------------
+  
+  tar_target(
+    nn_poisson_test,
+    {
+      model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
+      model$train(learn, test, epochs = 35, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
+      model
+    }
+  ),
+  
+  tar_target(
+    nn_nb2_test,
+    {
+      model <- NB2MLP$new(NB2CANN3L, DatasetNNCount)
+      model$train(learn, test, epochs = 35, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
+      model
+    }
+  ),
+  
+  tar_target(
+    nn_mvnb_test,
+    {
+      model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
+      model$train(learn_mvnb, test_mvnb, epochs = 35, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
       model
     }
   )
