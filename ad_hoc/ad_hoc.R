@@ -1,26 +1,46 @@
-train_mvnb <- tar_read(train_mvnb)[1:1000, ]
-valid_mvnb <- tar_read(valid_mvnb)[1:250, ]
+glm_nb2_class_learn <- tar_read(glm_nb2_class_learn)
 
-glm_mvnb_class_tele <- tar_read(glm_mvnb_class_tele)
-glm_mvnb_class <- tar_read(glm_mvnb_class)
-nn_mvnb <- tar_read(nn_mvnb)
+# ===============================================================================================================================
 
-nn_mvnb$valid_res$phi
-glm_mvnb_class_tele$valid_res$phi
-glm_mvnb_class$valid_res$phi
+glm_nb2_class_learn$train_res$phi
 
-model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
-model$train(train_mvnb, valid_mvnb, epochs = 20, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.3, n_1L = 128, n_2L = 64, n_3L = 32)
+glm_mvnb_class_tele_learn$betas %>% round(4)
+
+glm_nb2_class_tele_learn$params_df %>%
+  slice(1:8, 22:29) %>% 
+  arrange(term) %>% pull(estimate) %>% round(4) %>% as.numeric()
 
 
-train <- tar_read(train)
-valid <- tar_read(valid)
-test <- tar_read(test)
+# Créer des données simulées
+set.seed(123)
+mu <- 5
+theta <- 2 # mu = 5 et theta = 2, donc on s'entend que Var(Y) = 5 + 5^2/2 = 17.5
+data <- data.frame(y = rnbinom(100000, mu = mu, size = theta))
 
-total <- bind_rows(train, valid, test)
+# Ajuster le modèle
+model <- glm.nb(y ~ 1, data)
 
+# Obtenir les moyennes ajustées du modèle
+fitted_means <- predict(model, type = "response")
 
+# Calculer les variances prédites en utilisant l'équation
+predicted_variances <- fitted_means + fitted_means ^ 2 / theta
+predicted_variances
 
-nrow(tar_read(atd_train))
-nrow(tar_read(atd_valid))
-nrow(tar_read(atd_test))
+# ===============================================================================================================================
+
+glm_nb2_class_learn <- tar_read(glm_nb2_class_learn)
+glm_nb2_class_learn$print_metrics()
+glm_nb2_class_learn$train_res$phi
+glm_nb2_class_learn$params_df %>% 
+  # slice(1:8, 22:29) %>% 
+  arrange(term) %>% pull(estimate) %>% round(4) %>% as.numeric()
+
+glm_nb2_class_tele_learn <- tar_read(glm_nb2_class_tele_learn)
+glm_nb2_class_tele_learn$print_metrics()
+glm_nb2_class_tele_learn$train_res$phi
+
+# ===============================================================================================================================
+
+glm_nb2_class_tele_learn <- tar_read(glm_nb2_class_tele_learn)
+glm_nb2_class_tele_learn$print_metrics()

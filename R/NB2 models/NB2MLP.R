@@ -134,7 +134,7 @@ NB2MLP <-
               mean = mu,
               phi = best_phi,
               sd = sqrt(mu + (mu ^ 2) / phi),
-              prob = dnbinom(self$valid_targets, mu = mu, size = 1 / phi),
+              prob = dnbinom(self$valid_targets, mu = mu, size = phi),
               norm_carre_p = map2_dbl(mu, phi, ~ sum_p_2_nb2(.x, phi = .y)),
               
               pred_naif = rep(mean(self$train_targets), length(self$valid_targets)),
@@ -150,7 +150,7 @@ NB2MLP <-
               mean = mu,
               phi = best_phi,
               sd = sqrt(mu + (mu ^ 2) / phi),
-              prob = dnbinom(self$train_targets, mu = mu, size = 1 / phi),
+              prob = dnbinom(self$train_targets, mu = mu, size = phi),
               norm_carre_p = map2_dbl(mu, phi, ~ sum_p_2_nb2(.x, phi = .y))
             )
         },

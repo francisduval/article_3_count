@@ -16,9 +16,6 @@ library(hms)
 library(stringr)
 library(dtplyr)
 library(conflicted)
-library(gee)
-library(multilevelmod)
-library(geepack)
 library(embed)
 library(glue)
 library(R6)
@@ -32,12 +29,18 @@ library(MASS)
 library(xaringan)
 library(kableExtra)
 library(tictoc)
+library(Hmisc)
+library(innsight)
+library(iml)
+library(ggExtra)
+library(grid)
 
 # Conflits ======================================================================================================================
 conflicted::conflicts_prefer(
   dplyr::filter,
   dplyr::select,
-  hms::hms
+  hms::hms,
+  purrr::set_names
 )
 
 # Options et thème ==============================================================================================================
@@ -50,4 +53,6 @@ walk(dir_ls("R/Poisson models"), source)
 walk(dir_ls("R/NB2 models"), source)
 walk(dir_ls("R/MVNB models"), source)
 walk(dir_ls("R/Preprocessing"), source)
+walk(dir_ls("R/Permutation tests"), source)
+walk(dir_ls("R/Partial Dependence"), source)
 

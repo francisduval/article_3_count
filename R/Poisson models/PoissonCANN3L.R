@@ -2,7 +2,7 @@ PoissonCANN3L <-
   nn_module(
     "PoissonCANN3L",
     
-    initialize = function(input_size_mlp = 86, input_size_skip = 16, p = 0, n_1L, n_2L, n_3L) {
+    initialize = function(input_size_mlp = 85, input_size_skip = 15, p = 0, n_1L, n_2L, n_3L) {
       self$bn0 = nn_batch_norm1d(input_size_mlp)
       self$linear1 = nn_linear(input_size_mlp, n_1L)
       self$bn1 = nn_batch_norm1d(n_1L)
@@ -20,23 +20,22 @@ PoissonCANN3L <-
       self$linear_skip = nn_linear(input_size_skip, 1)
       
       beta_vec = c(
-        -2.821575625,
-        0.194967088,
-        0.019056239,
-        0.007703927,
-        0.042412745,
-        -0.146902033,
-        -0.064365497,
-        -0.033364018,
-        0.179616550,
-        -0.028814077,
-        0.024572095,
-        0.028071549,
-        0.091785046,
-        0.091836265,
-        0.016965687,
-        0.003538139,
-        -0.018009292
+        -2.821135621,
+        0.194998158,
+        0.019168680,
+        0.007777778,
+        0.043272529,
+        -0.146869448,
+        -0.090465829,
+        0.179838036,
+        -0.028817484,
+        0.025100512,
+        0.028956233,
+        0.092745549,
+        0.092665955,
+        0.016976728,
+        0.003361323,
+        -0.018224918
       )
       
       self$init_params(beta_vec, input_size_skip)

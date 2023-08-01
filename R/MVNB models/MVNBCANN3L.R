@@ -2,7 +2,7 @@ MVNBCANN3L <-
   nn_module(
     "MVNBCANN3L",
     
-    initialize = function(input_size_mlp = 86, input_size_skip = 16, p = 0, n_1L, n_2L, n_3L) {
+    initialize = function(input_size_mlp = 85, input_size_skip = 15, p = 0, n_1L, n_2L, n_3L) {
       self$bn0 = nn_batch_norm1d(input_size_mlp)
       self$linear1 = nn_linear(input_size_mlp, n_1L)
       self$bn1 = nn_batch_norm1d(n_1L)
@@ -22,23 +22,22 @@ MVNBCANN3L <-
       self$linear_skip = nn_linear(input_size_skip, 1)
       
       beta_vec = c(
-        -2.818871246,
-        0.196138742,
-        0.020410604,
-        0.007910109 ,
-        0.042566457,
-        -0.145403897,
-        -0.062495204,
-        -0.036259695,
-        0.177550268,
-        -0.029010633,
-        0.024562630,
-        0.028331168,
-        0.092156941,
-        0.091193267,
-        0.016570425,
-        0.003417417,
-        -0.017817111 
+        -2.818449879,
+        0.196261410,
+        0.020357634,
+        0.008058515,
+        0.043447884,
+        -0.145438109,
+        -0.091940396,
+        0.177812436,
+        -0.029063520,
+        0.025198414,
+        0.029204766,
+        0.093115072,
+        0.091970961,
+        0.016581202,
+        0.003276535,
+        -0.017965556
       )
       self$init_params(beta_vec, input_size_skip)
     },
@@ -94,16 +93,16 @@ MVNBCANN3L <-
       nnf_softplus(torch_add(self$skip(x), self$mlp(x)))
     },
     
-    phi = function(x) {
+    phi = function() {
       nnf_softplus(self$linear_phi(1))
     },
     
     alpha = function(x) {
-      self$phi(x) + x$x_sum_past_claims
+      self$phi() + x$x_sum_past_claims
     },
     
     gamma = function(x) {
-      self$phi(x) + x$x_sum_past_mu
+      self$phi() + x$x_sum_past_mu
     },
     
     forward = function(x) {

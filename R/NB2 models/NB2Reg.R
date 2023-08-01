@@ -31,7 +31,7 @@ NB2Reg <- R6Class(
       fit <- glm.nb(form, data = train_df_juiced)
       
       sum_p_2_pois <- function(mu) sum(map_dbl(0:30, ~ dpois(., lambda = mu) ^ 2))
-      sum_p_2_nb2 <- function(mu, phi) sum(map_dbl(0:30, ~ dnbinom(., mu = mu, size = 1 / phi) ^ 2))
+      sum_p_2_nb2 <- function(mu, phi) sum(map_dbl(0:30, ~ dnbinom(., mu = mu, size = phi) ^ 2))
       
       # ---
       
@@ -43,10 +43,10 @@ NB2Reg <- R6Class(
         select(vin, contract_start_date, nb_claims) %>% 
         mutate(
           mu = predict(fit, type = "response", newdata = valid_df_juiced),
-          phi = 1 / fit$theta,
+          phi = fit$theta,
           mean = mu,
           sd = sqrt(mu + (mu ^ 2) / phi),
-          prob = dnbinom(self$valid_targets, mu = mu, size = 1 / phi),
+          prob = dnbinom(self$valid_targets, mu = mu, size = phi),
           norm_carre_p = map2_dbl(mu, phi, ~ sum_p_2_nb2(.x, phi = .y)),
           
           pred_naif = rep(mean(self$train_targets), length(self$valid_targets)),
@@ -59,10 +59,10 @@ NB2Reg <- R6Class(
         select(vin, contract_start_date, nb_claims) %>% 
         mutate(
           mu = predict(fit, type = "response", newdata = train_df_juiced),
-          phi = 1 / fit$theta,
+          phi = fit$theta,
           mean = mu,
           sd = sqrt(mu + (mu ^ 2) / phi),
-          prob = dnbinom(self$train_targets, mu = mu, size = 1 / phi),
+          prob = dnbinom(self$train_targets, mu = mu, size = phi),
           norm_carre_p = map2_dbl(mu, phi, ~ sum_p_2_nb2(.x, phi = .y))
         )
       

@@ -1,20 +1,27 @@
-DatasetNNCount <- 
+DatasetNNMVNB_imp <- 
   dataset(
-    name = "DatasetNNCount",
+    name = "DatasetNNMVNB_imp",
     
     initialize = function(df) {
       data <- self$prepare_data(df)
       
       self$x_mlp <- data$x_mlp
       self$x_skip <- data$x_skip
+      self$sum_past_claims <- data$sum_past_claims
+      self$sum_past_mu <- data$sum_past_mu
       self$y <- data$y
+      
+      self$x_original <- self$get_x(df)
+      self$y_original <- self$get_y(df)
     },
     
     .getitem = function(i) {
       list(
         x = list(
           x_mlp = self$x_mlp[i, ],
-          x_skip = self$x_skip[i, ]
+          x_skip = self$x_skip[i, ],
+          x_sum_past_claims = self$sum_past_claims[i, ],
+          x_sum_past_mu = self$sum_past_mu[i, ]
         ),
         y = self$y[i, ]
       )
@@ -24,8 +31,20 @@ DatasetNNCount <-
       self$y$size()[[1]]
     },
     
+    get_x = function(df) {
+      df %>%
+        select(expo:distance, -years_claim_free, starts_with(c("h_", "p_", "vmo", "vma", "d_")))
+    },
+    
+    get_y = function(df) {
+      df %>%
+        select(nb_claims)
+    },
+    
     prepare_data = function(df) {
-      target_col <- as.matrix(df$nb_claims) 
+      target_col <- as.matrix(df$nb_claims)
+      sum_past_claims_col <- as.matrix(df$sum_past_claims)
+      sum_past_mu_col <- as.matrix(df$sum_past_mu)
       
       tele_cols <- 
         df %>%
@@ -46,6 +65,8 @@ DatasetNNCount <-
       list(
         x_mlp = torch_tensor(cbind(class_cols, tele_cols)),
         x_skip = torch_tensor(class_cols),
+        sum_past_claims = torch_tensor(sum_past_claims_col),
+        sum_past_mu = torch_tensor(sum_past_mu_col),
         y = torch_tensor(target_col)
       )
     }

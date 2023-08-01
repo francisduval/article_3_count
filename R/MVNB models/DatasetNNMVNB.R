@@ -38,11 +38,11 @@ DatasetNNMVNB <-
         select(starts_with(c("h_", "p_", "vmo", "vma", "d_"))) %>%
         as.matrix()
       
-      class_df <- select(df, expo:distance)
+      class_df <- select(df, expo:distance, -years_claim_free)
       
       rec_class <-
         recipe(~ ., data = class_df) %>%
-        step_impute_median(commute_distance, years_claim_free) %>%
+        step_impute_median(commute_distance) %>%
         step_other(all_nominal(), threshold = 0.05) %>%
         step_dummy(all_nominal()) %>%
         prep()

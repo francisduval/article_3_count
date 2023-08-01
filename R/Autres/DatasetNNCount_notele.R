@@ -1,6 +1,6 @@
-DatasetNNCount <- 
+DatasetNNCount_notele <- 
   dataset(
-    name = "DatasetNNCount",
+    name = "DatasetNNCount_notele",
     
     initialize = function(df) {
       data <- self$prepare_data(df)
@@ -25,13 +25,7 @@ DatasetNNCount <-
     },
     
     prepare_data = function(df) {
-      target_col <- as.matrix(df$nb_claims) 
-      
-      tele_cols <- 
-        df %>%
-        select(starts_with(c("h_", "p_", "vmo", "vma", "d_"))) %>%
-        as.matrix()
-      
+      target_col <- as.matrix(df$nb_claims)
       class_df <- select(df, expo:distance, -years_claim_free)
       
       rec_class <-
@@ -44,7 +38,7 @@ DatasetNNCount <-
       class_cols <- juice(rec_class) %>% as.matrix()
       
       list(
-        x_mlp = torch_tensor(cbind(class_cols, tele_cols)),
+        x_mlp = torch_tensor(class_cols),
         x_skip = torch_tensor(class_cols),
         y = torch_tensor(target_col)
       )
