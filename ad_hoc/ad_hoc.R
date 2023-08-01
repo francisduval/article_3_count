@@ -25,7 +25,7 @@ fitted_means <- predict(model, type = "response")
 
 # Calculer les variances prédites en utilisant l'équation
 predicted_variances <- fitted_means + fitted_means ^ 2 / theta
-predicted_variances
+predicted_variances # Donne 17.40096, ce qui est très proche de la vraie variance de 17.5.
 
 # ===============================================================================================================================
 
