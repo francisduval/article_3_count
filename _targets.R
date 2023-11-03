@@ -179,6 +179,29 @@ list(
       step_normalize(all_predictors())
   ),
   
+  # ----------
+  
+  tar_target(
+    rec_class_televec_learn,
+    recipe(nb_claims ~ ., data = learn) %>%
+      update_role(
+        -all_of(vars_class), 
+        -all_of(starts_with("h_")), 
+        -all_of(starts_with("p_")),
+        -all_of(starts_with("vmo_")),
+        -all_of(starts_with("vma_")),
+        -all_of(starts_with("d_")),
+        -nb_claims, 
+        new_role = "ID"
+      ) %>% 
+      update_role(c("h_24", "p_7", "vmo_13", "vma_16", "d_10"), new_role = "ID") %>% 
+      step_impute_median(commute_distance) %>%
+      step_other(all_nominal_predictors(), threshold = 0.05) %>%
+      step_dummy(all_nominal_predictors()) %>% 
+      step_normalize(all_predictors())
+  ),
+  
+  
   # GLMs on training set --------------------------------------------------------------------------------------------------------
 
   tar_target(
@@ -279,6 +302,32 @@ list(
     }
   ),
   
+  # ----------
+  
+  tar_target(
+    glm_poisson_class_televec_learn,
+    {
+      model <- PoissonGLM$new(rec_class_televec_learn)
+      model$train(test)
+    }
+  ),
+  
+  tar_target(
+    glm_nb2_class_televec_learn,
+    {
+      model <- NB2Reg$new(rec_class_televec_learn)
+      model$train(test)
+    }
+  ),
+  
+  tar_target(
+    glm_mvnb_class_televec_learn,
+    {
+      model <- MVNBReg$new(rec_class_televec_learn)
+      model$train(test)
+    }
+  ),
+  
   # -----------------------------------------------------------------------------------------------------------------------------
   # Tuning des hyperparamètres du réseau de neurones ----------------------------------------------------------------------------
   # -----------------------------------------------------------------------------------------------------------------------------
@@ -333,43 +382,43 @@ list(
   
   # CANNs on training set -------------------------------------------------------------------------------------------------------
   
-  # tar_target(
-  #   nn_poisson_valid,
-  #   {
-  #     model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
-  #     model$train(train, valid, epochs = 100, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
-  #     model
-  #   }
-  # ),
+tar_target(
+   nn_poisson_valid,
+   {
+     model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
+     model$train(train, valid, epochs = 100, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
+     model
+   }
+  ),
 
-  # tar_target(
-  #   nn_nb2_valid,
-  #   {
-  #     model <- NB2MLP$new(NB2CANN3L, DatasetNNCount)
-  #     model$train(train, valid, epochs = 100, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
-  #     model
-  #   }
-  # ),
+tar_target(
+   nn_nb2_valid,
+   {
+     model <- NB2MLP$new(NB2CANN3L, DatasetNNCount)
+     model$train(train, valid, epochs = 100, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
+     model
+   }
+  ),
 
-  # tar_target(
-  #   nn_mvnb_valid,
-  #   {
-  #     model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
-  #     model$train(train_mvnb, valid_mvnb, epochs = 100, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
-  #     model
-  #   }
-  # ),
+# tar_target(
+#    nn_mvnb_valid,
+#    {
+#      model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
+#      model$train(train_mvnb, valid_mvnb, epochs = 100, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
+#      model
+#    }
+#   ),
   
   # CANNs on learning set -------------------------------------------------------------------------------------------------------
   
-  # tar_target(
-  #   nn_poisson_test,
-  #   {
-  #     model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
-  #     model$train(learn, test, epochs = 35, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
-  #     model
-  #   }
-  # ),
+  tar_target(
+    nn_poisson_test,
+    {
+      model <- PoissonMLP$new(PoissonCANN3L, DatasetNNCount)
+      model$train(learn, test, epochs = 35, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
+      model
+    }
+  ),
 
   tar_target(
     nn_nb2_test,
@@ -380,15 +429,46 @@ list(
     }
   ),
 
-  # tar_target(
-  #   nn_mvnb_test,
-  #   {
-  #     model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
-  #     model$train(learn_mvnb, test_mvnb, epochs = 35, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
-  #     model
-  #   }
-  # ),
+  tar_target(
+    nn_mvnb_test,
+    {
+      model <- MVNBMLP$new(MVNBCANN3L, DatasetNNMVNB)
+      model$train(learn_mvnb, test_mvnb, epochs = 35, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
+      model
+    }
+  ),
   
+
+  # CANNs boost on learning set -------------------------------------------------------------------------------------------------
+
+  tar_target(
+    nn_boost_poisson_test,
+    {
+      model <- PoissonMLP$new(PoissonCANN3L_boost, DatasetNNCount)
+      model$train(learn, test, epochs = 35, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
+      model
+    }
+  ),
+
+  tar_target(
+    nn_boost_nb2_test,
+    {
+      model <- NB2MLP$new(NB2CANN3L_boost, DatasetNNCount)
+      model$train(learn, test, epochs = 35, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
+      model
+    }
+  ),
+  
+  tar_target(
+    nn_boost_mvnb_test,
+    {
+      model <- MVNBMLP$new(MVNBCANN3L_boost, DatasetNNMVNB)
+      model$train(learn_mvnb, test_mvnb, epochs = 35, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
+      model
+    }
+  ),
+
+
   # CANNs on learning set (no telematics) ---------------------------------------------------------------------------------------
   
   # tar_target(
@@ -407,7 +487,7 @@ list(
       model$train(learn, test, input_size_mlp = 15, epochs = 35, lr_start = 0.00001, factor = 0.3, patience = 2, batch = 256, p = 0.4, n_1L = 128, n_2L = 64, n_3L = 32)
       model
     }
-  )#,
+  ),
 
   # tar_target(
   #   nn_mvnb_test_notele,
@@ -447,6 +527,41 @@ list(
   #     return(imp$imp_df)
   #   }
   # )
+
+  
+  # -----------------------------------------------------------------------------------------------------------------------------
+  # Balance property ------------------------------------------------------------------------------------------------------------
+  # -----------------------------------------------------------------------------------------------------------------------------
+  
+  tar_target(
+    balance_learn,
+    {
+      somme_target <- sum(learn$nb_claims)
+      
+      tribble(
+        ~model, ~sum_target, ~sum_pred,
+        "CANN Poisson tele", somme_target, sum(nn_poisson_test$train_res$mean),
+        "CANN NB2 tele", somme_target, sum(nn_nb2_test$train_res$mean),
+        "CANN MVNB tele", somme_target, sum(nn_mvnb_test$train_res$mean)
+      ) %>% 
+        mutate(balance = sum_pred / sum_target)
+    }
+  ),
+  
+  tar_target(
+    balance_test,
+    {
+      somme_target <- sum(test$nb_claims)
+      
+      tribble(
+        ~model, ~sum_target, ~sum_pred,
+        "CANN Poisson tele", somme_target, sum(nn_poisson_test$valid_res$mean),
+        "CANN NB2 tele", somme_target, sum(nn_nb2_test$valid_res$mean),
+        "CANN MVNB tele", somme_target, sum(nn_mvnb_test$valid_res$mean)
+      ) %>% 
+        mutate(balance = sum_pred / sum_target)
+    }
+  )
   
   # -----------------------------------------------------------------------------------------------------------------------------
   # Rapports RMarkdown ----------------------------------------------------------------------------------------------------------
